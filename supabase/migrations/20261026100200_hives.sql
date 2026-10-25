@@ -60,13 +60,13 @@ $$;
 
 revoke execute on function private.check_hive_dates() from public;
 
-create trigger hives_set_timestamps before insert or update on public.hives
+create trigger hives_10_set_timestamps before insert or update on public.hives
   for each row execute function private.set_timestamps();
-create trigger hives_force_author before insert or update on public.hives
+create trigger hives_20_force_author before insert or update on public.hives
   for each row execute function private.force_author();
-create trigger hives_check_apiary before insert or update on public.hives
+create trigger hives_30_check_apiary before insert or update on public.hives
   for each row execute function private.check_parent('apiaries', 'apiary_id');
-create trigger hives_check_dates before insert or update of colony_started_on on public.hives
+create trigger hives_40_check_dates before insert or update of colony_started_on on public.hives
   for each row execute function private.check_hive_dates();
 
 -- An apiary is soft-deleted only once it holds no hive (whatever its status): children of a deleted
@@ -89,7 +89,7 @@ $$;
 
 revoke execute on function private.check_apiary_empty() from public;
 
-create trigger apiaries_check_empty before update of deleted_at on public.apiaries
+create trigger apiaries_30_check_empty before update of deleted_at on public.apiaries
   for each row execute function private.check_apiary_empty();
 
 alter table public.hives enable row level security;

@@ -30,9 +30,9 @@ create unique index apiaries_org_name_key on public.apiaries (organization_id, l
   where deleted_at is null;
 create index apiaries_sync_idx on public.apiaries (organization_id, updated_at);
 
-create trigger apiaries_set_timestamps before insert or update on public.apiaries
+create trigger apiaries_10_set_timestamps before insert or update on public.apiaries
   for each row execute function private.set_timestamps();
-create trigger apiaries_force_author before insert or update on public.apiaries
+create trigger apiaries_20_force_author before insert or update on public.apiaries
   for each row execute function private.force_author();
 
 alter table public.apiaries enable row level security;

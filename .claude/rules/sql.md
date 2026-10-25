@@ -17,5 +17,6 @@ paths:
 - **Idempotent creates** use `insert … on conflict (id) do nothing` and look at `found`, never `if exists … then insert`.
 - **Soft-deleted parents** are checked in every RPC that acts on their children.
 - `execute` is granted to `authenticated` only for helpers that policies or `security invoker` functions call; helpers used only inside `security definer` RPCs get no grant.
+- Postgres fires `before` triggers in name order: domain tables name them `<table>_<NN>_<purpose>` (`10_set_timestamps`, `20_force_author`, `30_check_<parent>`, `40+` table-specific checks), so authorship and immutability errors win over parent checks.
 - Errors raised for clients: `raise exception '<Spanish message>' using errcode = 'P0001', detail = '<machine_code>';`
 - Tests: `supabase/tests/<area>.test.sql`, each starts with `begin; \ir _helpers.psql` and ends with `select * from finish(); rollback;`. Impersonate with `tests.authenticate_as(id)`; read ids with `\gset` before switching roles.
