@@ -23,4 +23,12 @@ pnpm ci:check     # todo lo anterior
 pnpm db:stop
 ```
 
-Los códigos de ingreso en local no se envían: se leen en Mailpit (http://127.0.0.1:54324).
+Usuarios de prueba (seed): `owner@landak.test`, `reviewer@landak.test`, `other@landak.test` y `admin@landak.test`, todos con la contraseña `landak-2026`.
+
+No se envían correos (no hay dominio todavía). Si alguien olvida su contraseña:
+
+```bash
+SUPABASE_URL=… SUPABASE_SECRET_KEY=… scripts/reset-password.sh correo@ejemplo.com
+```
+
+Si cambias `supabase/config.toml`, reinicia con `pnpm db:stop && pnpm db:start` (`db:reset` no recarga la configuración de Auth).
