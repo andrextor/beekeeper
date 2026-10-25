@@ -17,7 +17,8 @@ create table public.hive_events (
       and pg_column_size(details) <= 8192
       and (
         type <> 'note'
-        or (jsonb_typeof(details -> 'text') = 'string' and char_length(details ->> 'text') between 1 and 2000)
+        -- coalesce: a missing key gives null, and a null check passes.
+        or coalesce(jsonb_typeof(details -> 'text') = 'string' and char_length(details ->> 'text') between 1 and 2000, false)
       )
     ),
   created_by uuid not null references public.profiles,

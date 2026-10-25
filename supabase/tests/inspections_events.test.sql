@@ -140,7 +140,7 @@ select is((select count(*) from public.hive_events), 0::bigint, 'nor their event
 select tests.authenticate_as(:'admin_id');
 select is((select count(*) from public.inspections), 2::bigint, 'the platform admin reads every inspection');
 select throws_ok(
-  format('insert into public.inspections (id, organization_id, hive_id, inspected_at, source) values (%L, %L, %L, now(), %L)', gen_random_uuid(), :'org_a', :'hive_a', 'manual'),
+  format('insert into public.inspections (id, organization_id, hive_id, inspected_at, source, inspected_by) values (%L, %L, %L, now(), %L, %L)', gen_random_uuid(), :'org_a', :'hive_a', 'manual', :'owner_a'),
   '42501', null, 'the platform admin cannot write'
 );
 
