@@ -78,7 +78,7 @@ Every enum is a named `check` (not a Postgres `enum` type), so adding a value is
 
 | Table | select | insert | update |
 |-------|--------|--------|--------|
-| `apiaries`, `hives` | `private.can_read(organization_id)` | `private.has_role(organization_id, 'owner')` | `private.has_role(organization_id, 'owner')` (with check the same) |
+| `apiaries`, `hives` | `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())` | `private.has_role(organization_id, 'owner')` | `private.has_role(organization_id, 'owner')` (with check the same) |
 
 No `delete` grant: deletion is `deleted_at`. Soft-deleting an apiary that still has any hive with `deleted_at is null` (whatever its `status`, dead hives included) is refused (`apiary_not_empty`, "El apiario todavía tiene colmenas."); the owner moves or deletes the hives first. Same rule as `check_parent_org`, which refuses children of a deleted parent.
 

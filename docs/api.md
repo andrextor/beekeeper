@@ -85,7 +85,7 @@ After signing in: `rpc('my_memberships')`. No memberships → onboarding offers 
 | `profiles` | `id`, `email`, `display_name`, `is_platform_admin`, `created_at`, `updated_at` | Yourself, people who share an organization with you, platform admin |
 | `organizations` | `id`, `name`, `created_by`, `created_at`, `updated_at`, `deleted_at` | Members, platform admin |
 | `organization_members` | `organization_id`, `user_id`, `role` (`owner` \| `reviewer`), `created_at`, `updated_at` | Members, platform admin |
-| `organization_invites` | `id`, `organization_id`, `label`, `role`, `invited_by`, `created_at`, `expires_at`, `accepted_at`, `accepted_by`, `revoked_at` (never the code) | Owners, platform admin |
+| `organization_invites` | `id`, `organization_id`, `label`, `role`, `invited_by`, `created_at`, `expires_at`, `accepted_at`, `accepted_by`, `revoked_at` — **list these columns explicitly**: `select=*` is refused because `code_hash` is not readable | Owners, platform admin |
 
 Direct writes allowed: `profiles.display_name` (own row), `organizations.name` and `organizations.deleted_at` (owners). Everything else goes through the RPCs.
 
@@ -97,11 +97,11 @@ Memberships are **hard-deleted** and are not part of the cursor pull: on every s
 
 | RPC | Params | Returns | Who | Errors (`details`) |
 |-----|--------|---------|-----|--------------------|
-| `create_organization` | `p_id` (client uuid), `p_name` | `uuid` | anyone signed in. Idempotent for its owner | `invalid_name`, `id_taken` |
-| `create_invite` | `p_organization_id`, `p_role`, `p_label?` | `[{ invite_id, code, expires_at }]` — `code` like `K7M2-9QXA`, shown **only here** | owner | `not_owner`, `invalid_role`, `invalid_label` |
+| `create_organization` | `p_id` (client uuid), `p_name` | `uuid` | anyone signed in. Idempotent for its owner, also for parallel retries | `invalid_id`, `invalid_name`, `id_taken` |
+| `create_invite` | `p_organization_id`, `p_role`, `p_label?` | `[{ invite_id, code, expires_at }]` — `code` like `K7M2-9QXA`, shown **only here** | owner | `not_owner`, `organization_deleted`, `invalid_role`, `invalid_label` |
 | `accept_invite` | `p_code` (any case, spaces/dashes ok) | organization `uuid` | anyone signed in. Single use, 7 days; keeps `owner` if already owner | `invalid_code` |
-| `revoke_invite` | `p_invite_id` | — | owner | `not_owner`, `invite_not_pending` |
-| `set_member_role` | `p_organization_id`, `p_user_id`, `p_role` | — | owner | `not_owner`, `invalid_role`, `not_member`, `last_owner` |
+| `revoke_invite` | `p_invite_id` | — | owner | `not_owner`, `organization_deleted`, `invite_not_pending` |
+| `set_member_role` | `p_organization_id`, `p_user_id`, `p_role` | — | owner | `not_owner`, `organization_deleted`, `invalid_role`, `not_member`, `last_owner` |
 | `remove_member` | `p_organization_id`, `p_user_id` | — | owner, or yourself (leave) | `not_allowed`, `not_member`, `last_owner` |
 | `my_memberships` | — | `[{ organization_id, organization_name, role }]`, ordered by name | anyone signed in | — |
 

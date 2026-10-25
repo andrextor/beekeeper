@@ -89,8 +89,10 @@ All `language sql stable security definer set search_path = ''`, `execute` grant
 | `private.is_member(org uuid)` | caller has any role in `org` |
 | `private.has_role(org uuid, role text)` | caller has exactly `role` in `org` |
 | `private.is_platform_admin()` | caller's profile has the flag |
-| `private.can_read(org uuid)` | `is_member(org) or is_platform_admin()` |
-| `private.shares_org(user_id uuid)` | caller and `user_id` share an organization |
+| `private.my_organization_ids()` (setof uuid) | the organizations the caller belongs to |
+| `private.co_member_ids()` (setof uuid) | users who share an organization with the caller |
+
+Amended 2026-10-26 (code review F7): `can_read(org)` and `shares_org(user)` were replaced by the set-returning helpers, used as `organization_id in (select private.my_organization_ids())` so Postgres evaluates them once per query instead of once per row; argument-free helpers and `auth.uid()` are always wrapped in `(select …)`. RPC-only helpers (`require_user`, `require_owner`, `lock_organization`, `owner_count`, `require_role_value`) have no `execute` grant (F8).
 
 `security definer` is needed so the helpers can read `organization_members` without recursing into its own policy.
 
@@ -98,9 +100,9 @@ All `language sql stable security definer set search_path = ''`, `execute` grant
 
 | Table | select | insert | update | delete |
 |-------|--------|--------|--------|--------|
-| `profiles` | own row, `shares_org(id)`, or platform admin | — (trigger) | own row, column `display_name` only (column grant) | — |
-| `organizations` | `can_read(id)` | — (RPC) | `has_role(id, 'owner')`, columns `name`, `deleted_at` | — |
-| `organization_members` | `can_read(organization_id)` | — (RPC) | — (RPC) | — (RPC) |
+| `profiles` | own row, `id in (select private.co_member_ids())`, or platform admin | — (trigger) | own row, column `display_name` only (column grant) | — |
+| `organizations` | `id in (select private.my_organization_ids())` or platform admin | — (RPC) | `has_role(id, 'owner')`, columns `name`, `deleted_at` | — |
+| `organization_members` | `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())` | — (RPC) | — (RPC) | — (RPC) |
 | `organization_invites` | `has_role(organization_id, 'owner')` or platform admin | — (RPC) | — (RPC) | — |
 
 `is_platform_admin` cannot be changed through the API: `update` on `profiles` is granted only on `display_name`.
