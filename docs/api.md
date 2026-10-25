@@ -33,8 +33,8 @@ Unique constraint → detail code (filled in by each module):
 |------------|-------------|---------|
 | `organization_invites_code_key` | `code_collision` | "No pudimos crear el código. Inténtalo de nuevo." (≈ 1 in 10^12; just retry) |
 | `apiaries_org_name_key` | `duplicate_name` | "Ya tienes un apiario con ese nombre." |
-| `hives_org_name_key` | `duplicate_name` | "Ya tienes una colmena con ese nombre." |
-| `hives_qr_code_key` | `qr_taken` | "Ese código QR ya está en uso. Genera otro." (the app regenerates silently on create) |
+| `hives_apiary_name_key` | `duplicate_name` | "Ya hay una colmena con ese nombre en este apiario." |
+| `hives_qr_code_key` | `qr_taken` | "Ese código QR ya está en uso en otra colmena." (the app regenerates silently on create; on re-labelling it shows the message) |
 
 A check violation (`23514`, constraint name in `message`) means the client sent a value outside the documented ranges; clients validate the same rules first, so it is shown as "Revisa los datos: hay un valor fuera de rango." and logged.
 
@@ -47,7 +47,7 @@ A check violation (`23514`, constraint name in `message`) means the client sent 
 
 | `details` | Message | When |
 |-----------|---------|------|
-| `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one |
+| `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one, including restoring (`deleted_at = null`) a child whose parent is deleted |
 | `immutable_column` | "Un registro no puede cambiar de organización." | An update changes `organization_id` |
 | `missing_author` | "Falta el autor del registro." | Server-side insert without `created_by` (never from clients) |
 | `apiary_not_empty` | "El apiario todavía tiene colmenas. Muévelas o elimínalas primero." | Soft-deleting an apiary with any non-deleted hive (dead ones included) |
@@ -160,8 +160,8 @@ Share text for an invite (app): "Te invité a mi apiario en Landak Apiario. Inst
 | `id` | uuid | client-generated |
 | `organization_id` | uuid | immutable |
 | `apiary_id` | uuid | apiary of the same organization, not deleted; changing it moves the hive |
-| `name` | text | 1..40 ("C-12"), unique per organization among non-deleted (case-insensitive) |
-| `qr_code` | text | exactly 10 Crockford base32 characters `[0-9A-HJKMNP-TV-Z]` (no I, L, O, U), client-generated, **globally unique** |
+| `name` | text | 1..40 ("C-12"), unique **per apiary** among non-deleted (case-insensitive): C-01 can exist in every apiary |
+| `qr_code` | text | exactly 10 Crockford base32 characters `[0-9A-HJKMNP-TV-Z]` (no I, L, O, U), client-generated, **unique across all organizations among non-deleted hives**: deleting a hive frees its code so the printed label can go on a new colony |
 | `hive_type` | text | enum below |
 | `brood_boxes` | smallint | 0..5 |
 | `supers` | smallint | 0..10 (alzas) |
@@ -177,7 +177,7 @@ Share text for an invite (app): "Te invité a mi apiario en Landak Apiario. Inst
 
 ### QR
 
-The printed label encodes `landak://h/<qr_code>` and nothing else. Lookup: local SQLite first; online `from('hives').select(…).eq('qr_code', code)`. An empty result means "not in your organizations" (another organization's hive and an unknown code look the same). Re-labelling is an owner update of `qr_code` plus a `qr_relabel` event (B4).
+The printed label encodes `landak://h/<qr_code>` and nothing else. Lookup: local SQLite first; online `from('hives').select(…).eq('qr_code', code)`. An empty result means "not in your organizations": a read never tells another organization's hive from an unknown code. (Creating a hive with a code another organization uses fails with `qr_taken`, which reveals only that the code exists somewhere — it is already printed on that physical label, and no data is exposed.) Re-labelling is an owner update of `qr_code` plus a `qr_relabel` event (B4).
 
 ### Spanish labels (the app and the admin use exactly these)
 
