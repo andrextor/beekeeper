@@ -60,12 +60,14 @@ Walk what the branch added against the mobile sync and the free-tier limits:
 ```bash
 pnpm lint          # Biome
 supabase start     # local stack (Docker)
-supabase db reset  # apply every migration + seed from scratch
+supabase db reset  # apply every migration + seed from scratch (~75 s, restarts the stack)
+pnpm db:migrate    # apply only new migrations (~3 s)
 supabase test db   # pgTAP
-pnpm ci:check      # all of the above
+pnpm check:quick   # lint + pgTAP without a reset (~9 s), the inner loop
+pnpm ci:check      # lint + reset + pgTAP (~90 s), what CI runs
 ```
 
-The session runs `pnpm ci:check` once when every task of a plan is committed (not after each task) and reports the output as is; Iván re-runs it before merging.
+While working, use `pnpm db:migrate` + `pnpm check:quick`. The session runs `pnpm ci:check` once when every task of a plan is committed (not after each task) and reports the output as is; Iván re-runs it before merging.
 
 ## Changelog
 

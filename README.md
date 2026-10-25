@@ -16,10 +16,12 @@ Backend (Supabase) y panel de administración de **Landak Apiario**, una app gra
 ```bash
 pnpm install
 pnpm db:start     # Supabase local: API :54321, Studio :54323, Mailpit :54324
-pnpm db:reset     # aplica todas las migraciones + seed desde cero
+pnpm db:reset     # aplica todas las migraciones + seed desde cero (~75 s, reinicia los contenedores)
+pnpm db:migrate   # aplica solo las migraciones nuevas (~3 s)
 pnpm test:db      # tests pgTAP (RLS y RPCs)
 pnpm lint         # Biome
-pnpm ci:check     # todo lo anterior
+pnpm check:quick  # lint + tests, sin reset (~9 s): para el día a día
+pnpm ci:check     # lint + reset + tests (~90 s): antes de entregar una rama, igual que el CI
 pnpm db:stop
 ```
 

@@ -18,6 +18,10 @@ All notable changes to this project are documented here. The format follows [Kee
 - Creating an organization twice in parallel (offline retries) returns the same id instead of an error.
 - `scripts/reset-password.sh` shows the API error instead of exiting silently.
 
+### Added
+
+- `pnpm db:migrate` (only new migrations, ~3 s) and `pnpm check:quick` (lint + tests without a reset, ~9 s) for the daily loop; `pnpm ci:check` stays the full from-scratch check.
+
 ### Changed
 
 - Clients must list the columns they read from `organization_invites` (`select=*` is refused).
