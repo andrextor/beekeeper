@@ -49,10 +49,10 @@ A check violation (`23514`, constraint name in `message`) means the client sent 
 |-----------|---------|------|
 | `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one, including restoring (`deleted_at = null`) a child whose parent is deleted |
 | `immutable_column` | "Un registro no puede cambiar de organización." | An update changes `organization_id` |
+| `immutable_column` | "Una revisión no puede cambiar de colmena." | An update changes `inspections.hive_id` (delete it and record it again on the right hive) |
 | `missing_author` | "Falta el autor del registro." | Server-side insert without `created_by` (never from clients) |
 | `apiary_not_empty` | "El apiario todavía tiene colmenas. Muévelas o elimínalas primero." | Soft-deleting an apiary with any non-deleted hive (dead ones included) |
-| `future_date` | "La fecha de inicio de la colonia no puede ser futura." | `hives.colony_started_on` after tomorrow |
-| `future_date` | "La fecha no puede ser futura." | `inspections.inspected_at` or `hive_events.occurred_at` more than one day ahead |
+| `future_date` | "La fecha no puede ser futura." | `hives.colony_started_on`, `inspections.inspected_at` or `hive_events.occurred_at` more than one day ahead |
 | `not_member` | "La persona que revisó no pertenece a esta organización." | `inspections.inspected_by` set to (or changed to) someone outside the organization |
 
 An unmapped `23505` is shown as "Ya existe un registro igual.".
@@ -223,11 +223,11 @@ Table `inspections`. Common columns (`id`, `organization_id`, `created_by`, `cre
 
 Out-of-range values fail with `23514` on `inspections_<column>_check` (`inspections_varroa_check` for the varroa trio).
 
-**Who writes:** owners and reviewers insert; owners edit or soft-delete any inspection, reviewers only those they created (others' rows come back as `[]` on PATCH, `42501` on upsert). The platform admin reads only. Edits by a member who has since left stay editable by the owner.
+**Who writes:** owners and reviewers insert; owners edit or soft-delete any inspection, reviewers only those they created (others' rows come back as `[]` on PATCH, `42501` on upsert). The platform admin reads only. Inspections by a member who has since left stay editable by the owner. `hive_id` cannot change. Soft-deleting an inspection soft-deletes its linked events in the same write (they come back in the next pull with a new `updated_at`); restoring the inspection does not restore them.
 
 ### Open tasks
 
-View `hive_open_tasks` (RLS applies): one row per non-deleted hive that has an inspection, with `hive_id`, `organization_id`, `planned_actions`, `inspected_at` of its **latest** non-deleted inspection. "Colmenas por alimentar": `select=hive_id&planned_actions=cs.{feed}`. Older inspections' actions are history, not open tasks.
+View `hive_open_tasks` (RLS applies): one row per non-deleted hive that has an inspection, with `hive_id`, `organization_id`, `planned_actions`, `inspected_at` of its **latest** non-deleted inspection (ties: highest `id`). "Colmenas por alimentar": `select=hive_id&planned_actions=cs.{feed}`. Older inspections' actions are history, not open tasks.
 
 ### Spanish labels
 
@@ -269,7 +269,7 @@ Events never change the hive by themselves (a `loss` does not set `hives.status`
 
 ## Hive timeline
 
-`rpc('hive_timeline', { p_hive_id, p_before?, p_before_id?, p_limit? })` → rows `{ kind: 'inspection' | 'event', id, at, created_by, author_name, data }`, non-deleted only, newest first (`at desc, id desc`). `data` is the full row as JSON, same columns as the tables. `p_limit` defaults to 30, clamped to 1..100. Next page: pass the last item's `at` and `id` as `p_before` / `p_before_id` (an event recorded during an inspection often shares its timestamp). Runs under RLS: a hive you cannot read returns no rows. `author_name` is `null` when the author's profile is not visible (a member who left).
+`rpc('hive_timeline', { p_hive_id, p_before?, p_before_id?, p_limit? })` → rows `{ kind: 'inspection' | 'event', id, at, created_by, author_name, data }`, non-deleted only, newest first (`at desc, id desc`). `data` is the full row as JSON, same columns as the tables. `p_limit` defaults to 30, clamped to 1..100. Next page: pass the last item's `at` and `id` as `p_before` / `p_before_id` (an event recorded during an inspection often shares its timestamp). `p_before` alone means strictly before that instant. Runs under RLS: a hive you cannot read returns no rows. `author_name` is `null` when the author's profile is not visible (a member who left).
 
 ## Photos
 

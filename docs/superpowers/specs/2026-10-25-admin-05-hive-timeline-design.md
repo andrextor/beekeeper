@@ -11,7 +11,7 @@ The records themselves: every inspection, event, note and photo of a hive, in or
 ### `/apicultores/:orgId/colmenas/:hiveId`
 
 - Header: hive name, apiary, status badge, QR code text (monospace), type, boxes/supers, queen (year, color dot, marked, origin), origin, age, notes.
-- **Timeline** from `hive_timeline(hiveId, before, 30)` (B4), "Cargar más" with the last item's date as `before` (cursor, not offset).
+- **Timeline** from `hive_timeline(hiveId, before, beforeId, 30)` (B4), "Cargar más" with the last item's `at` and `id` as `p_before` / `p_before_id` (cursor, not offset).
 - Item rendering by kind:
   - Inspection (`clipboard-check`): date, author, source badge (`mic` "Por voz" / `keyboard` "Manual"), one summary line ("Fuerza 4 · Reina vista · 3 cuadros de cría · Reservas bajas"), attention badge. Expand → every recorded field with its Spanish label (`lib/labels.ts`), `not_checked` shown as "No revisado", null fields hidden; the original transcript in a quote block; its notes and photos.
   - Event: icon per type (DESIGN.md), one line from `details` ("Alimentación · Jarabe 1:1 · 2 l"), author.

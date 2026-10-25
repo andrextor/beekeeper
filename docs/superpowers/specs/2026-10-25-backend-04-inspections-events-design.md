@@ -49,7 +49,7 @@ Common columns (B3) plus:
 
 Indexes: `(organization_id, updated_at)`, `(hive_id, inspected_at desc)` for the timeline and for the latest inspection. No GIN on `planned_actions`: the filter runs on one row per hive (`hive_open_tasks`), not on the whole history.
 
-View `hive_open_tasks` (`security_invoker = true`): one row per non-deleted hive with `hive_id`, `organization_id`, `planned_actions`, `inspected_at` of its latest non-deleted inspection (ties broken by `created_at`), used by the admin and, later, by an app filter.
+View `hive_open_tasks` (`security_invoker = true`): one row per non-deleted hive with `hive_id`, `organization_id`, `planned_actions`, `inspected_at` of its latest non-deleted inspection (ties broken by `id`), used by the admin and, later, by an app filter.
 
 ### `hive_events`
 
@@ -89,6 +89,7 @@ Indexes: `(organization_id, updated_at)`, `(hive_id, occurred_at desc)`.
 
 - Triggers follow `<table>_<NN>_<purpose>`: `10_set_timestamps`, `20_force_author`, `30_check_hive` (`check_parent`), `40+` table-specific.
 - `private.check_not_future(column)` is shared by `inspections.inspected_at` and `hive_events.occurred_at` (message "La fecha no puede ser futura.", `future_date`).
+- Review fixes (`audits/2026-10-26-b4-code-review.md`): `inspections.hive_id` is immutable; soft-deleting an inspection soft-deletes its linked events; `check_parent` takes an optional match column (`check_parent('inspections', 'inspection_id', 'hive_id')`); hives use `check_not_future('colony_started_on')` too.
 - `inspected_by` is checked only on insert or when it changes, so the owner can still edit an inspection by a member who has since been removed (`not_member`, "La persona que revisó no pertenece a esta organización.").
 
 ## Tests
