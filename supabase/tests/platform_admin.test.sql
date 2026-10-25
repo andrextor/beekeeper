@@ -11,7 +11,7 @@ select tests.make_platform_admin(:'admin_id');
 
 select tests.authenticate_as(:'owner_a');
 select public.create_organization(:'org_a', 'Finca A');
-select public.invite_member(:'org_a', 'nuevo@landak.test', 'reviewer');
+select * from public.create_invite(:'org_a', 'reviewer');
 select tests.authenticate_as(:'owner_b');
 select public.create_organization(:'org_b', 'Finca B');
 
@@ -24,7 +24,7 @@ select is((select count(*) from public.profiles), 3::bigint, 'and every profile'
 update public.organizations set name = 'Cambiada' where id = :'org_a';
 select is((select name from public.organizations where id = :'org_a'), 'Finca A', 'the admin cannot rename an organization');
 select throws_ok(
-  format('select public.invite_member(%L, %L, %L)', :'org_a', 'x@landak.test', 'reviewer'),
+  format('select * from public.create_invite(%L, %L)', :'org_a', 'reviewer'),
   'P0001', 'Solo el propietario de la organización puede hacer esto.', 'the admin cannot invite'
 );
 select is((select count(*) from public.my_memberships()), 0::bigint, 'the admin is a member of nothing');

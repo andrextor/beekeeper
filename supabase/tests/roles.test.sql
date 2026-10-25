@@ -9,15 +9,15 @@ select gen_random_uuid() as org \gset
 
 select tests.authenticate_as(:'owner_id');
 select public.create_organization(:'org', 'Finca Landak');
-select public.invite_member(:'org', 'reviewer@landak.test', 'reviewer');
-select public.invite_member(:'org', 'owner2@landak.test', 'owner');
+select code as reviewer_code from public.create_invite(:'org', 'reviewer') \gset
+select code as owner2_code from public.create_invite(:'org', 'owner') \gset
 
 select tests.authenticate_as(:'reviewer_id');
-select is((select count(*) from public.accept_my_invites()), 1::bigint, 'the reviewer accepts the invite');
+select is(public.accept_invite(:'reviewer_code'), :'org'::uuid, 'the reviewer joins with the code');
 select is((select role from public.organization_members where organization_id = :'org' and user_id = :'reviewer_id'), 'reviewer', 'and is a reviewer');
 
 select throws_ok(
-  format('select public.invite_member(%L, %L, %L)', :'org', 'otro@landak.test', 'reviewer'),
+  format('select * from public.create_invite(%L, %L)', :'org', 'reviewer'),
   'P0001', 'Solo el propietario de la organización puede hacer esto.', 'a reviewer cannot invite'
 );
 select throws_ok(
@@ -46,7 +46,7 @@ select throws_ok(
 );
 
 select tests.authenticate_as(:'owner2_id');
-select public.accept_my_invites();
+select public.accept_invite(:'owner2_code');
 select tests.authenticate_as(:'owner_id');
 select lives_ok(
   format('select public.set_member_role(%L, %L, %L)', :'org', :'owner_id', 'reviewer'),

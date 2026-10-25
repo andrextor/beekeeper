@@ -1,5 +1,10 @@
 -- Included by every test file with \ir; lives only inside the test transaction.
+set client_min_messages = warning;
 create schema if not exists tests;
+
+-- Every test starts from an empty tenancy, independent of supabase/seed.sql; the final rollback restores it.
+truncate public.organizations cascade;
+delete from auth.users;
 
 create or replace function tests.create_user(p_email text, p_confirmed boolean default true)
 returns uuid

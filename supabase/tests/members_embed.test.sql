@@ -9,9 +9,9 @@ select gen_random_uuid() as org \gset
 
 select tests.authenticate_as(:'owner_id');
 select public.create_organization(:'org', 'Finca Landak');
-select public.invite_member(:'org', 'reviewer@landak.test', 'reviewer');
+select code from public.create_invite(:'org', 'reviewer') \gset
 select tests.authenticate_as(:'reviewer_id');
-select public.accept_my_invites();
+select public.accept_invite(:'code');
 
 -- The SQL equivalent of the app's PostgREST embed organization_members?select=role,profiles(email,display_name).
 select results_eq(

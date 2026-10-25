@@ -11,8 +11,6 @@ create table public.profiles (
   updated_at timestamptz not null default now()
 );
 
-create index profiles_email_idx on public.profiles (email);
-
 create table public.organizations (
   id uuid primary key,
   name text not null
@@ -38,24 +36,22 @@ create index organization_members_user_id_idx on public.organization_members (us
 create table public.organization_invites (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations on delete cascade,
-  email text not null
-    constraint organization_invites_email_check check (
-      email = lower(email) and email ~ '^[^@\s]+@[^@\s]+\.[^@\s]+$'
-    ),
+  code_hash text not null,
+  label text
+    constraint organization_invites_label_check check (char_length(label) between 1 and 80 and label = btrim(label)),
   role text not null
     constraint organization_invites_role_check check (role in ('owner', 'reviewer')),
   invited_by uuid not null references public.profiles,
   created_at timestamptz not null default now(),
+  expires_at timestamptz not null,
   accepted_at timestamptz,
   accepted_by uuid references public.profiles,
   revoked_at timestamptz
 );
 
-create unique index organization_invites_pending_key on public.organization_invites (organization_id, email)
-  where accepted_at is null and revoked_at is null;
+create unique index organization_invites_code_key on public.organization_invites (code_hash);
 
-create index organization_invites_email_idx on public.organization_invites (email)
-  where accepted_at is null and revoked_at is null;
+create index organization_invites_organization_id_idx on public.organization_invites (organization_id);
 
 create trigger profiles_set_timestamps before insert or update on public.profiles
   for each row execute function private.set_timestamps();

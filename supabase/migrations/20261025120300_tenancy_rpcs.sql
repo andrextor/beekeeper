@@ -88,43 +88,65 @@ begin
 end;
 $$;
 
-create function public.invite_member(p_organization_id uuid, p_email text, p_role text)
-returns uuid
+-- Crockford base32 without I, L, O, U. Readers type O for 0 and I or L for 1.
+create function private.normalize_invite_code(p_code text)
+returns text
+language sql
+immutable
+set search_path = ''
+as $$
+  select translate(upper(regexp_replace(coalesce(p_code, ''), '[\s-]', '', 'g')), 'OIL', '011');
+$$;
+
+create function private.hash_invite_code(p_code text)
+returns text
+language sql
+immutable
+set search_path = ''
+as $$
+  select encode(extensions.digest(private.normalize_invite_code(p_code), 'sha256'), 'hex');
+$$;
+
+-- 256 is a multiple of 32, so byte % 32 picks every symbol with the same probability.
+create function private.new_invite_code()
+returns text
+language sql
+volatile
+set search_path = ''
+as $$
+  select string_agg(substr('0123456789ABCDEFGHJKMNPQRSTVWXYZ', (get_byte(b.bytes, i) % 32) + 1, 1), '' order by i)
+  from (select extensions.gen_random_bytes(8) as bytes) b, generate_series(0, 7) as i;
+$$;
+
+revoke execute on function
+  private.normalize_invite_code(text),
+  private.hash_invite_code(text),
+  private.new_invite_code()
+from public;
+
+create function public.create_invite(p_organization_id uuid, p_role text, p_label text default null)
+returns table (invite_id uuid, code text, expires_at timestamptz)
 language plpgsql
 security definer
 set search_path = ''
 as $$
 declare
   v_uid uuid := private.require_user();
-  v_email text := lower(btrim(p_email));
-  v_invite_id uuid;
+  v_label text := nullif(btrim(p_label), '');
+  v_code text;
 begin
   perform private.require_owner(p_organization_id);
   perform private.require_role_value(p_role);
 
-  if v_email is null or v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
-    raise exception 'Escribe un correo válido.' using errcode = 'P0001', detail = 'invalid_email';
+  if char_length(v_label) > 80 then
+    raise exception 'La etiqueta puede tener hasta 80 caracteres.' using errcode = 'P0001', detail = 'invalid_label';
   end if;
 
-  if exists (
-    select 1 from public.organization_members m
-    join public.profiles p on p.id = m.user_id
-    where m.organization_id = p_organization_id and p.email = v_email
-  ) then
-    raise exception 'Esa persona ya es miembro de la organización.' using errcode = 'P0001', detail = 'already_member';
-  end if;
-
-  select id into v_invite_id from public.organization_invites
-  where organization_id = p_organization_id and email = v_email and accepted_at is null and revoked_at is null;
-
-  if v_invite_id is not null then
-    return v_invite_id;
-  end if;
-
-  insert into public.organization_invites (organization_id, email, role, invited_by)
-  values (p_organization_id, v_email, p_role, v_uid)
-  returning id into v_invite_id;
-  return v_invite_id;
+  v_code := private.new_invite_code();
+  return query
+  insert into public.organization_invites as i (organization_id, code_hash, label, role, invited_by, expires_at)
+  values (p_organization_id, private.hash_invite_code(v_code), v_label, p_role, v_uid, now() + interval '7 days')
+  returning i.id, substr(v_code, 1, 4) || '-' || substr(v_code, 5, 4), i.expires_at;
 end;
 $$;
 
@@ -151,39 +173,34 @@ begin
 end;
 $$;
 
-create function public.accept_my_invites()
-returns setof uuid
+create function public.accept_invite(p_code text)
+returns uuid
 language plpgsql
 security definer
 set search_path = ''
 as $$
 declare
   v_uid uuid := private.require_user();
-  v_email text;
-  v_confirmed_at timestamptz;
+  v_invite public.organization_invites;
 begin
-  select lower(u.email), u.email_confirmed_at into v_email, v_confirmed_at from auth.users u where u.id = v_uid;
+  select * into v_invite from public.organization_invites
+  where code_hash = private.hash_invite_code(p_code)
+    and accepted_at is null and revoked_at is null and expires_at > now()
+  for update;
 
-  -- Without a confirmed email anyone could sign up with the invited address and take the access.
-  if v_confirmed_at is null then
-    raise exception 'Confirma tu correo para aceptar invitaciones.' using errcode = 'P0001', detail = 'email_not_confirmed';
+  -- Unknown, used, revoked and expired codes look the same, so a guess learns nothing.
+  if v_invite.id is null then
+    raise exception 'El código no es válido, ya se usó o venció. Pide uno nuevo al propietario.'
+      using errcode = 'P0001', detail = 'invalid_code';
   end if;
 
-  return query
-  with accepted as (
-    update public.organization_invites i
-    set accepted_at = now(), accepted_by = v_uid
-    where i.email = v_email and i.accepted_at is null and i.revoked_at is null
-    returning i.organization_id, i.role
-  ),
-  joined as (
-    insert into public.organization_members as m (organization_id, user_id, role)
-    select a.organization_id, v_uid, a.role from accepted a
-    on conflict (organization_id, user_id) do update
-      set role = case when m.role = 'owner' or excluded.role = 'owner' then 'owner' else 'reviewer' end
-    returning m.organization_id
-  )
-  select j.organization_id from joined j;
+  insert into public.organization_members as m (organization_id, user_id, role)
+  values (v_invite.organization_id, v_uid, v_invite.role)
+  on conflict (organization_id, user_id) do update
+    set role = case when m.role = 'owner' or excluded.role = 'owner' then 'owner' else 'reviewer' end;
+
+  update public.organization_invites set accepted_at = now(), accepted_by = v_uid where id = v_invite.id;
+  return v_invite.organization_id;
 end;
 $$;
 
@@ -263,9 +280,9 @@ $$;
 
 revoke execute on function
   public.create_organization(uuid, text),
-  public.invite_member(uuid, text, text),
+  public.create_invite(uuid, text, text),
   public.revoke_invite(uuid),
-  public.accept_my_invites(),
+  public.accept_invite(text),
   public.set_member_role(uuid, uuid, text),
   public.remove_member(uuid, uuid),
   public.my_memberships()
@@ -273,9 +290,9 @@ from public, anon;
 
 grant execute on function
   public.create_organization(uuid, text),
-  public.invite_member(uuid, text, text),
+  public.create_invite(uuid, text, text),
   public.revoke_invite(uuid),
-  public.accept_my_invites(),
+  public.accept_invite(text),
   public.set_member_role(uuid, uuid, text),
   public.remove_member(uuid, uuid),
   public.my_memberships()
