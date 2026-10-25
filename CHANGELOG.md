@@ -4,6 +4,29 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-26
+
+### Security
+
+- Invite code hashes can no longer be read by any client. Before, an owner or the platform admin could have recovered a pending code from its hash.
+- Revoking an invite that was accepted at the same moment now fails instead of reporting success.
+- Role changes and removals check the caller's role after taking the organization lock, so someone demoted at that moment cannot act.
+
+### Fixed
+
+- Invite codes of a deleted organization no longer work, and owners cannot act on a deleted organization.
+- Creating an organization twice in parallel (offline retries) returns the same id instead of an error.
+- `scripts/reset-password.sh` shows the API error instead of exiting silently.
+
+### Added
+
+- `pnpm db:migrate` (only new migrations, ~3 s) and `pnpm check:quick` (lint + tests without a reset, ~9 s) for the daily loop; `pnpm ci:check` stays the full from-scratch check.
+
+### Changed
+
+- Clients must list the columns they read from `organization_invites` (`select=*` is refused).
+- Access policies evaluate membership once per query instead of once per row.
+
 ## [0.2.0] - 2026-10-25
 
 ### Added

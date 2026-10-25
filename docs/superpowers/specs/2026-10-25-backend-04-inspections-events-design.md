@@ -79,7 +79,7 @@ Indexes: `(organization_id, updated_at)`, `(hive_id, occurred_at desc)`.
 
 | Table | select | insert | update |
 |-------|--------|--------|--------|
-| `inspections`, `hive_events` | `can_read(organization_id)` | `is_member(organization_id)` | `has_role(organization_id, 'owner') or created_by = auth.uid()` (with check `is_member`) |
+| `inspections`, `hive_events` | `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())` | `is_member(organization_id)` | `has_role(organization_id, 'owner') or created_by = auth.uid()` (with check `is_member`) |
 
 ### Hive timeline RPC
 

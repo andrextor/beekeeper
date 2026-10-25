@@ -46,14 +46,14 @@ Object names must match `^<uuid>/<uuid>/<uuid>(\.thumb)?\.jpg$` (checked in the 
 
 | Operation | Allowed when |
 |-----------|--------------|
-| select (download, signed URL) | `private.can_read(path_org(name))` |
+| select (download, signed URL) | `private.path_org(name) in (select private.my_organization_ids()) or (select private.is_platform_admin())` |
 | insert | `private.is_member(path_org(name))` and the hive `path_hive(name)` exists in that organization and is not deleted |
 | update (re-upload on retry) | `owner_id = auth.uid()::text` |
 | delete | `private.has_role(path_org(name), 'owner')` or `owner_id = auth.uid()::text` |
 
 ### Table RLS
 
-Same as inspections: read `can_read`, insert `is_member`, update by owner or author. Soft delete keeps the file (history); a hard purge is a later owner action.
+Same as inspections: read by membership or platform admin, insert `is_member`, update by owner or author. Soft delete keeps the file (history); a hard purge is a later owner action.
 
 ### Reading photos
 

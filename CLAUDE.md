@@ -20,8 +20,12 @@ Status: greenfield. The September prototype (V0.3.1 ZIPs, Supabase project `kcqn
 
 ## Architecture
 
-- **Tenancy is row-level.** Every domain row carries `organization_id`; policies call `private.can_read(org)` / `is_member(org)` / `has_role(org, role)`. Child rows denormalize `organization_id` and `private.check_parent_org` checks it against the parent, so policies never join.
+- **Tenancy is row-level.** Every domain row carries `organization_id`; reads use `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())`, writes `private.is_member(org)` / `private.has_role(org, role)`. Child rows denormalize `organization_id` and `private.check_parent_org` checks it against the parent, so policies never join.
 - **Roles:** `owner` (everything in the org), `reviewer` (reads the org, writes inspections/events/notes/photos, edits only their own), platform admin flag `profiles.is_platform_admin` (read-only everywhere, set by SQL only).
 - **The app writes tables directly** with client-generated UUIDs and idempotent upserts; RPCs only for multi-row or privileged operations (tenancy, admin reads, timeline).
 - **Sync contract:** server-owned `updated_at`, soft delete via `deleted_at`, pulls by `updated_at > cursor` in pages of 500 with a 2-minute overlap. Spelled out in `docs/api.md`.
 - **Photos:** private bucket `hive-photos`, `{organization_id}/{hive_id}/{photo_id}.jpg` + `.thumb.jpg` made on the phone; storage policies authorize by the path's first folder.
+
+## Review lessons
+
+Code reviews live in `docs/superpowers/audits/`. Their recurring findings are rules, not memories: `.claude/rules/sql.md` (column grants for secrets, lock before check, `on conflict` creates, soft-deleted parents, helper grants), `.claude/rules/tenancy.md` (read pattern, lock order, explicit invite columns), `.claude/rules/scripts.md` (curl and JSON error handling). Read the rule file of the area before writing code there.
