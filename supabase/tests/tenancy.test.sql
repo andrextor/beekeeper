@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(15);
+select plan(17);
 
 select tests.create_user('a@landak.test') as user_a \gset
 select tests.create_user('b@landak.test') as user_b \gset
@@ -27,6 +27,15 @@ select throws_ok(
 select throws_ok(
   format('select public.create_organization(%L, %L)', gen_random_uuid(), '   '),
   'P0001', 'El nombre debe tener entre 1 y 120 caracteres.', 'a blank name is refused'
+);
+
+select throws_ok(
+  'select public.create_organization(null, ''Sin id'')',
+  'P0001', 'Falta el identificador de la organización.', 'a null id is refused with a code'
+);
+select throws_ok(
+  'select private.lock_organization(gen_random_uuid())',
+  '42501', null, 'clients cannot call the RPC-only helpers'
 );
 
 select is((select count(*) from public.organizations), 1::bigint, 'A sees only organization A');
