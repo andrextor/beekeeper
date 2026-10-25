@@ -75,3 +75,48 @@ insert into public.hives (
   ('00000000-0000-4000-d000-000000000006', '00000000-0000-4000-b000-000000000002', '00000000-0000-4000-c000-000000000003',
    'V-01', 'VC01F2R7VW', 'rustic', null, null, 'unknown', null, null, null, null, null, null,
    'active', null, '00000000-0000-4000-a000-000000000003');
+
+-- Inspections and events (B4). Ids: inspections …e000-…, events …f000-…; dates relative to the reset.
+insert into public.inspections (
+  id, organization_id, hive_id, inspected_at, inspected_by, source, transcript, population_strength, temperament,
+  queen_seen, eggs_seen, larvae_seen, queen_cells, brood_frames, honey_frames, pollen_frames, brood_pattern, stores,
+  varroa_method, varroa_count, varroa_sample_size, pests, disease_signs, weather, temperature_c, attention_level,
+  planned_actions, next_inspection_on, notes, created_by
+) values
+  ('00000000-0000-4000-e000-000000000001', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000001',
+   now() - interval '21 days', '00000000-0000-4000-a000-000000000001', 'manual', null, 4, 2,
+   'yes', 'yes', 'yes', 'none', 6, 4, 2, 'compact', 'ok',
+   'alcohol_wash', 3, 300, null, null, 'sunny', 22.5, 'none',
+   '{treat}', (now() - interval '7 days')::date, 'Buena postura. Programar tratamiento de varroa.', '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-e000-000000000002', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000001',
+   now() - interval '10 days', '00000000-0000-4000-a000-000000000002', 'manual', null, 4, 3,
+   'not_checked', 'yes', 'yes', 'none', 6, 3, 2, 'compact', 'ok',
+   null, null, null, '{ants}', null, 'cloudy', 18.0, 'soon',
+   '{check_queen}', (now() + interval '4 days')::date, 'Hormigas en la piquera.', '00000000-0000-4000-a000-000000000002'),
+  ('00000000-0000-4000-e000-000000000003', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000001',
+   now() - interval '2 days', '00000000-0000-4000-a000-000000000001', 'voice',
+   'Colmena fuerte, reina vista, poca miel, hay que alimentar esta semana.', 5, 2,
+   'yes', 'yes', 'yes', 'none', 7, 1, 2, 'compact', 'low',
+   null, null, null, null, null, 'sunny', 24.0, 'soon',
+   '{feed}', (now() + interval '7 days')::date, null, '00000000-0000-4000-a000-000000000001');
+
+insert into public.hive_events (id, organization_id, hive_id, inspection_id, type, occurred_at, details, created_by) values
+  ('00000000-0000-4000-f000-000000000001', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000001',
+   null, 'treatment', now() - interval '14 days',
+   '{"product": "Ácido oxálico", "active_ingredient": "oxalic_acid", "dose": "5 ml por cuadro", "method": "drip", "withdrawal_days": 0}',
+   '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-f000-000000000002', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000001',
+   '00000000-0000-4000-e000-000000000002', 'note', now() - interval '10 days',
+   '{"text": "Nota 1: muchas hormigas subiendo por el soporte", "source": "voice", "slot": 1}',
+   '00000000-0000-4000-a000-000000000002'),
+  ('00000000-0000-4000-f000-000000000003', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000001',
+   '00000000-0000-4000-e000-000000000003', 'note', now() - interval '2 days',
+   '{"text": "Nota 2: poner grasa en las patas del soporte", "source": "text", "slot": 2}',
+   '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-f000-000000000004', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000001',
+   null, 'feeding', now() - interval '1 day',
+   '{"feed": "sugar_syrup", "amount": 2, "unit": "l", "ratio": "1:1"}',
+   '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-f000-000000000005', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-d000-000000000003',
+   null, 'loss', now() - interval '40 days', '{"cause": "absconding"}',
+   '00000000-0000-4000-a000-000000000001');
