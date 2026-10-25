@@ -32,6 +32,26 @@ Unique constraint → detail code (filled in by each module):
 | Constraint | Detail code | Message |
 |------------|-------------|---------|
 | `organization_invites_code_key` | `code_collision` | "No pudimos crear el código. Inténtalo de nuevo." (≈ 1 in 10^12; just retry) |
+| `apiaries_org_name_key` | `duplicate_name` | "Ya tienes un apiario con ese nombre." |
+| `hives_org_name_key` | `duplicate_name` | "Ya tienes una colmena con ese nombre." |
+| `hives_qr_code_key` | `qr_taken` | "Ese código QR ya está en uso. Genera otro." (the app regenerates silently on create) |
+
+A check violation (`23514`, constraint name in `message`) means the client sent a value outside the documented ranges; clients validate the same rules first, so it is shown as "Revisa los datos: hay un valor fuera de rango." and logged.
+
+### Writes refused by RLS
+
+- `insert` / `upsert` that RLS refuses → `42501` ("new row violates row-level security policy"). Permanent.
+- A plain `update` / `PATCH` whose row RLS hides or does not let you change returns **200 with an empty body** (`[]` with `Prefer: return=representation`), not an error. Clients that patch must ask for the representation and treat an empty array as refused. The sync engine always pushes with `upsert` by `id`, which fails loudly instead.
+
+### Domain errors raised by triggers
+
+| `details` | Message | When |
+|-----------|---------|------|
+| `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one |
+| `immutable_column` | "Un registro no puede cambiar de organización." | An update changes `organization_id` |
+| `missing_author` | "Falta el autor del registro." | Server-side insert without `created_by` (never from clients) |
+| `apiary_not_empty` | "El apiario todavía tiene colmenas. Muévelas o elimínalas primero." | Soft-deleting an apiary with any non-deleted hive (dead ones included) |
+| `future_date` | "La fecha de inicio de la colonia no puede ser futura." | `hives.colony_started_on` after tomorrow |
 
 An unmapped `23505` is shown as "Ya existe un registro igual.".
 
@@ -115,11 +135,59 @@ Share text for an invite (app): "Te invité a mi apiario en Landak Apiario. Inst
 
 ## Apiaries
 
-*Filled in by B3.*
+`apiaries` — a site where hives stand ("Vallecito 1"). Read: members and platform admin. Insert/update: owners. Soft delete only (`apiary_not_empty` while it has hives).
+
+| Column | Type | Rule |
+|--------|------|------|
+| `id` | uuid | client-generated |
+| `organization_id` | uuid | immutable |
+| `name` | text | 1..80, trimmed, unique per organization among non-deleted (case-insensitive) |
+| `farm_name` | text | ≤ 80 |
+| `place` | text | ≤ 120 (municipio, vereda) |
+| `latitude`, `longitude` | numeric(9,6) | −90..90 / −180..180, both or neither |
+| `altitude_m` | integer | −100..6000 |
+| `flora_notes` | text | ≤ 2000 |
+| `water_source` | text | ≤ 200 |
+| `notes` | text | ≤ 2000 |
+| `created_by`, `created_at`, `updated_at`, `deleted_at` | | common columns (server-owned except `deleted_at`) |
 
 ## Hives
 
-*Filled in by B3.*
+`hives` — one colony with its printed QR. Read: members and platform admin. Insert/update: owners. Soft delete only.
+
+| Column | Type | Rule |
+|--------|------|------|
+| `id` | uuid | client-generated |
+| `organization_id` | uuid | immutable |
+| `apiary_id` | uuid | apiary of the same organization, not deleted; changing it moves the hive |
+| `name` | text | 1..40 ("C-12"), unique per organization among non-deleted (case-insensitive) |
+| `qr_code` | text | exactly 10 Crockford base32 characters `[0-9A-HJKMNP-TV-Z]` (no I, L, O, U), client-generated, **globally unique** |
+| `hive_type` | text | enum below |
+| `brood_boxes` | smallint | 0..5 |
+| `supers` | smallint | 0..10 (alzas) |
+| `colony_origin` | text | enum below |
+| `colony_started_on` | date | not after tomorrow; the age is computed from it |
+| `bee_race` | text | ≤ 60, free text |
+| `queen_year` | smallint | 2000..2100 |
+| `queen_marked` | boolean | null = unknown |
+| `queen_color` | text | enum below |
+| `queen_origin` | text | enum below |
+| `status` | text | enum below, default `active` |
+| `notes` | text | ≤ 2000 |
+
+### QR
+
+The printed label encodes `landak://h/<qr_code>` and nothing else. Lookup: local SQLite first; online `from('hives').select(…).eq('qr_code', code)`. An empty result means "not in your organizations" (another organization's hive and an unknown code look the same). Re-labelling is an owner update of `qr_code` plus a `qr_relabel` event (B4).
+
+### Spanish labels (the app and the admin use exactly these)
+
+| Column | Value → label |
+|--------|---------------|
+| `hive_type` | `langstroth` Langstroth · `dadant` Dadant · `top_bar` Kenyana (barras) · `warre` Warré · `nucleus` Núcleo · `rustic` Rústica · `other` Otra |
+| `colony_origin` | `swarm_capture` Captura de enjambre · `split` División · `package` Paquete de abejas · `nucleus_purchase` Núcleo comprado · `colony_purchase` Colmena comprada · `unknown` Desconocido |
+| `queen_color` | `white` Blanco (años terminados en 1 o 6) · `yellow` Amarillo (2 o 7) · `red` Rojo (3 o 8) · `green` Verde (4 o 9) · `blue` Azul (5 o 0) |
+| `queen_origin` | `own_rearing` Cría propia · `purchased` Comprada · `natural` Natural (reemplazo) · `unknown` Desconocido |
+| `status` | `active` Activa · `inactive` Inactiva · `dead` Muerta · `absconded` Fugada · `merged` Unida · `sold` Vendida |
 
 ## Inspections
 
@@ -158,4 +226,4 @@ select * from organizations;  -- what reviewer@landak.test sees
 rollback;
 ```
 
-Seed ids: users `…a000-000000000001` owner, `…02` reviewer, `…03` other, `…04` admin; organizations `…b000-000000000001` Finca Landak, `…02` Apiario Ajeno (prefix `00000000-0000-4000-`).
+Seed ids (prefix `00000000-0000-4000-`): users `a000-…01` owner, `…02` reviewer, `…03` other, `…04` admin; organizations `b000-…01` Finca Landak, `…02` Apiario Ajeno; apiaries `c000-…01` Vallecito 1, `…02` La Loma, `…03` Apiario del vecino; hives `d000-…01` C-01 (`V1C01A7K2M`), `…02` C-02, `…03` C-03 (dead), `…04` L-01, `…05` L-02, `…06` V-01 (other beekeeper).
