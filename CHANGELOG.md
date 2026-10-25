@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-26
+
+### Added
+
+- Inspections: strength, temperament, queen, eggs and larvae, queen cells, brood/honey/pollen frames, brood pattern, stores, varroa (method, count, sample), pests, observed disease signs, weather, temperature, attention level, planned actions, next inspection date, notes and the original dictation. Only the hive, date and source are required; every observation accepts "not checked".
+- Hive events: note (field-mode Nota 1, Nota 2…), feeding, treatment, queen change, harvest, split, merge, transfer, swarm, loss and QR relabel, optionally linked to an inspection of the same hive.
+- Owners and reviewers record inspections and events; reviewers edit only their own, owners edit all of them (also those of a member who left); the platform admin only reads.
+- Open tasks per hive (`hive_open_tasks`): the planned actions of its latest inspection, e.g. "colmenas por alimentar".
+- `hive_timeline`: inspections and events of a hive merged newest first, paged by date and id.
+- Dates more than a day in the future (now one rule and one message for hives too), inspectors outside the organization, events linked to another hive's inspection and moving an inspection to another hive are refused. Deleting an inspection deletes the notes and events recorded with it.
+- Local demo data: three inspections, two notes, a feeding and a treatment on C-01, and the loss of C-03.
+
 ## [0.3.0] - 2026-10-26
 
 ### Added

@@ -49,9 +49,11 @@ A check violation (`23514`, constraint name in `message`) means the client sent 
 |-----------|---------|------|
 | `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one, including restoring (`deleted_at = null`) a child whose parent is deleted |
 | `immutable_column` | "Un registro no puede cambiar de organización." | An update changes `organization_id` |
+| `immutable_column` | "Una revisión no puede cambiar de colmena." | An update changes `inspections.hive_id` (delete it and record it again on the right hive) |
 | `missing_author` | "Falta el autor del registro." | Server-side insert without `created_by` (never from clients) |
 | `apiary_not_empty` | "El apiario todavía tiene colmenas. Muévelas o elimínalas primero." | Soft-deleting an apiary with any non-deleted hive (dead ones included) |
-| `future_date` | "La fecha de inicio de la colonia no puede ser futura." | `hives.colony_started_on` after tomorrow |
+| `future_date` | "La fecha no puede ser futura." | `hives.colony_started_on`, `inspections.inspected_at` or `hive_events.occurred_at` more than one day ahead |
+| `not_member` | "La persona que revisó no pertenece a esta organización." | `inspections.inspected_by` set to (or changed to) someone outside the organization |
 
 An unmapped `23505` is shown as "Ya existe un registro igual.".
 
@@ -191,11 +193,83 @@ The printed label encodes `landak://h/<qr_code>` and nothing else. Lookup: local
 
 ## Inspections
 
-*Filled in by B4.*
+Table `inspections`. Common columns (`id`, `organization_id`, `created_by`, `created_at`, `updated_at`, `deleted_at`) plus the ones below. Only `hive_id`, `inspected_at` and `source` are required: a half-filled inspection saved in the rain is better than none. `null` = not recorded; `not_checked` = looked for it but could not check.
+
+| Column | Type | Values |
+|--------|------|--------|
+| `hive_id` | uuid | a hive of the same organization, not deleted (`parent_mismatch`) |
+| `inspected_at` | timestamptz | ≤ now + 1 day (`future_date`) |
+| `inspected_by` | uuid | defaults to the signed-in user; must be a member (`not_member`) |
+| `source` | text | `manual`, `voice` |
+| `transcript` | text | ≤ 10000; the original dictation, never rewritten |
+| `population_strength` | smallint | 1..5 (1 muy débil … 5 muy fuerte) |
+| `temperament` | smallint | 1..5 (1 mansa … 5 muy defensiva) |
+| `queen_seen`, `eggs_seen`, `larvae_seen` | text | `yes`, `no`, `not_checked` |
+| `queen_cells` | text | `none`, `swarm`, `supersedure`, `not_checked` |
+| `brood_frames`, `honey_frames`, `pollen_frames` | smallint | 0..40 |
+| `brood_pattern` | text | `compact`, `spotty`, `not_checked` |
+| `stores` | text | `low`, `ok`, `high`, `not_checked` |
+| `varroa_method` | text | `alcohol_wash`, `sugar_roll`, `sticky_board`, `visual` |
+| `varroa_count` | integer | ≥ 0; set together with `varroa_method` |
+| `varroa_sample_size` | integer | > 0; required for `alcohol_wash` and `sugar_roll`, only with a method |
+| `pests` | text[] | subset of `wax_moth`, `small_hive_beetle`, `ants`, `wasps`, `mice`, `other` |
+| `disease_signs` | text[] | subset of `chalkbrood`, `sacbrood`, `foulbrood_signs`, `deformed_wings`, `dysentery`, `dead_bees`, `other` (observed signs, **not diagnoses**) |
+| `weather` | text | `sunny`, `cloudy`, `rain`, `windy` |
+| `temperature_c` | numeric(4,1) | −20..60 |
+| `attention_level` | text | `none`, `soon`, `urgent` |
+| `planned_actions` | text[] | subset of `feed`, `treat`, `change_queen`, `add_super`, `remove_super`, `harvest`, `split`, `merge`, `move`, `check_queen`, `other` |
+| `next_inspection_on` | date | |
+| `notes` | text | ≤ 4000 |
+
+Out-of-range values fail with `23514` on `inspections_<column>_check` (`inspections_varroa_check` for the varroa trio).
+
+**Who writes:** owners and reviewers insert; owners edit or soft-delete any inspection, reviewers only those they created (others' rows come back as `[]` on PATCH, `42501` on upsert). The platform admin reads only. Inspections by a member who has since left stay editable by the owner. `hive_id` cannot change. Soft-deleting an inspection soft-deletes its linked events in the same write (they come back in the next pull with a new `updated_at`); restoring the inspection does not restore them.
+
+### Open tasks
+
+View `hive_open_tasks` (RLS applies): one row per non-deleted hive that has an inspection, with `hive_id`, `organization_id`, `planned_actions`, `inspected_at` of its **latest** non-deleted inspection (ties: highest `id`). "Colmenas por alimentar": `select=hive_id&planned_actions=cs.{feed}`. Older inspections' actions are history, not open tasks.
+
+### Spanish labels
+
+| Column | Value → label |
+|--------|---------------|
+| `source` | `manual` Manual · `voice` Por voz |
+| `queen_seen` / `eggs_seen` / `larvae_seen` | `yes` Sí · `no` No · `not_checked` No revisado |
+| `queen_cells` | `none` Ninguna · `swarm` De enjambrazón · `supersedure` De reemplazo · `not_checked` No revisado |
+| `brood_pattern` | `compact` Compacta · `spotty` Salteada · `not_checked` No revisado |
+| `stores` | `low` Pocas · `ok` Suficientes · `high` Abundantes · `not_checked` No revisado |
+| `varroa_method` | `alcohol_wash` Lavado con alcohol · `sugar_roll` Azúcar glas · `sticky_board` Bandeja adhesiva · `visual` Visual |
+| `pests` | `wax_moth` Polilla de la cera · `small_hive_beetle` Escarabajo de la colmena · `ants` Hormigas · `wasps` Avispas · `mice` Ratones · `other` Otra |
+| `disease_signs` | `chalkbrood` Cría yesificada · `sacbrood` Cría ensacada · `foulbrood_signs` Signos de loque · `deformed_wings` Alas deformes · `dysentery` Diarrea · `dead_bees` Abejas muertas · `other` Otro |
+| `weather` | `sunny` Soleado · `cloudy` Nublado · `rain` Lluvia · `windy` Viento |
+| `attention_level` | `none` Ninguna · `soon` Pronto · `urgent` Urgente |
+| `planned_actions` | `feed` Alimentar · `treat` Tratar · `change_queen` Cambiar reina · `add_super` Poner alza · `remove_super` Quitar alza · `harvest` Cosechar · `split` Dividir · `merge` Unir · `move` Trasladar · `check_queen` Revisar reina · `other` Otra |
 
 ## Events
 
-*Filled in by B4.*
+Table `hive_events`. Common columns plus `hive_id`, `inspection_id` (optional; an inspection of the **same hive**, not deleted, else `parent_mismatch`), `type`, `occurred_at` (≤ now + 1 day, `future_date`), `details jsonb` (default `{}`). Same write rules as inspections.
+
+The database checks only `type`, that `details` is an object of at most 8 KB, and that a `note` has `text` (1..2000 chars) (`23514` on `hive_events_details_check`). The shapes below are validated by the app (Zod); a new optional key needs no migration.
+
+| `type` | Label | `details` |
+|--------|-------|-----------|
+| `note` | Nota | `{ text: string, source: 'voice' \| 'text', slot?: number }` (field-mode "Nota 1, Nota 2…") |
+| `feeding` | Alimentación | `{ feed: 'sugar_syrup' \| 'fondant' \| 'pollen_patty' \| 'honey' \| 'other', amount?: number, unit?: 'l' \| 'kg' \| 'g', ratio?: '1:1' \| '2:1' }` |
+| `treatment` | Tratamiento | `{ product: string, active_ingredient?: string, dose?: string, method?: 'strip' \| 'drip' \| 'vapor' \| 'dust' \| 'other', withdrawal_days?: number, ends_on?: 'YYYY-MM-DD' }` |
+| `queen_change` | Cambio de reina | `{ queen_year?: number, queen_color?: string, queen_origin?: string, reason?: 'failing' \| 'aggressive' \| 'lost' \| 'planned' }` |
+| `harvest` | Cosecha | `{ product: 'honey' \| 'pollen' \| 'propolis' \| 'wax', kg: number, supers_taken?: number }` |
+| `split` | División | `{ new_hive_id?: uuid }` |
+| `merge` | Unión | `{ merged_hive_id?: uuid }` |
+| `transfer` | Traslado | `{ from_apiary_id?: uuid, to_apiary_id?: uuid }` |
+| `swarm` | Enjambre | `{ captured: boolean, new_hive_id?: uuid }` |
+| `loss` | Pérdida | `{ cause?: 'starvation' \| 'pests' \| 'disease' \| 'absconding' \| 'pesticide' \| 'unknown' }` |
+| `qr_relabel` | Cambio de etiqueta QR | `{ old_qr_code: string, new_qr_code: string }` |
+
+Events never change the hive by themselves (a `loss` does not set `hives.status`). The owner's app upserts the hive change in the same outbox batch; a reviewer's app shows "Avisa al propietario". They are two upserts: if the hive update is refused, the event stays and the hive change shows "Requiere atención".
+
+## Hive timeline
+
+`rpc('hive_timeline', { p_hive_id, p_before?, p_before_id?, p_limit? })` → rows `{ kind: 'inspection' | 'event', id, at, created_by, author_name, data }`, non-deleted only, newest first (`at desc, id desc`). `data` is the full row as JSON, same columns as the tables. `p_limit` defaults to 30, clamped to 1..100. Next page: pass the last item's `at` and `id` as `p_before` / `p_before_id` (an event recorded during an inspection often shares its timestamp). `p_before` alone means strictly before that instant. Runs under RLS: a hive you cannot read returns no rows. `author_name` is `null` when the author's profile is not visible (a member who left).
 
 ## Photos
 
@@ -226,4 +300,4 @@ select * from organizations;  -- what reviewer@landak.test sees
 rollback;
 ```
 
-Seed ids (prefix `00000000-0000-4000-`): users `a000-…01` owner, `…02` reviewer, `…03` other, `…04` admin; organizations `b000-…01` Finca Landak, `…02` Apiario Ajeno; apiaries `c000-…01` Vallecito 1, `…02` La Loma, `…03` Apiario del vecino; hives `d000-…01` C-01 (`V1C01A7K2M`), `…02` C-02, `…03` C-03 (dead), `…04` L-01, `…05` L-02, `…06` V-01 (other beekeeper).
+Seed ids (prefix `00000000-0000-4000-`): users `a000-…01` owner, `…02` reviewer, `…03` other, `…04` admin; organizations `b000-…01` Finca Landak, `…02` Apiario Ajeno; apiaries `c000-…01` Vallecito 1, `…02` La Loma, `…03` Apiario del vecino; hives `d000-…01` C-01 (`V1C01A7K2M`), `…02` C-02, `…03` C-03 (dead), `…04` L-01, `…05` L-02, `…06` V-01 (other beekeeper); inspections `e000-…01..03` on C-01 (latest `{feed}`, `…02` by the reviewer, `…03` by voice); events `f000-…01` treatment, `…02`/`…03` notes, `…04` feeding on C-01, `…05` loss on C-03.
