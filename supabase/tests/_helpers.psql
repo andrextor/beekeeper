@@ -1,5 +1,10 @@
 -- Included by every test file with \ir; lives only inside the test transaction.
+set client_min_messages = warning;
 create schema if not exists tests;
+
+-- Every test starts from an empty tenancy, independent of supabase/seed.sql; the final rollback restores it.
+truncate public.organizations cascade;
+delete from auth.users;
 
 create or replace function tests.create_user(p_email text, p_confirmed boolean default true)
 returns uuid
@@ -25,17 +30,37 @@ begin
 end;
 $$;
 
+-- security definer so a test can switch from one signed-in user to another.
+create or replace function tests.user_email(p_user_id uuid)
+returns text
+language sql
+security definer
+set search_path = ''
+as $$
+  select email from auth.users where id = p_user_id;
+$$;
+
 create or replace function tests.authenticate_as(p_user_id uuid)
 returns void
 language plpgsql
 as $$
-declare
-  v_email text;
 begin
-  select email into v_email from auth.users where id = p_user_id;
-  perform set_config('request.jwt.claims', json_build_object('sub', p_user_id, 'role', 'authenticated', 'email', v_email)::text, true);
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', p_user_id, 'role', 'authenticated', 'email', tests.user_email(p_user_id))::text,
+    true
+  );
   set local role authenticated;
 end;
+$$;
+
+create or replace function tests.make_platform_admin(p_user_id uuid)
+returns void
+language sql
+security definer
+set search_path = ''
+as $$
+  update public.profiles set is_platform_admin = true where id = p_user_id;
 $$;
 
 create or replace function tests.clear_authentication()

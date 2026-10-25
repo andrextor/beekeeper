@@ -1,4 +1,6 @@
-# D1 · Remote Supabase project, SMTP, first platform admin — spec
+# D1 · Remote Supabase project, auth settings, first platform admin — spec
+
+Revised 2026-10-25: no email is sent in the pilot (no domain; B2 §Authentication). When Iván has a domain, a separate spec adds Resend SMTP (free 3,000/month) for password recovery and, optionally, email confirmation.
 
 Date: 2026-10-25 · Branch: `chore/d1-supabase-remote` · Status: **awaiting OK** · Version: 0.12.0
 
@@ -13,7 +15,7 @@ Everything so far runs on the local stack. The app and the admin need a real bac
 | Layer | Runs on | Cost |
 |-------|---------|------|
 | REST API (PostgREST over the schema), RPCs | Supabase | Free plan |
-| Auth (email OTP) | Supabase Auth + Resend SMTP | Free plan / Resend free 3,000 emails/month, 100/day |
+| Auth (email + password, no emails sent) | Supabase Auth | Free plan |
 | Database | Supabase Postgres 17, `sa-east-1` | Free: 500 MB |
 | Photos | Supabase Storage | Free: 1 GB |
 | Custom logic (only if ever needed) | Supabase Edge Functions | Free: 500k invocations/month |
@@ -32,9 +34,9 @@ Rejected: a Node/Nest/Express server on Render/Railway/Fly. Free tiers there sle
 1. Create project `landak-apiario` in `sa-east-1`, strong DB password into Iván's password manager.
 2. `pnpm exec supabase link --project-ref <ref>`; `pnpm exec supabase db push` (all migrations; seeds never run remotely).
 3. Bucket `hive-photos` comes from the migration; verify it is private.
-4. Auth: email OTP length 6, expiry 600 s, confirmations on, signup on; Spanish OTP template pasted from `supabase/templates/otp.html`; site URL = admin URL from D2; redirect `landak://`.
-5. Resend: verify a sending domain (Iván's domain, SPF/DKIM DNS records), create an API key, set it as SMTP in Supabase (host `smtp.resend.com`, port 465, user `resend`), sender `Landak Apiario <no-reply@…>`; raise Auth's email rate limit to 30/hour.
-6. Iván signs in once through the admin, then in the SQL editor: `update public.profiles set is_platform_admin = true where email = '<his email>';`.
+4. Auth (dashboard → Authentication → Providers → Email): email provider on, **Confirm email off**, minimum password length 8, signups on (same as `supabase/config.toml`); site URL = admin URL from D2; redirect `landak://`.
+5. Iván keeps the project's secret key in his password manager for `scripts/reset-password.sh` (the only password recovery in the pilot).
+6. Iván creates his account (app or Studio → Authentication → Add user), then in the SQL editor: `update public.profiles set is_platform_admin = true where email = '<his email>';`.
 7. GitHub secrets for the backup workflow: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_REF`.
 8. `docs/deploy.md` (Spanish): every step above, how to apply a new migration (`supabase db push` from `main` after a release), how to restore a paused project, where the keys live.
 
