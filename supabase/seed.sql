@@ -43,3 +43,35 @@ insert into public.organization_members (organization_id, user_id, role) values
   ('00000000-0000-4000-b000-000000000001', '00000000-0000-4000-a000-000000000001', 'owner'),
   ('00000000-0000-4000-b000-000000000001', '00000000-0000-4000-a000-000000000002', 'reviewer'),
   ('00000000-0000-4000-b000-000000000002', '00000000-0000-4000-a000-000000000003', 'owner');
+
+-- Apiaries and hives (B3). Ids: apiaries …c000-…, hives …d000-… (prefix 00000000-0000-4000-).
+insert into public.apiaries (id, organization_id, name, farm_name, place, latitude, longitude, altitude_m, flora_notes, water_source, created_by) values
+  ('00000000-0000-4000-c000-000000000001', '00000000-0000-4000-b000-000000000001', 'Vallecito 1', 'Finca Landak', 'Vereda El Vallecito',
+   4.711000, -74.072100, 2550, 'Eucalipto, cítricos y flor de café en temporada.', 'Quebrada a 50 m', '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-c000-000000000002', '00000000-0000-4000-b000-000000000001', 'La Loma', 'Finca Landak', 'Alto de la loma',
+   null, null, 2700, 'Monte nativo y aguacate.', null, '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-c000-000000000003', '00000000-0000-4000-b000-000000000002', 'Apiario del vecino', null, null,
+   null, null, null, null, null, '00000000-0000-4000-a000-000000000003');
+
+insert into public.hives (
+  id, organization_id, apiary_id, name, qr_code, hive_type, brood_boxes, supers, colony_origin, colony_started_on,
+  bee_race, queen_year, queen_marked, queen_color, queen_origin, status, notes, created_by
+) values
+  ('00000000-0000-4000-d000-000000000001', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-c000-000000000001',
+   'C-01', 'V1C01A7K2M', 'langstroth', 1, 2, 'swarm_capture', '2025-03-14', 'africanizada', 2026, true, 'white', 'own_rearing',
+   'active', null, '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-d000-000000000002', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-c000-000000000001',
+   'C-02', 'V1C02B8M3N', 'nucleus', 1, 0, 'split', '2026-08-02', 'africanizada', 2026, false, null, 'natural',
+   'active', 'Núcleo de la división de C-01.', '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-d000-000000000003', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-c000-000000000001',
+   'C-03', 'V1C03C9N4P', 'langstroth', 1, 0, 'colony_purchase', '2024-11-20', 'africanizada', 2024, true, 'green', 'purchased',
+   'dead', 'Se perdió en septiembre.', '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-d000-000000000004', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-c000-000000000002',
+   'L-01', 'KM01D0P5QR', 'top_bar', null, null, 'swarm_capture', '2025-10-05', null, null, null, null, 'unknown',
+   'active', null, '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-d000-000000000005', '00000000-0000-4000-b000-000000000001', '00000000-0000-4000-c000-000000000002',
+   'L-02', 'KM02E1Q6ST', 'langstroth', 2, 1, 'package', '2025-06-30', 'africanizada', 2025, true, 'blue', 'purchased',
+   'active', null, '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-d000-000000000006', '00000000-0000-4000-b000-000000000002', '00000000-0000-4000-c000-000000000003',
+   'V-01', 'VC01F2R7VW', 'rustic', null, null, 'unknown', null, null, null, null, null, null,
+   'active', null, '00000000-0000-4000-a000-000000000003');
