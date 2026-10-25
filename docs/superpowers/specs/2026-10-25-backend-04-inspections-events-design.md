@@ -21,7 +21,7 @@ Common columns (B3) plus:
 
 | Column | Type | Rule / meaning |
 |--------|------|----------------|
-| `hive_id` | uuid → hives | same organization (`check_parent_org`) |
+| `hive_id` | uuid → hives | same organization (`check_parent`) |
 | `inspected_at` | timestamptz | not null; ≤ now + 1 day (phone clocks drift) |
 | `inspected_by` | uuid → profiles | default `auth.uid()`; must be a member of the organization (`not_member`) |
 | `source` | text | `manual`, `voice` |

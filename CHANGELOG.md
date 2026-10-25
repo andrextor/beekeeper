@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-26
+
+### Added
+
+- Apiaries (name, farm, place, optional coordinates and altitude, flora, water, notes) and hives (type, boxes and supers, colony origin and start date, race, queen year/colour/mark/origin, status, notes).
+- Every hive has a 10-character QR code that is unique across all beekeepers; the label carries only `landak://h/<code>`. Deleting a hive frees its code, so the printed label can go on a new colony.
+- Owners create and edit apiaries and hives; reviewers and the platform admin read them; other beekeepers never see them.
+- Hive names are unique per apiary (C-01 can exist in every apiary).
+- An apiary cannot be deleted while it still has hives; a hive cannot point to, move into or be restored into another beekeeper's apiary or a deleted one, even when both happen at the same moment.
+- Local demo data: "Vallecito 1" (C-01, C-02, C-03 dead) and "La Loma" (L-01, L-02) in Finca Landak, plus one hive of the other beekeeper.
+
 ## [0.2.1] - 2026-10-26
 
 ### Security

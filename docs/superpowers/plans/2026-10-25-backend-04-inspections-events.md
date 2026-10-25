@@ -2,7 +2,7 @@
 
 Spec: `docs/superpowers/specs/2026-10-25-backend-04-inspections-events-design.md` · Branch: `feat/b4-inspections-events` · Status: **awaiting OK**
 
-1. **Inspections** — `<ts>_inspections.sql`: table, named checks (enums, ranges, array subsets with `<@`, varroa coherence), indexes, triggers (`set_updated_at`, `force_author`, `check_parent_org('hives','hive_id')`, `private.check_inspector_member`), RLS + grants.
+1. **Inspections** — `<ts>_inspections.sql`: table, named checks (enums, ranges, array subsets with `<@`, varroa coherence), indexes, triggers (`set_updated_at`, `force_author`, `check_parent('hives','hive_id')`, `private.check_inspector_member`), RLS + grants.
 2. **Events** — `<ts>_hive_events.sql`: table, `type` check, `details` checks, `private.check_event_inspection` (same hive), indexes, triggers, RLS + grants.
 3. **Timeline RPC and open tasks** — `<ts>_hive_timeline.sql`: `hive_timeline()` (`security invoker`, `stable`), view `hive_open_tasks` (`security_invoker`), grants to `authenticated`.
 4. **Tests** — `supabase/tests/inspections_events.test.sql`, `hive_timeline.test.sql`.
