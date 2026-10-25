@@ -26,7 +26,10 @@ end;
 $$;
 
 -- Trigger arguments: parent table, foreign key column. The parent must exist in the same organization
--- and not be soft-deleted. A null foreign key (optional parent) and an unchanged one on update are skipped.
+-- and not be soft-deleted. Skipped for a null foreign key (optional parent) and for an update that keeps
+-- the parent and does not restore the row. The parent is read `for share`, so a concurrent soft delete of
+-- the parent waits for this transaction and then sees the new child (and the other way round).
+-- ponytail: to_jsonb + dynamic SQL per row; fine at pilot volume, per-table functions if pushes get heavy.
 create function private.check_parent()
 returns trigger
 language plpgsql
@@ -43,11 +46,11 @@ begin
   end if;
   if tg_op = 'UPDATE'
     and v_parent_id is not distinct from (to_jsonb(old) ->> tg_argv[1])::uuid
-    and new.organization_id is not distinct from old.organization_id then
+    and not (old.deleted_at is not null and new.deleted_at is null) then
     return new;
   end if;
 
-  execute format('select organization_id, deleted_at from public.%I where id = $1', tg_argv[0])
+  execute format('select organization_id, deleted_at from public.%I where id = $1 for share', tg_argv[0])
     into v_parent_org, v_parent_deleted_at
     using v_parent_id;
 

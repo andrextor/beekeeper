@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(21);
+select plan(26);
 
 select tests.create_user('owner-a@landak.test') as owner_a \gset
 select tests.create_user('reviewer-a@landak.test') as reviewer_a \gset
@@ -46,6 +46,17 @@ on conflict (id) do update set name = excluded.name;
 select is((select count(*) from public.hives where id = :'hive_a'), 1::bigint, 'an upsert retry by id keeps one row');
 select is((select name from public.hives where id = :'hive_a'), 'C-01 bis', 'and applies the latest values');
 
+select gen_random_uuid() as apiary_a2 \gset
+insert into public.apiaries (id, organization_id, name) values (:'apiary_a2', :'org_a', 'La Loma');
+select lives_ok(
+  format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_a2', 'c-01 BIS', 'EEEEEEEEEE'),
+  'the same hive name can be used in another apiary'
+);
+select throws_ok(
+  format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_a2', 'C-01 BIS', 'FFFFFFFFFF'),
+  '23505', null, 'hive names are unique inside one apiary, ignoring case'
+);
+
 select throws_ok(
   format('insert into public.apiaries (id, organization_id, name) values (%L, %L, %L)', gen_random_uuid(), :'org_a', 'VALLECITO 1'),
   '23505', null, 'apiary names are unique per organization, ignoring case'
@@ -77,7 +88,7 @@ select throws_ok(
 
 -- Reviewer A
 select tests.authenticate_as(:'reviewer_a');
-select is((select count(*) from public.hives), 1::bigint, 'a reviewer reads the organization''s hives');
+select is((select count(*) from public.hives), 2::bigint, 'a reviewer reads the organization''s hives');
 select throws_ok(
   format('insert into public.apiaries (id, organization_id, name) values (%L, %L, %L)', gen_random_uuid(), :'org_a', 'Del revisor'),
   '42501', null, 'a reviewer cannot create apiaries'
@@ -94,12 +105,12 @@ select throws_ok(
 );
 select lives_ok(
   format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_b', :'apiary_b', 'C-01 bis', 'CCCCCCCCCC'),
-  'hive names only need to be unique inside one organization'
+  'another organization can use the same hive name'
 );
 
 -- Platform admin
 select tests.authenticate_as(:'admin_id');
-select is((select count(*) from public.hives), 2::bigint, 'the platform admin reads every hive');
+select is((select count(*) from public.hives), 3::bigint, 'the platform admin reads every hive');
 select throws_ok(
   format('insert into public.apiaries (id, organization_id, name) values (%L, %L, %L)', gen_random_uuid(), :'org_a', 'Del admin'),
   '42501', null, 'the platform admin cannot write'
@@ -109,6 +120,18 @@ select throws_ok(
 select tests.authenticate_as(:'owner_a');
 update public.hives set deleted_at = now() where id = :'hive_a';
 update public.apiaries set deleted_at = now() where id = :'apiary_a';
+select throws_ok(
+  format('update public.hives set deleted_at = null where id = %L', :'hive_a'),
+  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a hive cannot be restored into a deleted apiary'
+);
+select throws_ok(
+  format('update public.hives set apiary_id = %L where name = %L', :'apiary_a', 'c-01 BIS'),
+  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a hive cannot move into a deleted apiary'
+);
+select lives_ok(
+  format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_a2', 'Nueva', '7K2M9QXA4B'),
+  'a deleted hive frees its QR code for a new colony'
+);
 select throws_ok(
   format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_a', 'C-05', 'DDDDDDDDDD'),
   'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a hive cannot be added to a deleted apiary'

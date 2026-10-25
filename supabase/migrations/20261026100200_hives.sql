@@ -38,8 +38,10 @@ create table public.hives (
   deleted_at timestamptz
 );
 
-create unique index hives_qr_code_key on public.hives (qr_code);
-create unique index hives_org_name_key on public.hives (organization_id, lower(name)) where deleted_at is null;
+-- A deleted hive frees its code, so its printed label can go on a new colony.
+create unique index hives_qr_code_key on public.hives (qr_code) where deleted_at is null;
+-- Beekeepers number hives per site (C-01 in every apiary).
+create unique index hives_apiary_name_key on public.hives (apiary_id, lower(name)) where deleted_at is null;
 create index hives_sync_idx on public.hives (organization_id, updated_at);
 create index hives_apiary_id_idx on public.hives (apiary_id) where deleted_at is null;
 
@@ -78,6 +80,8 @@ security definer
 set search_path = ''
 as $$
 begin
+  -- The update already holds this apiary's row lock; check_parent reads it `for share`, so a hive
+  -- inserted or moved here concurrently either commits first (and is seen) or waits and then fails.
   if new.deleted_at is not null and old.deleted_at is null
     and exists (select 1 from public.hives h where h.apiary_id = new.id and h.deleted_at is null) then
     raise exception 'El apiario todavía tiene colmenas. Muévelas o elimínalas primero.'
@@ -89,7 +93,7 @@ $$;
 
 revoke execute on function private.check_apiary_empty() from public;
 
-create trigger apiaries_30_check_empty before update of deleted_at on public.apiaries
+create trigger apiaries_40_check_empty before update of deleted_at on public.apiaries
   for each row execute function private.check_apiary_empty();
 
 alter table public.hives enable row level security;
