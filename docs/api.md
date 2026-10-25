@@ -31,7 +31,7 @@ Unique constraint → detail code (filled in by each module):
 
 | Constraint | Detail code | Message |
 |------------|-------------|---------|
-| *(none yet)* | | |
+| `organization_invites_code_key` | `code_collision` | "No pudimos crear el código. Inténtalo de nuevo." (≈ 1 in 10^12; just retry) |
 
 An unmapped `23505` is shown as "Ya existe un registro igual.".
 
@@ -54,11 +54,64 @@ Repeat until a page returns fewer than 500 rows. The new cursor is the last row'
 
 ## Auth
 
-*Filled in by B2.*
+Email + password. **No email is ever sent** (no domain yet): confirmation is off, there are no codes by email and no self-service recovery.
+
+| Step | Call | Notes |
+|------|------|-------|
+| Sign up | `auth.signUp({ email, password })` | Returns a session at once. Password ≥ 8 characters |
+| Sign in | `auth.signInWithPassword({ email, password })` | |
+| Sign out | `auth.signOut()` | Clients also wipe local data |
+| Forgot password | — | Show "Pide a tu administrador que restablezca tu contraseña." Iván runs `scripts/reset-password.sh <email>` |
+
+Auth errors come in English; clients map `error_code` to Spanish:
+
+| `error_code` | Message |
+|--------------|---------|
+| `invalid_credentials` | "Correo o contraseña incorrectos." |
+| `user_already_exists` / `email_exists` | "Ya existe una cuenta con ese correo. Ingresa con tu contraseña." |
+| `weak_password` | "La contraseña debe tener al menos 8 caracteres." |
+| `validation_failed` | "Revisa el correo y la contraseña." |
+| `over_request_rate_limit` | "Demasiados intentos. Espera un minuto." |
+| network error | "No hay conexión. Revisa tu internet e inténtalo de nuevo." |
+
+After signing in: `rpc('my_memberships')`. No memberships → onboarding offers **Crear mi apiario** (`create_organization`) or **Tengo un código** (`accept_invite`).
 
 ## Organizations
 
-*Filled in by B2.*
+### Tables (read with `select`, RLS-filtered)
+
+| Table | Columns | Who sees it |
+|-------|---------|-------------|
+| `profiles` | `id`, `email`, `display_name`, `is_platform_admin`, `created_at`, `updated_at` | Yourself, people who share an organization with you, platform admin |
+| `organizations` | `id`, `name`, `created_by`, `created_at`, `updated_at`, `deleted_at` | Members, platform admin |
+| `organization_members` | `organization_id`, `user_id`, `role` (`owner` \| `reviewer`), `created_at`, `updated_at` | Members, platform admin |
+| `organization_invites` | `id`, `organization_id`, `label`, `role`, `invited_by`, `created_at`, `expires_at`, `accepted_at`, `accepted_by`, `revoked_at` (never the code) | Owners, platform admin |
+
+Direct writes allowed: `profiles.display_name` (own row), `organizations.name` and `organizations.deleted_at` (owners). Everything else goes through the RPCs.
+
+Members screen: `from('organization_members').select('role, user_id, profiles(email, display_name)').eq('organization_id', id)`.
+
+Memberships are **hard-deleted** and are not part of the cursor pull: on every sync, compare `my_memberships()` with the local list and purge the local rows of any organization that disappeared. Rows still in the outbox for it end as "Requiere atención".
+
+### RPCs (`supabase.rpc(name, params)`)
+
+| RPC | Params | Returns | Who | Errors (`details`) |
+|-----|--------|---------|-----|--------------------|
+| `create_organization` | `p_id` (client uuid), `p_name` | `uuid` | anyone signed in. Idempotent for its owner | `invalid_name`, `id_taken` |
+| `create_invite` | `p_organization_id`, `p_role`, `p_label?` | `[{ invite_id, code, expires_at }]` — `code` like `K7M2-9QXA`, shown **only here** | owner | `not_owner`, `invalid_role`, `invalid_label` |
+| `accept_invite` | `p_code` (any case, spaces/dashes ok) | organization `uuid` | anyone signed in. Single use, 7 days; keeps `owner` if already owner | `invalid_code` |
+| `revoke_invite` | `p_invite_id` | — | owner | `not_owner`, `invite_not_pending` |
+| `set_member_role` | `p_organization_id`, `p_user_id`, `p_role` | — | owner | `not_owner`, `invalid_role`, `not_member`, `last_owner` |
+| `remove_member` | `p_organization_id`, `p_user_id` | — | owner, or yourself (leave) | `not_allowed`, `not_member`, `last_owner` |
+| `my_memberships` | — | `[{ organization_id, organization_name, role }]`, ordered by name | anyone signed in | — |
+
+Every RPC raises `not_signed_in` ("Inicia sesión para continuar.") without a session.
+
+Share text for an invite (app): "Te invité a mi apiario en Landak Apiario. Instala la app, crea tu cuenta y escribe este código: K7M2-9QXA (vence el 1 de noviembre)."
+
+### Platform admin
+
+`profiles.is_platform_admin` is set only by SQL: `update public.profiles set is_platform_admin = true where email = '…';`. It reads every organization and writes nothing.
 
 ## Apiaries
 
@@ -90,7 +143,19 @@ Repeat until a page returns fewer than 500 rows. The new cursor is the last row'
 |---------|-----|
 | API | http://127.0.0.1:54321 |
 | Studio | http://127.0.0.1:54323 |
-| Mailpit (sign-in codes) | http://127.0.0.1:54324 |
+| Mailpit (no email is sent today; kept for when recovery emails exist) | http://127.0.0.1:54324 |
 | Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 
-`pnpm db:start` prints the local publishable key.
+`pnpm db:start` prints the local publishable key. Seed users (`owner@`, `reviewer@`, `other@`, `admin@landak.test`) sign in with the password `landak-2026`. Auth config changes need `pnpm db:stop && pnpm db:start`; `db:reset` does not reload them.
+
+### Impersonate a user in Studio's SQL editor
+
+```sql
+begin;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-a000-000000000002","role":"authenticated"}', true);
+set local role authenticated;
+select * from organizations;  -- what reviewer@landak.test sees
+rollback;
+```
+
+Seed ids: users `…a000-000000000001` owner, `…02` reviewer, `…03` other, `…04` admin; organizations `…b000-000000000001` Finca Landak, `…02` Apiario Ajeno (prefix `00000000-0000-4000-`).
