@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-25
+
+### Added
+
+- Organizations with two roles: owner (manages everything) and reviewer (reads everything, records field work). A person can belong to several organizations.
+- Sign-up and sign-in with email and password (minimum 8 characters). No emails are sent.
+- Single-use invite codes (`XXXX-XXXX`, valid 7 days) that an owner shares by WhatsApp; the invited person creates their own account and types the code.
+- Owners can change roles and remove people; anyone can leave. An organization always keeps at least one owner.
+- Read-only platform admin that sees every organization.
+- `scripts/reset-password.sh` to set a new password while there is no recovery email.
+- Local demo data: two organizations and four users with the password `landak-2026`.
+
+### Changed
+
+- Email sign-in codes from 0.1.0 were replaced by passwords; the Spanish code email template was removed.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added
