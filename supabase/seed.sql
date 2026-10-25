@@ -1,13 +1,14 @@
 -- Local demo data only. Never run against the remote project.
--- Sign in with any of these emails: request a code and read it in Mailpit (http://127.0.0.1:54324).
+-- Every seed user signs in with its email and the password `landak-2026`.
 
 insert into auth.users (
-  id, instance_id, aud, role, email, email_confirmed_at,
+  id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
   raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
   confirmation_token, recovery_token, email_change_token_new, email_change
 )
 select
-  u.id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', u.email, now(),
+  u.id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', u.email,
+  extensions.crypt('landak-2026', extensions.gen_salt('bf')), now(),
   '{"provider":"email","providers":["email"]}', '{}', now(), now(),
   '', '', '', ''
 from (values
