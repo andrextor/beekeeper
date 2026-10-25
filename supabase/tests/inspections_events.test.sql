@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(27);
+select plan(29);
 
 select tests.create_user('owner-a@landak.test') as owner_a \gset
 select tests.create_user('reviewer-a@landak.test') as reviewer_a \gset
@@ -113,6 +113,11 @@ select is((select notes from public.inspections where id = :'insp_owner'), null,
 update public.inspections set notes = 'Corregida por el revisor' where id = :'insp_rev';
 select is((select notes from public.inspections where id = :'insp_rev'), 'Corregida por el revisor', 'a reviewer edits their own inspection');
 
+select throws_ok(
+  format('update public.inspections set hive_id = %L where id = %L', :'hive_a2', :'insp_rev'),
+  'P0001', 'Una revisión no puede cambiar de colmena.', 'an inspection cannot move to another hive'
+);
+
 -- Open tasks
 select is(
   (select planned_actions from public.hive_open_tasks where hive_id = :'hive_a'), '{feed}'::text[],
@@ -123,6 +128,7 @@ select is(
   (select planned_actions from public.hive_open_tasks where hive_id = :'hive_a'), '{treat}'::text[],
   'a deleted inspection gives way to the previous one'
 );
+select isnt((select deleted_at from public.hive_events where id = :'note_id'), null, 'deleting an inspection deletes its linked events');
 
 -- Owner B
 select tests.authenticate_as(:'owner_b');

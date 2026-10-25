@@ -27,42 +27,29 @@ create table public.hive_events (
 );
 
 create index hive_events_sync_idx on public.hive_events (organization_id, updated_at);
-create index hive_events_hive_idx on public.hive_events (hive_id, occurred_at desc) where deleted_at is null;
+create index hive_events_hive_idx on public.hive_events (hive_id, occurred_at desc, id desc) where deleted_at is null;
 
--- The linked inspection must be of the same hive (hence the same organization) and not deleted; re-checked
--- like check_parent when the link or the hive changes, or the event is restored.
-create function private.check_event_inspection()
+-- Notes and events recorded during an inspection go with it (B4 review F2). security definer: a reviewer
+-- deleting their own inspection also hides linked events written by others. Restoring the inspection
+-- does not restore them; each event is restored on its own.
+create function private.delete_inspection_events()
 returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
-declare
-  v_hive_id uuid;
-  v_deleted_at timestamptz;
 begin
-  if new.inspection_id is null then
-    return new;
-  end if;
-  if tg_op = 'UPDATE'
-    and new.inspection_id is not distinct from old.inspection_id
-    and new.hive_id is not distinct from old.hive_id
-    and not (old.deleted_at is not null and new.deleted_at is null) then
-    return new;
-  end if;
-
-  select i.hive_id, i.deleted_at into v_hive_id, v_deleted_at
-  from public.inspections i where i.id = new.inspection_id for share;
-
-  if v_hive_id is distinct from new.hive_id or v_deleted_at is not null then
-    raise exception 'El registro relacionado no existe, fue eliminado o es de otra organización.'
-      using errcode = 'P0001', detail = 'parent_mismatch';
-  end if;
-  return new;
+  update public.hive_events set deleted_at = new.deleted_at
+  where inspection_id = new.id and deleted_at is null;
+  return null;
 end;
 $$;
 
-revoke execute on function private.check_event_inspection() from public;
+revoke execute on function private.delete_inspection_events() from public;
+
+create trigger inspections_70_delete_events after update of deleted_at on public.inspections
+  for each row when (old.deleted_at is null and new.deleted_at is not null)
+  execute function private.delete_inspection_events();
 
 create trigger hive_events_10_set_timestamps before insert or update on public.hive_events
   for each row execute function private.set_timestamps();
@@ -71,7 +58,7 @@ create trigger hive_events_20_force_author before insert or update on public.hiv
 create trigger hive_events_30_check_hive before insert or update on public.hive_events
   for each row execute function private.check_parent('hives', 'hive_id');
 create trigger hive_events_40_check_inspection before insert or update on public.hive_events
-  for each row execute function private.check_event_inspection();
+  for each row execute function private.check_parent('inspections', 'inspection_id', 'hive_id');
 create trigger hive_events_50_check_date before insert or update of occurred_at on public.hive_events
   for each row execute function private.check_not_future('occurred_at');
 

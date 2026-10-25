@@ -71,7 +71,7 @@ select throws_ok(
 );
 select throws_ok(
   format('insert into public.hives (id, organization_id, apiary_id, name, qr_code, colony_started_on) values (%L, %L, %L, %L, %L, current_date + 30)', gen_random_uuid(), :'org_a', :'apiary_a', 'C-03', 'AAAAAAAAAA'),
-  'P0001', 'La fecha de inicio de la colonia no puede ser futura.', 'a future colony start date is refused'
+  'P0001', 'La fecha no puede ser futura.', 'a future colony start date is refused'
 );
 select throws_ok(
   format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_b', 'C-04', 'BBBBBBBBBB'),

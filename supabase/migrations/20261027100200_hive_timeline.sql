@@ -15,7 +15,8 @@ as $$
     select
       least(greatest(coalesce(p_limit, 30), 1), 100) as page_size,
       coalesce(p_before, 'infinity'::timestamptz) as before_at,
-      coalesce(p_before_id, 'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid) as before_id
+      -- Without p_before_id the cursor is "strictly before p_before" (B4 review F3).
+      coalesce(p_before_id, '00000000-0000-0000-0000-000000000000'::uuid) as before_id
   ),
   items as (
     (
@@ -45,12 +46,14 @@ revoke execute on function public.hive_timeline(uuid, timestamptz, uuid, integer
 grant execute on function public.hive_timeline(uuid, timestamptz, uuid, integer) to authenticated;
 
 -- A hive's open tasks are the planned actions of its latest inspection; older ones are history.
+-- ponytail: walks every live inspection of the visible hives (index-ordered); keep a latest_inspection_id
+-- on hives if an organization's history makes "colmenas por alimentar" slow.
 create view public.hive_open_tasks with (security_invoker = true) as
 select distinct on (i.hive_id) i.hive_id, i.organization_id, i.planned_actions, i.inspected_at
 from public.inspections i
 join public.hives h on h.id = i.hive_id and h.deleted_at is null
 where i.deleted_at is null
-order by i.hive_id, i.inspected_at desc, i.created_at desc;
+order by i.hive_id, i.inspected_at desc, i.id desc;
 
 revoke all on public.hive_open_tasks from anon, authenticated;
 grant select on public.hive_open_tasks to authenticated;

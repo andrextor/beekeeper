@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(7);
+select plan(8);
 
 select tests.create_user('owner-a@landak.test') as owner_a \gset
 select tests.create_user('reviewer-a@landak.test') as reviewer_a \gset
@@ -56,6 +56,11 @@ select results_eq(
   format('select id from public.hive_timeline(%L, %L, %L, 2)', :'hive_a', '2026-01-12 10:00+00', :'ins1'),
   format('values (%L::uuid), (%L::uuid)', :'ev1', :'ins0'),
   'the (at, id) cursor continues after the last item without skipping or repeating a shared timestamp'
+);
+select results_eq(
+  format('select id from public.hive_timeline(%L, %L, null, 10)', :'hive_a', '2026-01-12 10:00+00'),
+  format('values (%L::uuid), (%L::uuid)', :'ev1', :'ins0'),
+  'without p_before_id the cursor is strictly before p_before'
 );
 select is(
   (select data ->> 'type' from public.hive_timeline(:'hive_a') where id = :'ev1'),

@@ -14,6 +14,49 @@ $$;
 
 revoke execute on function private.check_not_future() from public;
 
+-- One future-date rule for every domain date (B4 review F8).
+drop trigger hives_40_check_dates on public.hives;
+create trigger hives_40_check_dates before insert or update of colony_started_on on public.hives
+  for each row execute function private.check_not_future('colony_started_on');
+drop function private.check_hive_dates();
+
+-- Optional third argument: the column that must match the parent's (default organization_id), so a child
+-- can also require the same hive as its parent (B4 review F7). Re-checked when the foreign key or that
+-- column changes, or the row is restored.
+create or replace function private.check_parent()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_parent_id uuid := (to_jsonb(new) ->> tg_argv[1])::uuid;
+  v_match text := coalesce(tg_argv[2], 'organization_id');
+  v_parent_value text;
+  v_parent_deleted_at timestamptz;
+begin
+  if v_parent_id is null then
+    return new;
+  end if;
+  if tg_op = 'UPDATE'
+    and v_parent_id is not distinct from (to_jsonb(old) ->> tg_argv[1])::uuid
+    and (to_jsonb(new) ->> v_match) is not distinct from (to_jsonb(old) ->> v_match)
+    and not (old.deleted_at is not null and new.deleted_at is null) then
+    return new;
+  end if;
+
+  execute format('select %I::text, deleted_at from public.%I where id = $1 for share', v_match, tg_argv[0])
+    into v_parent_value, v_parent_deleted_at
+    using v_parent_id;
+
+  if v_parent_value is distinct from (to_jsonb(new) ->> v_match) or v_parent_deleted_at is not null then
+    raise exception 'El registro relacionado no existe, fue eliminado o es de otra organización.'
+      using errcode = 'P0001', detail = 'parent_mismatch';
+  end if;
+  return new;
+end;
+$$;
+
 create table public.inspections (
   id uuid primary key,
   organization_id uuid not null references public.organizations,
@@ -90,7 +133,25 @@ create table public.inspections (
 );
 
 create index inspections_sync_idx on public.inspections (organization_id, updated_at);
-create index inspections_hive_idx on public.inspections (hive_id, inspected_at desc) where deleted_at is null;
+-- Serves the timeline's (at, id) cursor and hive_open_tasks' latest-per-hive.
+create index inspections_hive_idx on public.inspections (hive_id, inspected_at desc, id desc) where deleted_at is null;
+
+-- Events linked to an inspection must stay on its hive (B4 review F1): a wrong hive is fixed by deleting
+-- the inspection and recording it again.
+create function private.check_inspection_hive()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if new.hive_id is distinct from old.hive_id then
+    raise exception 'Una revisión no puede cambiar de colmena.' using errcode = 'P0001', detail = 'immutable_column';
+  end if;
+  return new;
+end;
+$$;
+
+revoke execute on function private.check_inspection_hive() from public;
 
 -- Checked only when inspected_by is set or changes, so a removed member's past inspections stay editable.
 create function private.check_inspector()
@@ -122,9 +183,11 @@ create trigger inspections_20_force_author before insert or update on public.ins
   for each row execute function private.force_author();
 create trigger inspections_30_check_hive before insert or update on public.inspections
   for each row execute function private.check_parent('hives', 'hive_id');
-create trigger inspections_40_check_inspector before insert or update on public.inspections
+create trigger inspections_40_fixed_hive before update on public.inspections
+  for each row execute function private.check_inspection_hive();
+create trigger inspections_50_check_inspector before insert or update on public.inspections
   for each row execute function private.check_inspector();
-create trigger inspections_50_check_date before insert or update of inspected_at on public.inspections
+create trigger inspections_60_check_date before insert or update of inspected_at on public.inspections
   for each row execute function private.check_not_future('inspected_at');
 
 alter table public.inspections enable row level security;
