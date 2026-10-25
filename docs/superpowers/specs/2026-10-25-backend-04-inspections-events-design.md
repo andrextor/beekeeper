@@ -1,6 +1,6 @@
 # B4 · Inspections, events and field notes — spec
 
-Date: 2026-10-25 · Branch: `feat/b4-inspections-events` · Status: **awaiting OK** · Version: 0.4.0
+Date: 2026-10-25 · Branch: `feat/b4-inspections-events` · Status: **approved** (2026-10-26) · Version: 0.4.0
 
 ## Problem
 
@@ -22,7 +22,7 @@ Common columns (B3) plus:
 | Column | Type | Rule / meaning |
 |--------|------|----------------|
 | `hive_id` | uuid → hives | same organization (`check_parent`) |
-| `inspected_at` | timestamptz | not null; ≤ now + 1 day (phone clocks drift) |
+| `inspected_at` | timestamptz | not null; ≤ now + 1 day (phone clocks drift), else `future_date` |
 | `inspected_by` | uuid → profiles | default `auth.uid()`; must be a member of the organization (`not_member`) |
 | `source` | text | `manual`, `voice` |
 | `transcript` | text | ≤ 10000; the original dictation, never rewritten by the server |
@@ -47,13 +47,13 @@ Common columns (B3) plus:
 
 `null` means "not recorded"; `not_checked` means "looked for it but could not check". No field is required except `hive_id`, `inspected_at`, `source`: a half-filled inspection saved in the rain is better than none.
 
-Indexes: `(organization_id, updated_at)`, `(hive_id, inspected_at desc)` for the timeline, GIN on `planned_actions` for "colmenas por alimentar" style filters.
+Indexes: `(organization_id, updated_at)`, `(hive_id, inspected_at desc)` for the timeline and for the latest inspection. No GIN on `planned_actions`: the filter runs on one row per hive (`hive_open_tasks`), not on the whole history.
 
-View `hive_open_tasks` (`security_invoker = true`): one row per hive with `hive_id`, `organization_id`, `planned_actions`, `inspected_at` of the latest non-deleted inspection, used by the admin and, later, by an app filter.
+View `hive_open_tasks` (`security_invoker = true`): one row per non-deleted hive with `hive_id`, `organization_id`, `planned_actions`, `inspected_at` of its latest non-deleted inspection (ties broken by `created_at`), used by the admin and, later, by an app filter.
 
 ### `hive_events`
 
-Common columns plus `hive_id`, `inspection_id` (nullable, same hive — `parent_mismatch`), `type`, `occurred_at`, `details jsonb not null default '{}'`.
+Common columns plus `hive_id`, `inspection_id` (nullable, same hive and not deleted — `parent_mismatch`), `type`, `occurred_at` (≤ now + 1 day, else `future_date`), `details jsonb not null default '{}'`.
 
 | `type` | `details` shape (validated in the app; the database checks only what is marked *db*) |
 |--------|--------------------------------------------------------|
@@ -83,7 +83,13 @@ Indexes: `(organization_id, updated_at)`, `(hive_id, occurred_at desc)`.
 
 ### Hive timeline RPC
 
-`hive_timeline(p_hive_id uuid, p_before timestamptz default null, p_limit int default 30)` returns inspections and events merged by date (`kind` `'inspection' | 'event'`, `id`, `at`, `created_by`, `author_name`, `row jsonb` = `to_jsonb()` of the full row, so clients build their own Spanish summary from the same columns they store locally), `security invoker` so RLS applies. Used by the admin (A5) and by the app when online for hives it has not synced. The app's offline timeline reads its local tables instead.
+`hive_timeline(p_hive_id uuid, p_before timestamptz default null, p_before_id uuid default null, p_limit int default 30)` returns non-deleted inspections and events merged by date, newest first (`kind` `'inspection' | 'event'`, `id`, `at`, `created_by`, `author_name`, `data jsonb` = `to_jsonb()` of the full row, so clients build their own Spanish summary from the same columns they store locally), `security invoker` so RLS applies. The cursor is the last item's `(at, id)`: an event recorded during an inspection often has the same timestamp, and a date-only cursor would skip it at a page boundary. `p_limit` is clamped to 1..100. (`data`, not `row`: `row` is a SQL keyword.) Used by the admin (A5) and by the app when online for hives it has not synced. The app's offline timeline reads its local tables instead.
+
+### Shared helpers and triggers (B3 lessons)
+
+- Triggers follow `<table>_<NN>_<purpose>`: `10_set_timestamps`, `20_force_author`, `30_check_hive` (`check_parent`), `40+` table-specific.
+- `private.check_not_future(column)` is shared by `inspections.inspected_at` and `hive_events.occurred_at` (message "La fecha no puede ser futura.", `future_date`).
+- `inspected_by` is checked only on insert or when it changes, so the owner can still edit an inspection by a member who has since been removed (`not_member`, "La persona que revisó no pertenece a esta organización.").
 
 ## Tests
 
