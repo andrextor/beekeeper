@@ -29,7 +29,7 @@ The repo has only docs. Every later module needs: a local Supabase that resets f
 
 ## Files
 
-`package.json`, `pnpm-workspace.yaml`, `biome.json`, `.gitignore`, `.editorconfig`, `.env.example`, `supabase/config.toml`, `supabase/seed.sql` (empty, filled in later modules), `supabase/tests/00_helpers.sql`, `supabase/tests/00_smoke.test.sql`, `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.claude/rules/sql.md`, `docs/api.md`, `CHANGELOG.md`, `README.md` (Spanish: what the project is and how to run it).
+`package.json`, `pnpm-workspace.yaml`, `biome.json`, `.gitignore`, `.editorconfig`, `.env.example`, `supabase/config.toml`, `supabase/seed.sql` (empty, filled in later modules), `supabase/tests/_helpers.psql`, `supabase/tests/00_smoke.test.sql`, `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.claude/rules/sql.md`, `docs/api.md`, `CHANGELOG.md`, `README.md` (Spanish: what the project is and how to run it).
 
 ### `supabase/config.toml` settings that matter
 
@@ -44,7 +44,7 @@ The repo has only docs. Every later module needs: a local Supabase that resets f
 
 Lowercase SQL, `snake_case`, one migration per change named `<timestamp>_<slug>.sql`, `create … if not exists` never used to hide drift, every table gets RLS enabled in the same migration that creates it, every `security definer` function has `set search_path = ''` and fully-qualified names, every policy calls the `private.*` helpers (B2), every check constraint is named `<table>_<column>_check`.
 
-### `00_helpers.sql`
+### `_helpers.psql`
 
 `tests.create_user(email text, confirmed boolean default true) returns uuid` (inserts into `auth.users`, triggers create the profile), `tests.authenticate_as(user_id uuid)` (sets role and claims), `tests.clear_authentication()`. Lives in a `tests` schema created only in the test transaction.
 

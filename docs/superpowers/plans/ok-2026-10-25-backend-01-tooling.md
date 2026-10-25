@@ -6,7 +6,7 @@ Spec: `docs/superpowers/specs/2026-10-25-backend-01-tooling-design.md` · Branch
    Check: `pnpm install && pnpm lint`.
 2. **Supabase local stack** — `pnpm exec supabase init`, then edit `supabase/config.toml` per the spec; `supabase/templates/otp.html` (Spanish OTP email); empty `supabase/seed.sql`.
    Check: `pnpm db:start` prints the local URLs; Studio opens at http://localhost:54323; Mailpit at http://localhost:54324.
-3. **pgTAP harness** — `supabase/tests/00_helpers.sql`, `supabase/tests/00_smoke.test.sql` (plan 2: `pgtap` extension present, `tests.create_user` creates a profile-less user for now).
+3. **pgTAP harness** — `supabase/tests/_helpers.psql`, `supabase/tests/00_smoke.test.sql` (plan 2: `pgtap` extension present, `tests.create_user` creates a profile-less user for now).
    Check: `pnpm test:db` green.
 4. **CI and release** — `.github/workflows/ci.yml` (pnpm setup, `supabase/setup-cli` with the pinned version, `pnpm lint`, `supabase start`, `supabase db reset`, `supabase test db`), `.github/workflows/release.yml`.
    Check: workflow YAML valid (`actionlint` if available); real run happens on the first PR.
