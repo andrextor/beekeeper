@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Mandatory workflow (see AGENTS.md):** spec → plan → wait for Iván's explicit OK → implement. Never implement in the same turn the plan is written. Work goes module by module in the order of `docs/ROADMAP.md`; Iván tests each module (the plan's *How Iván tests it*) before the next starts.
 
+**Never run tests or checks.** Iván runs them, always (2026-10-26). Do not run `pnpm test:db`, `pnpm check:quick`, `pnpm ci:check`, `pnpm test` or any test command, not even the test just written. Write the code and the tests, commit each task, and at the end hand Iván the exact one-line command to run; he pastes back whatever fails.
+
 ## Project
 
 Landak Apiario: a free, multi-beekeeper hive management system. Beekeepers own an organization, register apiaries (sites such as "Vallecito 1") and hives, and record inspections, events, notes and photos from an offline-first Android app (`beekeeper-mobile`). They invite other users as reviewers; a platform admin reads everything through `admin/` and edits nothing.
@@ -20,7 +22,7 @@ Status: greenfield. The September prototype (V0.3.1 ZIPs, Supabase project `kcqn
 
 ## Architecture
 
-- **Tenancy is row-level.** Every domain row carries `organization_id`; reads use `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())`, writes `private.is_member(org)` / `private.has_role(org, role)`. Child rows denormalize `organization_id` and `private.check_parent_org` checks it against the parent, so policies never join.
+- **Tenancy is row-level.** Every domain row carries `organization_id`; reads use `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())`, writes `private.is_member(org)` / `private.has_role(org, role)`. Child rows denormalize `organization_id` and `private.check_parent` checks it against the parent, so policies never join.
 - **Roles:** `owner` (everything in the org), `reviewer` (reads the org, writes inspections/events/notes/photos, edits only their own), platform admin flag `profiles.is_platform_admin` (read-only everywhere, set by SQL only).
 - **The app writes tables directly** with client-generated UUIDs and idempotent upserts; RPCs only for multi-row or privileged operations (tenancy, admin reads, timeline).
 - **Sync contract:** server-owned `updated_at`, soft delete via `deleted_at`, pulls by `updated_at > cursor` in pages of 500 with a 2-minute overlap. Spelled out in `docs/api.md`.
