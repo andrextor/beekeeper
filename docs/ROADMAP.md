@@ -30,6 +30,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 | A4 | Organization detail: members, apiaries, hives | `specs/2026-10-25-admin-04-organization-design.md` | `plans/ok-2026-10-25-admin-04-organization.md` | 0.10.0 |
 | A5 | Hive detail: timeline, inspections, events, photos | `specs/2026-10-25-admin-05-hive-timeline-design.md` | `plans/ok-2026-10-25-admin-05-hive-timeline.md` | 0.11.0 |
 | A6 | Platform admin creates beekeepers and reviewers; print reports | `specs/2026-10-25-admin-06-create-users-design.md` | `plans/ok-2026-10-25-admin-06-create-users.md` | 0.14.0 |
+| A7 | Admin manages accounts (name, email, password, farms, admin, deactivate); my account | `specs/2026-10-25-admin-07-manage-users-design.md` | `plans/2026-10-25-admin-07-manage-users.md` | 0.15.0 |
 
 ## Phase 3 — Go live (external accounts, each step asks first)
 
