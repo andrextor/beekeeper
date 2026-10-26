@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-26
+
+### Added
+
+- Photos: private `hive-photos` bucket (5 MB, JPEG only) and a `photos` table linked to a hive and optionally to an inspection of the same hive. Files live under `{organization}/{hive}/{photo}.jpg` plus a `.thumb.jpg` made on the phone.
+- Members upload only into live hives of their own organization; other beekeepers cannot see or download the files; the platform admin only reads; nothing is ever hard-deleted by the app.
+
+### Changed
+
+- Moving an inspection or a photo to another hive is refused with "Un registro no puede cambiar de colmena." (was "Una revisión…").
+- Deleting an inspection now also deletes the photos taken during it, as it already did with its notes and events.
+
 ## [0.4.0] - 2026-10-26
 
 ### Added
