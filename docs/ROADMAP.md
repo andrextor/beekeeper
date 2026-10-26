@@ -18,7 +18,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 | B3 | Apiaries and hives (QR identity) | `specs/2026-10-25-backend-03-apiaries-hives-design.md` | `plans/2026-10-25-backend-03-apiaries-hives.md` | 0.3.0 |
 | B4 | Inspections, events and field notes | `specs/2026-10-25-backend-04-inspections-events-design.md` | `plans/ok-2026-10-25-backend-04-inspections-events.md` | 0.4.0 |
 | B5 | Photos: table + private bucket | `specs/2026-10-25-backend-05-photos-design.md` | `plans/ok-2026-10-25-backend-05-photos.md` | 0.5.0 |
-| B6 | Platform admin read API | `specs/2026-10-25-backend-06-admin-api-design.md` | `plans/2026-10-25-backend-06-admin-api.md` | 0.6.0 |
+| B6 | Platform admin read API | `specs/2026-10-25-backend-06-admin-api-design.md` | `plans/ok-2026-10-25-backend-06-admin-api.md` | 0.6.0 |
 
 ## Phase 2 — Admin panel (`beekeeper/admin`)
 

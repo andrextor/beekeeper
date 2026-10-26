@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-26
+
+### Added
+
+- Platform admin read API: `admin_stats` (totals, last-30-day activity, photo storage used), `admin_list_organizations` (beekeepers with owners, members, apiaries, active hives and last inspection; search by name or owner email), `admin_organization_summary` (members, pending invites, apiaries with counts) and `admin_list_users`.
+- Only the platform admin can call them, and they read through the same row-level security as everything else; none of them writes.
+
 ## [0.5.0] - 2026-10-26
 
 ### Added
