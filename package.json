@@ -15,7 +15,8 @@
     "db:migrate": "supabase migration up",
     "test:db": "supabase test db",
     "check:quick": "pnpm lint && pnpm test:db",
-    "ci:check": "pnpm lint && pnpm db:reset && pnpm test:db"
+    "ci:check": "pnpm lint && pnpm db:reset && pnpm test:db",
+    "db:types": "supabase gen types typescript --local --schema public > admin/src/lib/database.types.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",
