@@ -41,6 +41,9 @@
   --color-on-danger: var(--app-on-danger);
   --color-warning-bg: var(--app-warning-bg);
   --color-success-bg: var(--app-success-bg);
+  --color-glass: var(--app-glass);
+  --color-glass-field: var(--app-glass-field);
+  --color-glass-border: var(--app-glass-border);
 }
 
 :root {
@@ -61,6 +64,8 @@
   /* Glass: translucent panels over a softly lit page (sidebar, top bar, cards). */
   --app-glass: rgb(255 255 255 / 0.62);
   --app-glass-border: rgb(255 255 255 / 0.7);
+  /* Fields, chips and hovers inside glass panels: lighter than a panel, still see-through. */
+  --app-glass-field: rgb(255 255 255 / 0.55);
   --app-glass-shadow: 0 8px 32px rgb(4 48 59 / 0.08);
   --app-glow-honey: color-mix(in srgb, var(--color-honey) 22%, transparent);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 20%, transparent);
@@ -82,6 +87,7 @@
   --app-success-bg: #0b3a1f;
   --app-glass: rgb(4 48 59 / 0.55);
   --app-glass-border: rgb(255 255 255 / 0.08);
+  --app-glass-field: rgb(2 30 37 / 0.45);
   --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
   --app-glow-honey: color-mix(in srgb, var(--color-honey) 8%, transparent);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 10%, transparent);

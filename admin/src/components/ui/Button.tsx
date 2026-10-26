@@ -5,9 +5,9 @@ import { cx } from '../../lib/cx'
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-primary text-on-primary hover:opacity-90',
-  secondary: 'border border-border bg-surface text-text hover:bg-bg',
-  ghost: 'text-text hover:bg-border/40',
+  primary: 'bg-primary text-on-primary shadow-sm hover:opacity-90',
+  secondary: 'glass text-text hover:bg-glass-field',
+  ghost: 'text-text hover:bg-glass-field',
   danger: 'bg-danger text-on-danger hover:opacity-90',
 }
 

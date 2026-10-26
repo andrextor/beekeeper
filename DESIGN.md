@@ -45,6 +45,9 @@ Source: *Manual de Identidad Finca Landak 2025* (colors; its typeface, Arsenal, 
 | `--color-on-danger` | `#ffffff` | `deep` (white on `#f97066` is 2.6:1) |
 | `--color-warning-bg` | `#fff4e0` | `#3d2e10` |
 | `--color-success-bg` | `#e7f4e4` | `#0b3a1f` |
+| `--color-glass` | `rgb(255 255 255 / .62)` | `rgb(4 48 59 / .55)` |
+| `--color-glass-field` | `rgb(255 255 255 / .55)` | `rgb(2 30 37 / .45)` |
+| `--color-glass-border` | `rgb(255 255 255 / .7)` | `rgb(255 255 255 / .08)` |
 
 ### Record states (shared vocabulary with the app)
 
@@ -78,7 +81,7 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 
 - Mobile first (390 px), then 1024 and 1440. The admin is used mostly on a laptop but must work on a phone.
 - Shell: sidebar 248 px on ≥ `lg` (glass panel, `text` color, active item `accent` left bar on a 15 % `accent` tint); on smaller screens a glass top bar with a menu sheet. The deep-green sidebar was dropped on 2026-10-26: too heavy.
-- **Glass** (admin only; the app stays opaque for sun readability): the page background carries two soft glows (`honey` top-left, `sprout` bottom-right, 20 % light / 8–10 % dark); sidebar, top bar and cards use the `glass` utility (`--app-glass` translucent surface, 16 px blur, hairline `--app-glass-border`, soft shadow). With `prefers-reduced-transparency` it falls back to the solid `surface`. Inputs, tables and text blocks stay solid for contrast.
+- **Glass** (admin only; the app stays opaque for sun readability): the page background carries two soft glows (`honey` top-left, `sprout` bottom-right, 20 % light / 8–10 % dark); sidebar, top bar and cards use the `glass` utility (`--app-glass` translucent surface, 16 px blur, hairline `--app-glass-border`, soft shadow). With `prefers-reduced-transparency` it falls back to the solid `surface`. Every component follows it: secondary buttons are glass; ghost and icon buttons hover to `glass-field`; inputs and badges sit on `glass-field` (a lighter see-through fill, `rgb(255 255 255 / .55)` light, `rgb(2 30 37 / .45)` dark) with a `glass-border` hairline; skeletons are `text` at 10 %. Primary and danger buttons stay solid: they are the actions.
 - Content max width 1200 px, gutter 16 px (mobile) / 32 px (desktop), 8-px spacing grid.
 - Radius: 8 px controls, 12 px cards. Shadow only on overlays and glass panels.
 - Tables become stacked cards below `md`.

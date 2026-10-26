@@ -25,7 +25,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={onNavigate}
                 className={({ isActive }) =>
                   cx(
-                    'flex min-h-11 items-center gap-3 rounded-control border-l-4 px-3 transition hover:bg-text/5',
+                    'flex min-h-11 items-center gap-3 rounded-control border-l-4 px-3 transition hover:bg-glass-field',
                     isActive
                       ? 'border-accent bg-accent/15 font-medium'
                       : 'border-transparent text-muted',
@@ -39,7 +39,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           ))}
         </ul>
       </nav>
-      <div className="flex flex-col gap-2 border-t border-border/60 px-3 py-4">
+      <div className="flex flex-col gap-2 border-t border-glass-border px-3 py-4">
         <p className="truncate px-3 text-sm text-muted" title={email}>
           {email}
         </p>
@@ -47,12 +47,12 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <button
             type="button"
             onClick={() => signOut()}
-            className="flex min-h-11 items-center gap-3 rounded-control px-3 transition hover:bg-text/5"
+            className="flex min-h-11 items-center gap-3 rounded-control px-3 transition hover:bg-glass-field"
           >
             <LogOut size={20} aria-hidden />
             Cerrar sesión
           </button>
-          <ThemeToggle className="hover:bg-text/5" />
+          <ThemeToggle className="hover:bg-glass-field" />
         </div>
       </div>
     </div>
