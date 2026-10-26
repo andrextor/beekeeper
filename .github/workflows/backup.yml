@@ -1,0 +1,49 @@
+name: Backup
+
+# Weekly dump of the remote database (roles, schema, data). The free plan has no
+# daily backups. The repository is public and any GitHub user can download its
+# artifacts, so the dump is encrypted before upload. Restore: docs/deploy.md.
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec supabase link --project-ref "$SUPABASE_PROJECT_REF"
+      - run: |
+          mkdir backup
+          pnpm exec supabase db dump --linked --role-only -f backup/roles.sql
+          pnpm exec supabase db dump --linked -f backup/schema.sql
+          pnpm exec supabase db dump --linked --data-only --use-copy -f backup/data.sql
+      - name: Encrypt
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          : "${BACKUP_PASSPHRASE:?BACKUP_PASSPHRASE secret is missing}"
+          tar -czf - backup | gpg --batch --yes --pinentry-mode loopback --symmetric --cipher-algo AES256 \
+            --passphrase-file <(printf '%s' "$BACKUP_PASSPHRASE") -o backup.tar.gz.gpg
+          rm -rf backup
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-${{ github.run_number }}
+          path: backup.tar.gz.gpg
+          retention-days: 90
+          if-no-files-found: error
