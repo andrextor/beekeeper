@@ -18,6 +18,7 @@ paths:
 - **Soft-deleted parents** are checked in every RPC that acts on their children, and parent checks run again when a child is **restored** (`deleted_at` back to null), not only when its foreign key changes. Parent rows are read `for share` so a concurrent soft delete of the parent is serialized against the child write.
 - **A link checked from the child is also protected from the parent side.** If a child must match its parent (same hive, same organization), the parent's matched column is immutable or the parent's change cascades; a parent's soft delete cascades to children that only make sense with it.
 - **Keyset cursors** order by `(at, id)`, default a missing tiebreaker so a partial cursor stays strict, and their index carries the tiebreaker (`(hive_id, at desc, id desc)`).
+- **A check on an optional JSON key** wraps the condition in `coalesce(…, false)`: a missing key gives `null`, and a `null` check passes.
 - Partial unique indexes (`where deleted_at is null`) for anything a deleted row should give back: names, printed QR codes.
 - `execute` is granted to `authenticated` only for helpers that policies or `security invoker` functions call; helpers used only inside `security definer` RPCs get no grant.
 - Postgres fires `before` triggers in name order: domain tables name them `<table>_<NN>_<purpose>` (`10_set_timestamps`, `20_force_author`, `30_check_<parent>`, `40+` table-specific checks), so authorship and immutability errors win over parent checks.

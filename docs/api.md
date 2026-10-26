@@ -49,7 +49,7 @@ A check violation (`23514`, constraint name in `message`) means the client sent 
 |-----------|---------|------|
 | `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one, including restoring (`deleted_at = null`) a child whose parent is deleted |
 | `immutable_column` | "Un registro no puede cambiar de organización." | An update changes `organization_id` |
-| `immutable_column` | "Una revisión no puede cambiar de colmena." | An update changes `inspections.hive_id` (delete it and record it again on the right hive) |
+| `immutable_column` | "Un registro no puede cambiar de colmena." | An update changes `inspections.hive_id` or `photos.hive_id` (delete it and record it again on the right hive) |
 | `missing_author` | "Falta el autor del registro." | Server-side insert without `created_by` (never from clients) |
 | `apiary_not_empty` | "El apiario todavía tiene colmenas. Muévelas o elimínalas primero." | Soft-deleting an apiary with any non-deleted hive (dead ones included) |
 | `future_date` | "La fecha no puede ser futura." | `hives.colony_started_on`, `inspections.inspected_at` or `hive_events.occurred_at` more than one day ahead |
@@ -223,7 +223,7 @@ Table `inspections`. Common columns (`id`, `organization_id`, `created_by`, `cre
 
 Out-of-range values fail with `23514` on `inspections_<column>_check` (`inspections_varroa_check` for the varroa trio).
 
-**Who writes:** owners and reviewers insert; owners edit or soft-delete any inspection, reviewers only those they created (others' rows come back as `[]` on PATCH, `42501` on upsert). The platform admin reads only. Inspections by a member who has since left stay editable by the owner. `hive_id` cannot change. Soft-deleting an inspection soft-deletes its linked events in the same write (they come back in the next pull with a new `updated_at`); restoring the inspection does not restore them.
+**Who writes:** owners and reviewers insert; owners edit or soft-delete any inspection, reviewers only those they created (others' rows come back as `[]` on PATCH, `42501` on upsert). The platform admin reads only. Inspections by a member who has since left stay editable by the owner. `hive_id` cannot change. Soft-deleting an inspection soft-deletes its linked events and photos in the same write (they come back in the next pull with a new `updated_at`); restoring the inspection does not restore them.
 
 ### Open tasks
 
@@ -273,7 +273,46 @@ Events never change the hive by themselves (a `loss` does not set `hives.status`
 
 ## Photos
 
-*Filled in by B5.*
+Private bucket `hive-photos` (5 MB per file, `image/jpeg` only) plus table `photos`.
+
+### Files
+
+Two files per photo, made on the phone (the free plan has no image transformations):
+
+| File | Path | Size |
+|------|------|------|
+| Main | `{organization_id}/{hive_id}/{photo_id}.jpg` | long side 1600 px, JPEG q≈0.7, ~250 KB |
+| Thumbnail | `{organization_id}/{hive_id}/{photo_id}.thumb.jpg` | long side 320 px, ~20 KB |
+
+Ids are lowercase uuids. Any other name is refused (`403` from Storage). Members upload only into a non-deleted hive of their organization; the platform admin only reads. Files are never deleted by the app (no delete policy). Retries upload with `upsert: true`, which overwrites the uploader's own file at the same path.
+
+### Upload order
+
+1. Main file → 2. thumbnail → 3. upsert the `photos` row. The row is written last, so a crash leaves at most an orphan file, never a row pointing at nothing. Orphan cleanup is a later job.
+
+### Table `photos`
+
+Common columns plus:
+
+| Column | Type | Rule |
+|--------|------|------|
+| `hive_id` | uuid | a hive of the same organization, not deleted; cannot change (`immutable_column`) |
+| `inspection_id` | uuid | optional; an inspection of the same hive, not deleted (`parent_mismatch`) |
+| `storage_path` | text | exactly `{organization_id}/{hive_id}/{id}.jpg` (`23514` on `photos_storage_path_check`) |
+| `taken_at` | timestamptz | ≤ now + 1 day (`future_date`) |
+| `width`, `height` | integer | 1..10000 |
+| `bytes` | integer | 1..5242880, size of the main file |
+| `caption` | text | ≤ 300 |
+
+Same write rules as inspections: members insert, the owner edits any, a reviewer only their own; soft delete keeps the files.
+
+### Reading
+
+`storage.from('hive-photos').createSignedUrls(paths, 3600)`: one request per screen (up to 100 paths), thumbnails first. The thumbnail path is `storage_path` with `.jpg` → `.thumb.jpg`; if it returns 400/404, fall back to the main file. No public URLs.
+
+### Free-tier budget
+
+~270 KB per photo → ~3,700 photos in the free 1 GB of storage. Grids load only thumbnails to keep egress low. Past ~700 MB, photos move to Cloudflare R2 behind an Edge Function (new spec); paths and the app's queue stay the same.
 
 ## Admin
 
