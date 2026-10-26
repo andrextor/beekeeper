@@ -33,6 +33,12 @@ describe('formatColonyAge', () => {
     expect(formatColonyAge('2025-03-14', today)).toBe('1 año y 7 meses')
     expect(formatColonyAge('2027-01-01', today)).toBe('Menos de un mes')
   })
+
+  it('completes a month on the last day of a shorter month', () => {
+    expect(formatColonyAge('2026-01-31', new Date(2026, 1, 28))).toBe('1 mes')
+    expect(formatColonyAge('2026-03-31', new Date(2026, 3, 30))).toBe('1 mes')
+    expect(formatColonyAge('2026-03-31', new Date(2026, 3, 29))).toBe('Menos de un mes')
+  })
 })
 
 describe('formatAltitude', () => {

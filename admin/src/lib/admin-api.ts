@@ -248,7 +248,6 @@ export function organizationSummaryQuery(id: string) {
   return queryOptions({
     queryKey: ['admin-org', id],
     queryFn: () => fetchOrganizationSummary(id),
-    staleTime: 60_000,
   })
 }
 

@@ -76,32 +76,30 @@ function age(hive: Hive): string {
   return hive.colony_started_on ? formatColonyAge(hive.colony_started_on) : '—'
 }
 
-function hiveColumns(organizationId: string): ReadonlyArray<Column<Hive>> {
-  return [
-    {
-      header: 'Nombre',
-      cell: (hive) => (
-        <Link
-          to={`/apicultores/${organizationId}/colmenas/${hive.id}`}
-          viewTransition
-          className="font-medium hover:underline"
-        >
-          {hive.name}
-        </Link>
-      ),
-    },
-    { header: 'Tipo', cell: (hive) => label(hiveTypeLabels, hive.hive_type) },
-    { header: 'Estado', cell: (hive) => <StatusBadge hive={hive} /> },
-    { header: 'Cámaras / Alzas', cell: boxes },
-    { header: 'Reina', cell: (hive) => <Queen hive={hive} /> },
-    { header: 'Edad', cell: age },
-  ]
+function hivePath(hive: Hive): string {
+  return `/apicultores/${hive.organization_id}/colmenas/${hive.id}`
 }
 
-function HiveCard({ organizationId, hive }: { organizationId: string; hive: Hive }) {
+const hiveColumns: ReadonlyArray<Column<Hive>> = [
+  {
+    header: 'Nombre',
+    cell: (hive) => (
+      <Link to={hivePath(hive)} viewTransition className="font-medium hover:underline">
+        {hive.name}
+      </Link>
+    ),
+  },
+  { header: 'Tipo', cell: (hive) => label(hiveTypeLabels, hive.hive_type) },
+  { header: 'Estado', cell: (hive) => <StatusBadge hive={hive} /> },
+  { header: 'Cámaras / Alzas', cell: boxes },
+  { header: 'Reina', cell: (hive) => <Queen hive={hive} /> },
+  { header: 'Edad', cell: age },
+]
+
+function HiveCard({ hive }: { hive: Hive }) {
   return (
     <Link
-      to={`/apicultores/${organizationId}/colmenas/${hive.id}`}
+      to={hivePath(hive)}
       viewTransition
       className="glass flex flex-col gap-2 rounded-card p-4 transition duration-200 hover:-translate-y-0.5"
     >
@@ -160,16 +158,13 @@ function Facts({ apiary }: { apiary: Apiary }) {
   )
 }
 
-function Hives({ organizationId, apiaryId }: { organizationId: string; apiaryId: string }) {
+function Hives({ apiaryId }: { apiaryId: string }) {
   const [params, setParams] = useSearchParams()
   const filter: Filter = params.get('estado') === 'todas' ? 'todas' : 'activas'
   const hives = useQuery({
     queryKey: ['admin-hives', apiaryId],
     queryFn: () => fetchHives(apiaryId),
-    staleTime: 60_000,
   })
-
-  if (hives.isError) return <QueryError error={hives.error} onRetry={() => hives.refetch()} />
   const rows =
     filter === 'todas' ? hives.data : hives.data?.filter((hive) => hive.status === 'active')
 
@@ -186,20 +181,24 @@ function Hives({ organizationId, apiaryId }: { organizationId: string; apiaryId:
           }
         />
       </div>
-      <DataTable
-        caption="Colmenas"
-        columns={hiveColumns(organizationId)}
-        rows={rows}
-        rowKey={(hive) => hive.id}
-        card={(hive) => <HiveCard organizationId={organizationId} hive={hive} />}
-        rowHref={(hive) => `/apicultores/${organizationId}/colmenas/${hive.id}`}
-        empty={
-          <EmptyState
-            icon={Hexagon}
-            title={filter === 'todas' ? 'Aún no hay colmenas' : 'Sin colmenas activas'}
-          />
-        }
-      />
+      {hives.isError ? (
+        <QueryError error={hives.error} onRetry={() => hives.refetch()} />
+      ) : (
+        <DataTable
+          caption="Colmenas"
+          columns={hiveColumns}
+          rows={rows}
+          rowKey={(hive) => hive.id}
+          card={(hive) => <HiveCard hive={hive} />}
+          rowHref={hivePath}
+          empty={
+            <EmptyState
+              icon={Hexagon}
+              title={filter === 'todas' ? 'Aún no hay colmenas' : 'Sin colmenas activas'}
+            />
+          }
+        />
+      )}
     </section>
   )
 }
@@ -210,7 +209,6 @@ export function ApiaryPage() {
   const apiary = useQuery({
     queryKey: ['admin-apiary', apiaryId],
     queryFn: () => fetchApiary(apiaryId),
-    staleTime: 60_000,
   })
   const organizationName = organization.data?.organization.name ?? 'Apicultor'
   const found = apiary.data && apiary.data.organization_id === id ? apiary.data : null
@@ -224,7 +222,10 @@ export function ApiaryPage() {
           { label: found?.name ?? 'Apiario' },
         ]}
       />
-      {apiary.isPending ? (
+      {organization.isError ? (
+        // The summary RPC is the admin check here: RLS alone would answer a demoted admin with "not found".
+        <QueryError error={organization.error} onRetry={() => organization.refetch()} />
+      ) : apiary.isPending ? (
         <div className="flex flex-col gap-4">
           <Skeleton className="h-16" />
           <Skeleton className="h-40" />
@@ -241,7 +242,7 @@ export function ApiaryPage() {
         <>
           <h1 className="text-3xl font-bold">{found.name}</h1>
           <Facts apiary={found} />
-          <Hives organizationId={id} apiaryId={found.id} />
+          <Hives apiaryId={found.id} />
         </>
       )}
     </div>

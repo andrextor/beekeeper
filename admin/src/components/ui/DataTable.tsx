@@ -68,7 +68,13 @@ export function DataTable<T>({
               <tr
                 key={rowKey(row)}
                 onClick={
-                  rowHref ? () => navigate(rowHref(row), { viewTransition: true }) : undefined
+                  rowHref
+                    ? (event) => {
+                        // A link inside the row already navigates; a second push would double the history entry.
+                        if (event.target instanceof Element && event.target.closest('a')) return
+                        navigate(rowHref(row), { viewTransition: true })
+                      }
+                    : undefined
                 }
                 className={cx(
                   'border-b border-glass-border transition-colors last:border-0 hover:bg-glass-field',
