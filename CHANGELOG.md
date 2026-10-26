@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-28
+
 ### Added
 
 - Resumen: beekeepers, users, reviewers, apiaries, active hives of the total, inspections and events of the last 30 days, photos, photo storage against the 1 GB free limit (honey from 70 %, red from 90 %) and the 5 most recently inspected beekeepers.
