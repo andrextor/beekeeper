@@ -83,7 +83,7 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 
 - Mobile first (390 px), then 1024 and 1440. The admin is used mostly on a laptop but must work on a phone.
 - Shell: sidebar 248 px on ≥ `lg` (glass panel, `text` color, active item `accent` left bar on a 15 % `accent` tint); on smaller screens a glass top bar with a menu sheet. The deep-green sidebar was dropped on 2026-10-26: too heavy.
-- **Glass** (admin only; the app stays opaque for sun readability): the page background carries two soft glows (`sprout` top-left, `honey` bottom-right, 22/16 % light, 8/6 % dark); sidebar, top bar and cards use the `glass` utility (`--app-glass` translucent surface, 16 px blur, hairline `--app-glass-border`, soft shadow). With `prefers-reduced-transparency` it falls back to the solid `surface`. Every component follows it: secondary buttons are glass; ghost and icon buttons hover to `glass-field`; inputs and badges sit on `glass-field` (a lighter see-through fill, see `--color-glass-field`) with a `glass-border` hairline; skeletons are `text` at 10 %. Primary and danger buttons stay solid: they are the actions.
+- **Glass** (admin only; the app stays opaque for sun readability): the page background carries two soft glows (`sprout` top-left, `honey` bottom-right, 22/16 % light, 8/6 % dark); sidebar, top bar and cards use the `glass` utility (`--app-glass` translucent surface, 16 px blur, hairline `--app-glass-border`, soft shadow). With `prefers-reduced-transparency` it falls back to the solid `surface`. Every component follows it: secondary buttons are glass; ghost and icon buttons hover to `glass-field`; inputs and badges sit on `glass-field` (a lighter see-through fill, see `--color-glass-field`); badges keep a `glass-border` hairline, inputs a `--color-field-border` outline (`#86948a` / `#66705f`, ≥ 3:1 so the field is visible on glass); skeletons are `text` at 10 %. Primary and danger buttons stay solid: they are the actions.
 - Content max width 1200 px, gutter 16 px (mobile) / 32 px (desktop), 8-px spacing grid.
 - Radius: 8 px controls, 12 px cards. Shadow only on overlays and glass panels.
 - Tables become stacked cards below `md`.
@@ -98,5 +98,5 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 2. Every list names its source column and shows an empty state, a loading skeleton and an error state.
 3. Dates in Spanish (`Intl.DateTimeFormat('es-CO')`), relative for < 7 days ("hace 3 días"), absolute otherwise; times in the browser's zone.
 4. Numbers with `Intl.NumberFormat('es-CO')`.
-5. Focus visible on every interactive element (2 px `honey` ring + 2 px offset); touch targets ≥ 44 px.
+5. Focus visible on every interactive element (2 px `--app-focus` ring + 2 px offset: `leaf` by day, `honey` by night, both ≥ 3:1 against the page); touch targets ≥ 44 px.
 6. Copy is Spanish, short, and never blames the user.
