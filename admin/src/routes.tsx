@@ -7,6 +7,7 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
   ? [
       {
         path: '/_design',
+        HydrateFallback: () => null,
         lazy: () =>
           import('./features/design/DesignPage').then(({ DesignPage }) => ({
             Component: DesignPage,
