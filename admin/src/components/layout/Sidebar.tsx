@@ -1,11 +1,14 @@
-import { Hexagon } from 'lucide-react'
+import { Hexagon, LogOut } from 'lucide-react'
 import { NavLink } from 'react-router'
 import { cx } from '../../lib/cx'
+import { signOut, useSession } from '../../lib/session'
 import { navigation } from './navigation'
 import { ThemeToggle } from './ThemeToggle'
 
 /** Always on the brand's deep background (DESIGN.md → Layout), in light and dark. */
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+  const email = useSession().session?.user.email
+
   return (
     <div className="flex h-full flex-col bg-deep text-stone-100">
       <div className="flex items-center gap-2 px-6 py-6">
@@ -34,9 +37,21 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           ))}
         </ul>
       </nav>
-      <div className="flex items-center justify-between border-t border-white/10 px-6 py-4">
-        <span className="text-sm text-stone-300">Administrador</span>
-        <ThemeToggle className="hover:bg-white/10" />
+      <div className="flex flex-col gap-2 border-t border-white/10 px-3 py-4">
+        <p className="truncate px-3 text-sm text-stone-300" title={email}>
+          {email}
+        </p>
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="flex min-h-11 items-center gap-3 rounded-control px-3 transition hover:bg-white/10"
+          >
+            <LogOut size={20} aria-hidden />
+            Cerrar sesión
+          </button>
+          <ThemeToggle className="hover:bg-white/10" />
+        </div>
       </div>
     </div>
   )

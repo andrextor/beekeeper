@@ -3,15 +3,19 @@ import { authErrorMessage, networkErrorMessage, safeNextPath } from './auth'
 
 describe('authErrorMessage', () => {
   it('maps Supabase error codes to Spanish', () => {
-    expect(authErrorMessage({ name: 'AuthApiError', code: 'invalid_credentials', status: 400 })).toBe(
-      'Correo o contraseña incorrectos.',
+    expect(
+      authErrorMessage({ name: 'AuthApiError', code: 'invalid_credentials', status: 400 }),
+    ).toBe('Correo o contraseña incorrectos.')
+    expect(authErrorMessage({ name: 'AuthApiError', status: 429 })).toBe(
+      'Demasiados intentos. Espera un minuto.',
     )
-    expect(authErrorMessage({ name: 'AuthApiError', status: 429 })).toBe('Demasiados intentos. Espera un minuto.')
   })
 
   it('recognizes network failures', () => {
     expect(authErrorMessage(new TypeError('Failed to fetch'))).toBe(networkErrorMessage)
-    expect(authErrorMessage({ name: 'AuthRetryableFetchError', status: 0 })).toBe(networkErrorMessage)
+    expect(authErrorMessage({ name: 'AuthRetryableFetchError', status: 0 })).toBe(
+      networkErrorMessage,
+    )
   })
 
   it('never shows an unknown message as is', () => {

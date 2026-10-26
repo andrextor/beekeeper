@@ -24,7 +24,12 @@ export function NoAccessPage() {
         <p>Esta cuenta no tiene acceso al panel de administración.</p>
         <p className="text-sm text-muted">{session.user.email}</p>
       </div>
-      <Button variant="secondary" loading={leave.isPending} onClick={() => leave.mutate()} className="w-full">
+      <Button
+        variant="secondary"
+        loading={leave.isPending}
+        onClick={() => leave.mutate()}
+        className="w-full"
+      >
         Cerrar sesión
       </Button>
     </AuthLayout>
