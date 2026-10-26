@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-25
+
+### Added
+
+- Each user has a page in the panel (Usuarios → their email): change name, email and password (shown once to share), make them owner or reviewer of a farm, add or remove them from farms, grant or remove the admin permission, and deactivate or reactivate the account. Every change of access asks first.
+- A deactivated account cannot sign in ("Esta cuenta está desactivada.") and shows "Desactivado" in Usuarios and Personas; everything it recorded is kept. There is no delete: history always keeps who did the work.
+- Mi cuenta (the email in the menu): change your own name, and your password after typing the current one.
+- Safeguards: a farm always keeps an active owner, the platform always keeps an active admin, and no admin can remove their own permission or deactivate themselves. A deactivated admin loses admin powers at once, and your own email and password are changed only from Mi cuenta.
+
+### Changed
+
+- Resetting someone's password is done in the panel; `scripts/reset-password.sh` stays only for when the panel is down.
+
 ## [0.14.0] - 2026-10-25
 
 ### Added
