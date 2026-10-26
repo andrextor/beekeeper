@@ -1,6 +1,6 @@
 # A2 · Admin sign-in and access gate — spec
 
-Date: 2026-10-25 · Branch: `feat/a2-admin-sign-in` · Status: **awaiting OK** · Version: 0.8.0 · Revised 2026-10-25: email + password (no email is sent, B2 §Authentication)
+Date: 2026-10-25 · Branch: `feat/a2-admin-sign-in` · Status: **awaiting OK** · Version: 0.8.0 · Revised 2026-10-25: email + password (no email is sent, B2 §Authentication); 2026-10-26: local env script, `validation_failed`
 
 ## Problem
 
@@ -24,6 +24,7 @@ Only platform admins may use the panel. Anyone can create an account (the app ne
 | Case | Message |
 |------|---------|
 | `invalid_credentials` | "Correo o contraseña incorrectos." |
+| `validation_failed` | "Revisa el correo y la contraseña." |
 | `over_request_rate_limit` (429) | "Demasiados intentos. Espera un minuto." |
 | Network | "No hay conexión. Revisa tu internet e inténtalo de nuevo." |
 | Anything else | "No pudimos ingresar. Inténtalo de nuevo." |
@@ -31,6 +32,10 @@ Only platform admins may use the panel. Anyone can create an account (the app ne
 ### UI
 
 Centered card on `bg`, 400 px max, Plus Jakarta Sans title "Landak Apiario · Administración", `hexagon` mark in `leaf`. Inputs 48 px high, button full width. Enter submits; the button shows a spinner and is disabled while signing in. Works at 390 px.
+
+### Local configuration
+
+Root script `pnpm admin:env` writes `admin/.env.local` (gitignored) from `supabase status -o env`, keeping only `API_URL` → `VITE_SUPABASE_URL` and `PUBLISHABLE_KEY` → `VITE_SUPABASE_PUBLISHABLE_KEY`. No other key ever reaches the file.
 
 ## Security constraints
 
