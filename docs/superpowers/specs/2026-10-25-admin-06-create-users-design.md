@@ -8,7 +8,7 @@ Until the app ships (M1–M12) nobody can sign up, create a farm or accept an in
 
 ## Decision
 
-**Only platform admins** (`profiles.is_platform_admin`) can do it. The panel stays read-only for everything else; this is the one write it gets.
+**Only platform admins** (`profiles.is_platform_admin`) can do it. The panel stays read-only for everything else; this is the one write it gets. Beekeepers (owners) and reviewers can never create accounts: not from the app, not by calling the function or the SQL directly.
 
 ### Why an Edge Function
 
