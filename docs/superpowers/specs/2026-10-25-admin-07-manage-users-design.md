@@ -1,6 +1,6 @@
 # A7 · Platform admin manages accounts; my account — spec
 
-Date: 2026-10-25 · Branch: `feat/admin-manage-users` (on top of A6) · Status: **awaiting OK** · Version: 0.15.0
+Date: 2026-10-25 · Branch: `feat/a7-manage-users` · Status: **approved 2026-10-25** · Version: 0.15.0
 
 ## Problem
 

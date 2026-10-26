@@ -1,6 +1,6 @@
 # A7 · Manage accounts, my account — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-admin-07-manage-users-design.md` · Branch: `feat/admin-manage-users` (on top of A6) · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-admin-07-manage-users-design.md` · Branch: `feat/a7-manage-users` · Status: **approved 2026-10-25**
 
 ## 1. SQL
 
