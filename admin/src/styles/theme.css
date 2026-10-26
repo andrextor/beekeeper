@@ -88,6 +88,7 @@
   --color-glass: var(--app-glass);
   --color-glass-field: var(--app-glass-field);
   --color-glass-border: var(--app-glass-border);
+  --color-field-border: var(--app-field-border);
 }
 
 :root {
@@ -111,6 +112,9 @@
   --app-glass-border: rgb(255 255 255 / 0.85);
   /* Fields, chips and hovers inside glass panels: lighter than a panel, still see-through. */
   --app-glass-field: rgb(255 255 255 / 0.55);
+  /* Field outlines and the focus ring need 3:1 against the glass (WCAG 1.4.11); honey on sage is 1.7:1. */
+  --app-field-border: #7f8d83;
+  --app-focus: var(--color-leaf);
   --app-glass-shadow: 0 8px 32px rgb(24 33 26 / 0.07);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 22%, transparent);
   --app-glow-honey: color-mix(in srgb, var(--color-honey) 16%, transparent);
@@ -134,6 +138,8 @@
   --app-glass: rgb(29 34 27 / 0.6);
   --app-glass-border: rgb(255 255 255 / 0.07);
   --app-glass-field: rgb(18 21 17 / 0.5);
+  --app-field-border: #66705f;
+  --app-focus: var(--color-honey);
   --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 8%, transparent);
   --app-glow-honey: color-mix(in srgb, var(--color-honey) 6%, transparent);
@@ -193,7 +199,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--app-accent);
+    outline: 2px solid var(--app-focus);
     outline-offset: 2px;
   }
 }
@@ -218,6 +224,7 @@
   }
 }
 
+/* biome-ignore-start lint/complexity/noImportantStyles: reduced motion must beat every animation and utility */
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -231,3 +238,4 @@
     transition-duration: 0.01ms !important;
   }
 }
+/* biome-ignore-end lint/complexity/noImportantStyles: reduced motion must beat every animation and utility */

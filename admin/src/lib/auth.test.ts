@@ -35,6 +35,8 @@ describe('safeNextPath', () => {
     expect(safeNextPath('https://example.com')).toBe('/')
     expect(safeNextPath('//example.com')).toBe('/')
     expect(safeNextPath('/\\example.com')).toBe('/')
+    expect(safeNextPath('/\t/example.com')).toBe('/')
+    expect(safeNextPath('/.//example.com')).toBe('/')
     expect(safeNextPath(null)).toBe('/')
   })
 })

@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-10-28
+
+### Fixed
+
+- Panel totals no longer count apiaries, hives, inspections, events, photos or reviewers of deleted beekeepers.
+- The users list says when one of a person's organizations was deleted (`deleted_at` on each membership).
+- The keyboard focus ring and the outline of text fields are visible on the glass panels in light and dark mode.
+- The theme button in the sidebar and in the phone menu always agree.
+- The return address after signing in is parsed, so a crafted link cannot point the panel at another site.
+
 ## [0.8.0] - 2026-10-26
 
 ### Added
