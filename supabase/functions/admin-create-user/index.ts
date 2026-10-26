@@ -19,6 +19,12 @@ const roles: Record<Kind, 'owner' | 'reviewer' | 'admin'> = {
   admin: 'admin',
 }
 
+// admin_provision_member errors the panel can explain; anything else is a 500.
+const provisionStatus: Record<string, number> = {
+  not_platform_admin: 403,
+  organization_not_found: 404,
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -54,7 +60,9 @@ function parseInput(body: unknown): Input | string {
   const email = trimmed(body.email)?.toLowerCase() ?? ''
   if (email.length > 254 || !emailPattern.test(email)) return 'invalid_email'
   const password = typeof body.password === 'string' ? body.password : ''
-  if (password.length < 8 || password.length > 72) return 'invalid_password'
+  // bcrypt (Auth) stops at 72 bytes, not characters: accents and emoji take more than one.
+  if (password.length < 8 || new TextEncoder().encode(password).length > 72)
+    return 'invalid_password'
   const displayName = trimmed(body.display_name) ?? ''
   if (displayName.length < 1 || displayName.length > 80) return 'invalid_name'
 
@@ -118,24 +126,18 @@ async function handle(request: Request): Promise<Response> {
   const input = parseInput(body)
   if (typeof input === 'string') return respond(400, { error: input })
 
-  if (input.organizationId) {
-    const organization = await admin
-      .from('organizations')
-      .select('id')
-      .eq('id', input.organizationId)
-      .is('deleted_at', null)
-      .maybeSingle()
-    if (organization.error) throw organization.error
-    if (!organization.data) return respond(404, { error: 'organization_not_found' })
-  }
-
   const created = await admin.auth.admin.createUser({
     email: input.email,
     password: input.password,
     email_confirm: true,
   })
   if (created.error) {
-    if (created.error.code === 'email_exists') return respond(409, { error: 'email_taken' })
+    const code = created.error.code ?? ''
+    if (code === 'email_exists') return respond(409, { error: 'email_taken' })
+    if (code === 'email_address_invalid' || code === 'validation_failed') {
+      return respond(400, { error: 'invalid_email' })
+    }
+    if (code === 'weak_password') return respond(400, { error: 'invalid_password' })
     throw created.error
   }
   const userId = created.data.user.id
@@ -150,10 +152,13 @@ async function handle(request: Request): Promise<Response> {
   })
   if (provisioned.error) {
     // No half-made accounts: the profile goes with the Auth user (on delete cascade).
-    await admin.auth.admin.deleteUser(userId)
-    if (provisioned.error.details === 'organization_not_found') {
-      return respond(404, { error: 'organization_not_found' })
+    const rollback = await admin.auth.admin.deleteUser(userId)
+    if (rollback.error) {
+      // Left for Iván to delete in Authentication → Users; the email is taken until then.
+      console.error('admin-create-user rollback failed for user', userId, rollback.error.message)
     }
+    const status = provisionStatus[provisioned.error.details ?? '']
+    if (status) return respond(status, { error: provisioned.error.details })
     throw provisioned.error
   }
 

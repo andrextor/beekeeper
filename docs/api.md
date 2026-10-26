@@ -355,7 +355,7 @@ Only for platform admins; owners and reviewers are refused. `POST /functions/v1/
 |-------|------|
 | `kind` | `beekeeper` (account + new farm, as `owner`), `reviewer` (account + `reviewer` of an existing farm) or `admin` (account with `is_platform_admin`, no farm) |
 | `email` | valid, ≤ 254; stored lowercase |
-| `password` | 8–72 characters |
+| `password` | at least 8 characters, at most 72 bytes (UTF-8) |
 | `display_name` | 1–80 |
 | `organization_name` | beekeeper only, 1–120 |
 | `organization_id` | reviewer only, a live organization |

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, Copy, Eye, EyeOff, ShieldAlert, Sparkles } from 'lucide-react'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs'
 import { Button } from '../../components/ui/Button'
@@ -9,7 +9,7 @@ import { IconButton } from '../../components/ui/IconButton'
 import { Input } from '../../components/ui/Input'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { Segmented } from '../../components/ui/Segmented'
-import { fetchOrganizations, type OrganizationRow } from '../../lib/admin-api'
+import { type FarmOption, searchLiveOrganizations } from '../../lib/admin-api'
 import {
   type CreatedUser,
   type CreateUserField,
@@ -38,11 +38,19 @@ function kindFromParam(value: string | null): UserKind {
 }
 
 function CopyField({ label, value }: { label: string; value: string }) {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<'yes' | 'failed' | null>(null)
+  useEffect(() => {
+    if (!copied) return
+    const timer = setTimeout(() => setCopied(null), 2000)
+    return () => clearTimeout(timer)
+  }, [copied])
   const copy = async () => {
-    await navigator.clipboard.writeText(value)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopied('yes')
+    } catch {
+      setCopied('failed')
+    }
   }
   return (
     <div className="flex flex-col gap-1">
@@ -50,11 +58,16 @@ function CopyField({ label, value }: { label: string; value: string }) {
       <span className="flex items-center gap-2">
         <span className="break-all font-mono text-lg">{value}</span>
         <IconButton
-          icon={copied ? Check : Copy}
-          label={copied ? 'Copiado' : `Copiar ${label.toLowerCase()}`}
+          icon={copied === 'yes' ? Check : Copy}
+          label={copied === 'yes' ? 'Copiado' : `Copiar ${label.toLowerCase()}`}
           onClick={copy}
         />
       </span>
+      {copied === 'failed' && (
+        <span role="alert" className="text-sm text-danger">
+          No se pudo copiar. Selecciona el texto y cópialo a mano.
+        </span>
+      )}
     </div>
   )
 }
@@ -64,14 +77,14 @@ function FarmPicker({
   onChange,
   error,
 }: {
-  value: OrganizationRow | null
-  onChange: (farm: OrganizationRow | null) => void
+  value: FarmOption | null
+  onChange: (farm: FarmOption | null) => void
   error?: string
 }) {
   const [search, setSearch] = useState('')
   const farms = useQuery({
-    queryKey: ['admin-orgs', search, 1, 'picker'],
-    queryFn: () => fetchOrganizations(search, 1, 10),
+    queryKey: ['admin-orgs', 'picker', search],
+    queryFn: () => searchLiveOrganizations(search),
     enabled: value === null,
   })
 
@@ -93,12 +106,12 @@ function FarmPicker({
     )
   }
 
-  const rows = farms.data?.rows.filter((farm) => farm.deleted_at === null) ?? []
+  const rows = farms.data ?? []
   return (
     <div className="flex flex-col gap-2">
       <SearchInput
         label="Finca"
-        placeholder="Nombre o correo del dueño"
+        placeholder="Nombre de la finca"
         value={search}
         onSearch={setSearch}
       />
@@ -119,9 +132,6 @@ function FarmPicker({
                 className="flex min-h-11 w-full flex-col items-start rounded-control px-3 py-2 text-left transition hover:bg-glass-field"
               >
                 <span className="font-medium">{farm.name}</span>
-                {farm.owner_emails.length > 0 && (
-                  <span className="text-sm text-muted">{farm.owner_emails.join(', ')}</span>
-                )}
               </button>
             </li>
           ))}
@@ -155,7 +165,7 @@ function Done({
             viewTransition
             className="inline-flex min-h-11 items-center rounded-control px-4 font-medium text-primary hover:underline"
           >
-            Ver apicultor
+            {form.kind === 'beekeeper' ? 'Ver apicultor' : 'Ver finca'}
           </Link>
         )}
         <Button variant="secondary" onClick={onAnother}>
@@ -178,7 +188,7 @@ export function NewUserPage() {
   const [params, setParams] = useSearchParams()
   const kind = kindFromParam(params.get('tipo'))
   const [fields, setFields] = useState(emptyForm)
-  const [farm, setFarm] = useState<OrganizationRow | null>(null)
+  const [farm, setFarm] = useState<FarmOption | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<CreateUserField, string>>>({})
 

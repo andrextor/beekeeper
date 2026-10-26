@@ -33,7 +33,8 @@ export function validateCreateUser(form: CreateUserForm): Partial<Record<CreateU
     errors.displayName = 'Escribe el nombre (hasta 80 caracteres).'
   const email = form.email.trim()
   if (email.length > 254 || !emailPattern.test(email)) errors.email = 'Escribe un correo válido.'
-  if (form.password.length < 8 || form.password.length > 72) {
+  // Auth's limit is 72 bytes: accents and emoji take more than one.
+  if (form.password.length < 8 || new TextEncoder().encode(form.password).length > 72) {
     errors.password = 'La contraseña debe tener entre 8 y 72 caracteres.'
   }
   if (form.kind === 'beekeeper') {

@@ -52,6 +52,8 @@ describe('validateCreateUser', () => {
       validateCreateUser({ ...beekeeper, displayName: 'a'.repeat(81) }).displayName,
     ).toBeDefined()
     expect(validateCreateUser({ ...beekeeper, password: 'a'.repeat(73) }).password).toBeDefined()
+    // 37 characters, 74 bytes: Auth counts bytes.
+    expect(validateCreateUser({ ...beekeeper, password: 'ñ'.repeat(37) }).password).toBeDefined()
     expect(
       validateCreateUser({ ...beekeeper, organizationName: 'a'.repeat(121) }).organizationName,
     ).toBeDefined()

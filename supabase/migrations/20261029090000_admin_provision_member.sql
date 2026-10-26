@@ -17,11 +17,15 @@ as $$
 declare
   v_organization_id uuid;
 begin
-  if not coalesce((select p.is_platform_admin from public.profiles p where p.id = p_actor_id), false) then
-    raise exception 'Solo administradores de la plataforma.' using errcode = 'P0001', detail = 'not_platform_admin';
-  end if;
   if p_role not in ('owner', 'reviewer', 'admin') or p_role is null then
     raise exception 'Tipo de usuario no válido.' using errcode = 'P0001', detail = 'invalid_role';
+  end if;
+  -- Lock first, then check who asks (tenancy rule): an admin demoted while waiting is refused.
+  if p_role = 'reviewer' then
+    perform private.lock_organization(p_organization_id);
+  end if;
+  if not coalesce((select p.is_platform_admin from public.profiles p where p.id = p_actor_id for share), false) then
+    raise exception 'Solo administradores de la plataforma.' using errcode = 'P0001', detail = 'not_platform_admin';
   end if;
 
   update public.profiles set display_name = btrim(p_display_name) where id = p_user_id;
@@ -41,7 +45,6 @@ begin
     return v_organization_id;
   end if;
 
-  perform private.lock_organization(p_organization_id);
   if not exists (
     select 1 from public.organizations o where o.id = p_organization_id and o.deleted_at is null
   ) then

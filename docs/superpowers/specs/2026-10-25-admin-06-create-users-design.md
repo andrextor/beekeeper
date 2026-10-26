@@ -46,15 +46,15 @@ Steps, in order; the first failure answers and stops:
    |-------|------|-----------|
    | `kind` | `beekeeper`, `reviewer` or `admin` | `invalid_kind` |
    | `email` | trimmed, lowercased, `x@y.z` shape, ≤ 254 | `invalid_email` |
-   | `password` | 8–72 characters (Auth's minimum; bcrypt's limit) | `invalid_password` |
+   | `password` | at least 8 characters and at most 72 bytes in UTF-8 (Auth's minimum; bcrypt counts bytes) | `invalid_password` |
    | `display_name` | trimmed, 1–80 (the `profiles` check) | `invalid_name` |
    | `organization_name` | beekeeper only: trimmed, 1–120 (the `create_organization` rule) | `invalid_organization_name` |
    | `organization_id` | reviewer only: a UUID | `invalid_organization` |
 
    Not JSON or not an object → 400 `invalid_body`. Every validation error → 400.
-4. **Farm exists** (reviewer only). Select the organization by id with `deleted_at is null`; none → 404 `organization_not_found`. Checked before creating the account so a typo never creates and deletes one; step 6 checks again under the lock.
-5. **Account.** `auth.admin.createUser({ email, password, email_confirm: true })`. Email already registered (Auth `email_exists`) → 409 `email_taken`. The `on_auth_user_created` trigger makes the `profiles` row as for any sign-up.
-6. **Membership.** One RPC, `public.admin_provision_member` (below). On any error the function **deletes the Auth user it created in step 5** (no half-made accounts; the profile goes with it by `on delete cascade`) and answers with the RPC's code (`organization_not_found` → 404, anything else → 500 `server_error`).
+4. *(Removed by the code review, R9: a pre-check outside the lock was a second copy of step 6's check and could not prevent the race; step 6 checks under the lock and step 6's rollback handles a missing farm.)*
+5. **Account.** `auth.admin.createUser({ email, password, email_confirm: true })`. Email already registered (Auth `email_exists`) → 409 `email_taken`; an email or password Auth refuses (`email_address_invalid`, `validation_failed`, `weak_password`) → 400 `invalid_email` / `invalid_password`. The `on_auth_user_created` trigger makes the `profiles` row as for any sign-up.
+6. **Membership.** One RPC, `public.admin_provision_member` (below). On any error the function **deletes the Auth user it created in step 5** (no half-made accounts; the profile goes with it by `on delete cascade`) and answers with the RPC's code (`not_platform_admin` → 403, `organization_not_found` → 404, anything else → 500 `server_error`). If that delete fails too, the function logs the user id so Iván can delete it in Authentication → Users.
 7. **Answer.** 200 `{ "user_id": "…", "organization_id": "…" | null }`. The password is never echoed, logged or stored outside Auth.
 
 Errors always answer `{ "error": "<code>" }`, never Auth's or Postgres' English text. Unexpected exceptions → 500 `server_error`, with the detail only in the function logs (no password in them: the body is never logged).
@@ -77,7 +77,7 @@ admin_provision_member(
 - Checks again that `p_actor_id` is a platform admin (`not_platform_admin` otherwise): the admin rule lives in SQL too, where pgTAP can test it.
 - Sets `profiles.display_name` for `p_user_id`.
 - `owner`: inserts `organizations (id = gen_random_uuid(), name, created_by = p_user_id)` and the `owner` membership. The organization is the beekeeper's own from the start, exactly as if they had created it in the app.
-- `reviewer`: `private.lock_organization(p_organization_id)` **first**, then reads it; missing or `deleted_at` set → `organization_not_found`. Inserts the `reviewer` membership.
+- `reviewer`: `private.lock_organization(p_organization_id)` **first** (before the admin check, which reads the actor's profile `for share`), then reads it; missing or `deleted_at` set → `organization_not_found`. Inserts the `reviewer` membership.
 - `admin`: sets `profiles.is_platform_admin = true`; no organization, no membership; returns null.
 - Any other role → `invalid_role`.
 - Errors in the house style: `raise exception '<Spanish>' using errcode = 'P0001', detail = '<code>'`.
@@ -91,7 +91,7 @@ admin_provision_member(
   - **Nombre** (required), **Correo** (required, `type="email"`, `autocomplete="off"`).
   - **Contraseña** (required, min 8): show/hide like sign-in, plus **Generar**, which fills a random 12-character password from `crypto.getRandomValues` over letters and digits without look-alikes (`0 O 1 l I`), and shows it.
   - Apicultor: **Nombre de la finca** (required).
-  - Revisor: **Finca**: a search box over `admin_list_organizations` (10 results, deleted farms left out); picking one shows it as chosen with a "Cambiar" link.
+  - Revisor: **Finca**: a search by name over live farms (`organizations` where `deleted_at is null`, 10 results); picking one shows it as chosen with a "Cambiar" link.
   - **Crear usuario** button, disabled while sending; the form validates the same rules as the function before sending.
 - **Done**: the form is replaced by a card: "Usuario creado", the email and the password each with a copy button, the text "Compártela por un canal privado. No se vuelve a mostrar.", links **Ver apicultor** (the farm; not for an admin) and **Crear otro**. The users, beekeepers and dashboard queries are invalidated so the lists show the new account.
 - **Errors** under the button, in Spanish, by code:
