@@ -11,7 +11,7 @@ Only platform admins may use the panel. Anyone can create an account (the app ne
 ### Flow
 
 1. `/ingresar`: email + password fields (`autocomplete="email"` / `"current-password"`, show/hide password toggle with `eye` / `eye-off`), button "Ingresar" → `signInWithPassword({ email, password })`.
-2. No sign-up and no recovery link in the panel: the admin account is created in the app or in Studio, and the flag is set by SQL (B2). Under the form: "¿Olvidaste tu contraseña? Restablécela con `scripts/reset-password.sh`." (only the admin reads this screen).
+2. No sign-up and no recovery link in the panel: the admin account is created in the app or in Studio, and the flag is set by SQL (B2). No technical hints on screen (scripts, commands, codes): a forgotten admin password is reset by Iván with `scripts/reset-password.sh`, documented in `docs/api.md`, not in the form.
 3. After sign-in, read the own profile (`select is_platform_admin from profiles where id = auth.uid()`).
 4. Flag true → `next` or `/`. Flag false → `/sin-acceso` ("Esta cuenta no tiene acceso al panel de administración.") with "Cerrar sesión".
 

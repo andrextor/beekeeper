@@ -72,9 +72,6 @@ export function SignInPage() {
           Ingresar
         </Button>
       </form>
-      <p className="text-center text-sm text-muted">
-        ¿Olvidaste tu contraseña? Restablécela con <code>scripts/reset-password.sh</code>.
-      </p>
     </AuthLayout>
   )
 }
