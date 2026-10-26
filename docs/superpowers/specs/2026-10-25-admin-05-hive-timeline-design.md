@@ -22,7 +22,7 @@ From the apiary page the admin opens a hive and needs its records (every inspect
 
 - `hive_timeline(hiveId, before, beforeId, 30)` through `useInfiniteQuery`; "Cargar más" passes the last item's `at` and `id` (cursor, not offset). It stops when a page returns fewer than 30.
 - `data` is the full row as JSON: parsed with type guards into `Inspection` / `HiveEvent` (generated `Tables<>` types); an unknown `kind` is skipped, a malformed row throws (`QueryError`).
-- **Inspection** (`clipboard-check`): date, author (`author_name`, "Ex miembro" when null), source badge (`mic` "Por voz" / `keyboard` "Manual"), attention badge (soon `warning`, urgent `danger`, none hidden), and one summary line from `lib/inspection-summary.ts` ("Fuerza 4 · Reina vista · 7 cuadros de cría · Reservas: Pocas").
+- **Inspection** (`clipboard-check`): date, author (`author_name`, "Sin nombre" when null: the admin sees every profile, so null means no display name), source badge (`mic` "Por voz" / `keyboard` "Manual"), attention badge (soon `warning`, urgent `danger`, none hidden), and one summary line from `lib/inspection-summary.ts` ("Fuerza 4 · Reina vista · 7 cuadros de cría · Reservas: Pocas").
   - Expanding uses native `<details>`/`<summary>`: every recorded field with its Spanish label (`lib/labels.ts`), `not_checked` → "No revisado", null fields hidden, arrays joined, the transcript in a `blockquote`, the inspection notes.
 - **Event**: icon per type (DESIGN.md: note `sticky-note`, feeding `droplet`, treatment `syringe`, harvest `package`, queen change `crown`, others `calendar-clock`), one line from `lib/event-summary.ts` ("Alimentación · Jarabe de azúcar 1:1 · 2 l"), author, date. A note shows its text and a `mic` icon when dictated.
 - Empty → "Aún no hay registros".
@@ -48,6 +48,12 @@ The seed has no photos: Storage files cannot be written from `seed.sql`. `script
 - The timeline has inspections and events only (that is what `hive_timeline` returns). Notes are `note` events, so they appear as their own items; photos live in the Fotos tab instead of inside each inspection, which would cost one read per inspection.
 - `pnpm seed:photos` did not exist: the script above adds it.
 - The header shows breadcrumbs and the apiary, reusing A4's queries.
+
+## Implementation notes
+
+- `HiveStatusBadge` and `QueenMark` moved from the apiary page to `components/HiveBadges.tsx`, and the facts grid to `components/ui/FactList.tsx`: the hive page is their second user.
+- `PagePlaceholder` is deleted: the hive page was its last user.
+- No unit labels: `l`, `kg` and `g` read the same in Spanish.
 
 ## Security
 

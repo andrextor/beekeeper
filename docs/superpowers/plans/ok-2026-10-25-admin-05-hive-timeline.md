@@ -3,10 +3,10 @@
 Spec: `docs/superpowers/specs/2026-10-25-admin-05-hive-timeline-design.md` · Branch: `feat/a5-admin-hive-timeline` · Status: **approved 2026-10-28**
 
 1. **Seed photos** — `scripts/seed-photos.sh` (rules in `.claude/rules/scripts.md`), `supabase/seed-photos/{1,2}.jpg` + `.thumb.jpg`, `package.json` script `seed:photos`, a line in `docs/api.md` Local development.
-2. **Labels** — `lib/labels.ts`: `feedLabels`, `unitLabels`, `treatmentMethodLabels`, `harvestProductLabels`, `lossCauseLabels`, `queenChangeReasonLabels`; the same table in `docs/api.md` Events. Test in `labels.test.ts`.
+2. **Labels** — `lib/labels.ts`: `feedLabels`, `treatmentMethodLabels`, `harvestProductLabels`, `lossCauseLabels`, `queenChangeReasonLabels`; the same table in `docs/api.md` Events. Test in `labels.test.ts`.
 3. **Summaries** — `lib/inspection-summary.ts` (summary line + the label/value list for the expanded view), `lib/event-summary.ts`; tests for every event shape in `docs/api.md` and for an inspection with only the required fields.
 4. **API** — `admin-api.ts`: `fetchHive(id)`, `parseTimelineRow` + `fetchTimeline(hiveId, cursor)`, `fetchPhotos(hiveId, page)`, `signPhotoUrls(paths)` with the thumbnail fallback. Test for `parseTimelineRow`.
-5. **Hive page** — `features/hives/HivePage.tsx` (breadcrumbs, header, `Segmented`), `TimelineList.tsx` (infinite query, inspection and event items); route in `routes.tsx` replaces the placeholder.
+5. **Hive page** — `features/hives/HivePage.tsx` (breadcrumbs, header, `Segmented`), `TimelineList.tsx` (infinite query, inspection and event items); route in `routes.tsx` replaces the placeholder. Committed after task 6, which it imports.
 6. **Photos** — `features/hives/PhotosTab.tsx` (grid + pagination) and `Lightbox.tsx` (`<dialog>`).
 7. **Changelog** — `## [0.11.0]` Added.
 8. **Release** — `chore(release): 0.11.0`. Check: `pnpm ci:check`.
