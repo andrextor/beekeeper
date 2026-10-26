@@ -139,6 +139,45 @@ export const eventTypeLabels = {
   qr_relabel: 'Cambio de etiqueta QR',
 } as const
 
+export const feedLabels = {
+  sugar_syrup: 'Jarabe de azúcar',
+  fondant: 'Fondant',
+  pollen_patty: 'Torta proteica',
+  honey: 'Miel',
+  other: 'Otro alimento',
+} as const
+
+export const treatmentMethodLabels = {
+  strip: 'Tiras',
+  drip: 'Goteo',
+  vapor: 'Vapor',
+  dust: 'Espolvoreo',
+  other: 'Otro método',
+} as const
+
+export const harvestProductLabels = {
+  honey: 'Miel',
+  pollen: 'Polen',
+  propolis: 'Propóleo',
+  wax: 'Cera',
+} as const
+
+export const lossCauseLabels = {
+  starvation: 'Hambre',
+  pests: 'Plagas',
+  disease: 'Enfermedad',
+  absconding: 'Fuga',
+  pesticide: 'Pesticida',
+  unknown: 'Causa desconocida',
+} as const
+
+export const queenChangeReasonLabels = {
+  failing: 'Reina fallando',
+  aggressive: 'Colmena agresiva',
+  lost: 'Reina perdida',
+  planned: 'Planificado',
+} as const
+
 /** The database stores these as text; an unknown value (a newer server) shows as is instead of breaking. */
 export function label(
   labels: Readonly<Record<string, string>>,

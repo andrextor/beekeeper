@@ -1,25 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
 import { Hexagon, MapPin } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { Badge, type BadgeTone } from '../../components/ui/Badge'
+import { HiveStatusBadge, QueenMark } from '../../components/HiveBadges'
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs'
 import { Card } from '../../components/ui/Card'
 import { type Column, DataTable } from '../../components/ui/DataTable'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { FactList } from '../../components/ui/FactList'
 import { NotFoundState } from '../../components/ui/NotFoundState'
 import { QueryError } from '../../components/ui/QueryError'
 import { Segmented } from '../../components/ui/Segmented'
 import { Skeleton } from '../../components/ui/Skeleton'
 import {
   type Apiary,
-  fetchApiary,
+  apiaryQuery,
   fetchHives,
   type Hive,
   organizationSummaryQuery,
 } from '../../lib/admin-api'
-import { cx } from '../../lib/cx'
 import { formatAltitude, formatColonyAge } from '../../lib/format'
-import { hiveStatusLabels, hiveTypeLabels, label, queenColorLabels } from '../../lib/labels'
+import { hiveTypeLabels, label } from '../../lib/labels'
 
 type Filter = 'activas' | 'todas'
 
@@ -27,46 +27,6 @@ const filters: ReadonlyArray<{ value: Filter; label: string }> = [
   { value: 'activas', label: 'Activas' },
   { value: 'todas', label: 'Todas' },
 ]
-
-const statusTones: Readonly<Record<string, BadgeTone>> = {
-  active: 'success',
-  dead: 'danger',
-  absconded: 'danger',
-}
-
-// The international queen-marking colours, fixed whatever the theme.
-const queenDots: Readonly<Record<string, string>> = {
-  white: 'bg-white',
-  yellow: 'bg-yellow-400',
-  red: 'bg-red-600',
-  green: 'bg-green-600',
-  blue: 'bg-blue-600',
-}
-
-function StatusBadge({ hive }: { hive: Hive }) {
-  return (
-    <Badge tone={statusTones[hive.status] ?? 'neutral'}>
-      {label(hiveStatusLabels, hive.status)}
-    </Badge>
-  )
-}
-
-function Queen({ hive }: { hive: Hive }) {
-  const dot = hive.queen_color ? queenDots[hive.queen_color] : undefined
-  if (!hive.queen_year && !dot) return <span className="text-muted">—</span>
-  return (
-    <span className="inline-flex items-center gap-2">
-      {dot && (
-        <span
-          role="img"
-          aria-label={`Marca ${label(queenColorLabels, hive.queen_color).toLowerCase()}`}
-          className={cx('size-3 rounded-full border border-glass-border', dot)}
-        />
-      )}
-      {hive.queen_year ?? ''}
-    </span>
-  )
-}
 
 function boxes(hive: Hive): string {
   return `${hive.brood_boxes ?? '—'} / ${hive.supers ?? '—'}`
@@ -90,9 +50,9 @@ const hiveColumns: ReadonlyArray<Column<Hive>> = [
     ),
   },
   { header: 'Tipo', cell: (hive) => label(hiveTypeLabels, hive.hive_type) },
-  { header: 'Estado', cell: (hive) => <StatusBadge hive={hive} /> },
+  { header: 'Estado', cell: (hive) => <HiveStatusBadge hive={hive} /> },
   { header: 'Cámaras / Alzas', cell: boxes },
-  { header: 'Reina', cell: (hive) => <Queen hive={hive} /> },
+  { header: 'Reina', cell: (hive) => <QueenMark hive={hive} /> },
   { header: 'Edad', cell: age },
 ]
 
@@ -105,19 +65,20 @@ function HiveCard({ hive }: { hive: Hive }) {
     >
       <span className="flex flex-wrap items-center gap-2">
         <span className="font-medium">{hive.name}</span>
-        <StatusBadge hive={hive} />
+        <HiveStatusBadge hive={hive} />
       </span>
       <span className="text-sm text-muted">
         {label(hiveTypeLabels, hive.hive_type)} · Cámaras / Alzas {boxes(hive)} · Edad {age(hive)}
       </span>
       <span className="flex items-center gap-2 text-sm text-muted">
-        Reina <Queen hive={hive} />
+        Reina <QueenMark hive={hive} />
       </span>
     </Link>
   )
 }
 
 function Facts({ apiary }: { apiary: Apiary }) {
+  const hasMap = apiary.latitude != null && apiary.longitude != null
   const facts = [
     { term: 'Finca', value: apiary.farm_name },
     { term: 'Lugar', value: apiary.place },
@@ -128,22 +89,12 @@ function Facts({ apiary }: { apiary: Apiary }) {
     { term: 'Flora', value: apiary.flora_notes },
     { term: 'Agua', value: apiary.water_source },
     { term: 'Notas', value: apiary.notes },
-  ].filter((fact) => fact.value)
-  const hasMap = apiary.latitude != null && apiary.longitude != null
-  if (facts.length === 0 && !hasMap) return null
+  ]
+  if (!facts.some((fact) => fact.value) && !hasMap) return null
 
   return (
     <Card className="flex flex-col gap-4">
-      {facts.length > 0 && (
-        <dl className="grid gap-3 sm:grid-cols-2">
-          {facts.map((fact) => (
-            <div key={fact.term} className="flex flex-col gap-0.5">
-              <dt className="text-sm text-muted">{fact.term}</dt>
-              <dd className="whitespace-pre-line">{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
+      <FactList facts={facts} />
       {hasMap && (
         <a
           href={`https://www.google.com/maps?q=${apiary.latitude},${apiary.longitude}`}
@@ -206,10 +157,7 @@ function Hives({ apiaryId }: { apiaryId: string }) {
 export function ApiaryPage() {
   const { id = '', apiaryId = '' } = useParams()
   const organization = useQuery(organizationSummaryQuery(id))
-  const apiary = useQuery({
-    queryKey: ['admin-apiary', apiaryId],
-    queryFn: () => fetchApiary(apiaryId),
-  })
+  const apiary = useQuery(apiaryQuery(apiaryId))
   const organizationName = organization.data?.organization.name ?? 'Apicultor'
   const found = apiary.data && apiary.data.organization_id === id ? apiary.data : null
 

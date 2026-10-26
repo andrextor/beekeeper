@@ -1,3 +1,5 @@
+import { isRecord } from './guards'
+
 // Supabase Auth errors come in English; the panel shows Spanish by error_code (docs/api.md → Auth).
 const messages: Record<string, string> = {
   invalid_credentials: 'Correo o contraseña incorrectos.',
@@ -7,10 +9,6 @@ const messages: Record<string, string> = {
 
 export const networkErrorMessage = 'No hay conexión. Revisa tu internet e inténtalo de nuevo.'
 const fallbackMessage = 'No pudimos ingresar. Inténtalo de nuevo.'
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
 
 export function authErrorMessage(error: unknown): string {
   if (error instanceof TypeError) return networkErrorMessage

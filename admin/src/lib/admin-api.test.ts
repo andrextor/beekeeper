@@ -5,6 +5,8 @@ import {
   parseMemberships,
   parseOrganizationSummary,
   parseStats,
+  parseTimelineRow,
+  thumbnailPath,
 } from './admin-api'
 
 vi.mock('./supabase', () => ({ supabase: {} }))
@@ -103,5 +105,40 @@ describe('parseOrganizationSummary', () => {
   it('refuses a malformed result', () => {
     expect(() => parseOrganizationSummary({ ...summary, members: [{ role: 'admin' }] })).toThrow()
     expect(() => parseOrganizationSummary({ ...summary, organization: null })).toThrow()
+  })
+})
+
+describe('parseTimelineRow', () => {
+  const base = {
+    id: '00000000-0000-4000-e000-000000000003',
+    at: '2026-10-25T14:00:00Z',
+    author_name: null,
+  }
+
+  it('reads inspections and events', () => {
+    const inspection = { id: base.id, inspected_at: base.at, source: 'voice', transcript: 'Fuerte' }
+    expect(parseTimelineRow({ ...base, kind: 'inspection', data: inspection })).toEqual({
+      ...base,
+      kind: 'inspection',
+      inspection,
+    })
+    const event = { id: base.id, occurred_at: base.at, type: 'note', details: { text: 'Hola' } }
+    expect(parseTimelineRow({ ...base, kind: 'event', data: event })).toEqual({
+      ...base,
+      kind: 'event',
+      event,
+    })
+  })
+
+  it('skips an unknown kind and throws on a malformed row', () => {
+    expect(parseTimelineRow({ ...base, kind: 'photo', data: {} })).toBeNull()
+    expect(() => parseTimelineRow({ ...base, kind: 'inspection', data: { id: base.id } })).toThrow()
+    expect(() => parseTimelineRow({ ...base, kind: 'event', data: null })).toThrow()
+  })
+})
+
+describe('thumbnailPath', () => {
+  it('points at the thumbnail next to the main file', () => {
+    expect(thumbnailPath('o/h/p.jpg')).toBe('o/h/p.thumb.jpg')
   })
 })

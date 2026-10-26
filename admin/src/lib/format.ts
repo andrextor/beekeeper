@@ -20,6 +20,14 @@ export function formatDate(iso: string): string {
   return dateFormat.format(new Date(iso))
 }
 
+/** A calendar date ("2026-11-01") read as a local day, so it never shifts to the day before. Other text shows as is. */
+export function formatCalendarDate(date: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  if (!match) return date
+  const parsed = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+  return Number.isNaN(parsed.getTime()) ? date : dateFormat.format(parsed)
+}
+
 export function formatDateTime(iso: string): string {
   return dateTimeFormat.format(new Date(iso))
 }
@@ -47,7 +55,7 @@ export function formatAltitude(meters: number): string {
   return `${formatNumber(meters)} m`
 }
 
-function plural(count: number, one: string, many: string): string {
+export function plural(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`
 }
 

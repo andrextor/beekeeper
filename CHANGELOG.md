@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-28
+
+### Added
+
+- Colmena page: QR code, type, brood boxes and supers, queen, origin, age, race and notes, with breadcrumbs back to the apiary and a "no existe" state.
+- Historial view: inspections and events newest first, 30 at a time with "Cargar más". Each inspection shows a one-line summary, its source and attention, and opens to every recorded field, the dictated text and its notes; each event shows one line in Spanish.
+- Fotos view: thumbnails 48 per page, the full photo on click with its date, caption and inspection.
+- Spanish labels for feeding, treatment, harvest, loss and queen change details, in the panel and in `docs/api.md`.
+- `pnpm seed:photos` uploads two sample photos to C-01 after a local reset.
+
 ## [0.10.0] - 2026-10-28
 
 ### Added
