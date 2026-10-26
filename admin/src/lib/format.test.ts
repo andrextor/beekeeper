@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { formatAltitude, formatColonyAge, formatDate, formatNumber, formatRelative } from './format'
+import {
+  formatAltitude,
+  formatCalendarDate,
+  formatColonyAge,
+  formatDate,
+  formatNumber,
+  formatRelative,
+} from './format'
 
 const now = new Date('2026-10-26T15:00:00Z')
 
@@ -44,5 +51,11 @@ describe('formatColonyAge', () => {
 describe('formatAltitude', () => {
   it('groups thousands in meters', () => {
     expect(formatAltitude(2550)).toBe('2.550 m')
+  })
+})
+
+describe('formatCalendarDate', () => {
+  it('keeps the calendar day in any time zone', () => {
+    expect(formatCalendarDate('2026-11-01')).toBe(formatDate(new Date(2026, 10, 1).toISOString()))
   })
 })

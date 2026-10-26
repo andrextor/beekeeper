@@ -20,6 +20,12 @@ export function formatDate(iso: string): string {
   return dateFormat.format(new Date(iso))
 }
 
+/** A calendar date ("2026-11-01") read as a local day, so it never shifts to the day before. */
+export function formatCalendarDate(date: string): string {
+  const [year = 0, month = 1, day = 1] = date.split('-').map(Number)
+  return dateFormat.format(new Date(year, month - 1, day))
+}
+
 export function formatDateTime(iso: string): string {
   return dateTimeFormat.format(new Date(iso))
 }
@@ -47,7 +53,7 @@ export function formatAltitude(meters: number): string {
   return `${formatNumber(meters)} m`
 }
 
-function plural(count: number, one: string, many: string): string {
+export function plural(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`
 }
 
