@@ -11,7 +11,7 @@ import {
   pageCount,
   type Photo,
   photoPageSize,
-  signedUrlStaleTime,
+  signedUrlRefresh,
   signThumbnails,
 } from '../../lib/admin-api'
 import { useListParams } from '../../lib/useListParams'
@@ -30,7 +30,8 @@ export function PhotosTab({ hiveId }: { hiveId: string }) {
     queryKey: ['admin-photo-thumbnails', paths],
     queryFn: () => signThumbnails(paths),
     enabled: paths.length > 0,
-    staleTime: signedUrlStaleTime,
+    staleTime: signedUrlRefresh,
+    refetchInterval: signedUrlRefresh,
   })
 
   if (photos.isPending) {
@@ -46,7 +47,7 @@ export function PhotosTab({ hiveId }: { hiveId: string }) {
   if (thumbnails.isError) {
     return <QueryError error={thumbnails.error} onRetry={() => thumbnails.refetch()} />
   }
-  if (photos.data.rows.length === 0) {
+  if (photos.data.total === 0) {
     return (
       <Card>
         <EmptyState icon={Camera} title="Aún no hay fotos" />

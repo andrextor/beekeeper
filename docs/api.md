@@ -242,7 +242,7 @@ View `hive_open_tasks` (RLS applies): one row per non-deleted hive that has an i
 | `pests` | `wax_moth` Polilla de la cera · `small_hive_beetle` Escarabajo de la colmena · `ants` Hormigas · `wasps` Avispas · `mice` Ratones · `other` Otra |
 | `disease_signs` | `chalkbrood` Cría yesificada · `sacbrood` Cría ensacada · `foulbrood_signs` Signos de loque · `deformed_wings` Alas deformes · `dysentery` Diarrea · `dead_bees` Abejas muertas · `other` Otro |
 | `weather` | `sunny` Soleado · `cloudy` Nublado · `rain` Lluvia · `windy` Viento |
-| `attention_level` | `none` Ninguna · `soon` Pronto · `urgent` Urgente |
+| `attention_level` | `none` Sin novedad · `soon` Pronto · `urgent` Urgente |
 | `planned_actions` | `feed` Alimentar · `treat` Tratar · `change_queen` Cambiar reina · `add_super` Poner alza · `remove_super` Quitar alza · `harvest` Cosechar · `split` Dividir · `merge` Unir · `move` Trasladar · `check_queen` Revisar reina · `other` Otra |
 
 ## Events

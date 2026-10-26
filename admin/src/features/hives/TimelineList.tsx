@@ -30,6 +30,7 @@ import {
 } from '../../lib/admin-api'
 import { eventSummary } from '../../lib/event-summary'
 import { formatDateTime } from '../../lib/format'
+import { isRecord } from '../../lib/guards'
 import { inspectionFields, inspectionSummary } from '../../lib/inspection-summary'
 import { attentionLevelLabels, inspectionSourceLabels, label } from '../../lib/labels'
 
@@ -126,10 +127,7 @@ function Row({ children }: { children: ReactNode }) {
 
 function EventItem({ item, event }: { item: TimelineItem; event: HiveEvent }) {
   const dictated =
-    event.type === 'note' &&
-    typeof event.details === 'object' &&
-    !Array.isArray(event.details) &&
-    event.details.source === 'voice'
+    event.type === 'note' && isRecord(event.details) && event.details.source === 'voice'
   return (
     <Row>
       <ItemIcon icon={eventIcons[event.type] ?? CalendarClock} />
@@ -161,7 +159,8 @@ export function TimelineList({ hiveId }: { hiveId: string }) {
       </div>
     )
   }
-  if (timeline.isError && !timeline.isFetchNextPageError) {
+  // With pages already shown, a failed refetch keeps them; only a failed next page says so below.
+  if (timeline.isError && !timeline.data) {
     return <QueryError error={timeline.error} onRetry={() => timeline.refetch()} />
   }
 

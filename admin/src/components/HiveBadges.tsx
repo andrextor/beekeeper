@@ -28,7 +28,7 @@ export function HiveStatusBadge({ hive }: { hive: Hive }) {
 
 export function QueenMark({ hive }: { hive: Hive }) {
   const dot = hive.queen_color ? queenDots[hive.queen_color] : undefined
-  if (!hive.queen_year && !dot) return <span className="text-muted">—</span>
+  if (!hive.queen_year && !hive.queen_color) return <span className="text-muted">—</span>
   return (
     <span className="inline-flex items-center gap-2">
       {dot && (
@@ -38,6 +38,8 @@ export function QueenMark({ hive }: { hive: Hive }) {
           className={cx('size-3 rounded-full border border-glass-border', dot)}
         />
       )}
+      {/* A colour this panel does not know (a newer server) shows as text. */}
+      {hive.queen_color && !dot && <span>{label(queenColorLabels, hive.queen_color)}</span>}
       {hive.queen_year ?? ''}
     </span>
   )

@@ -58,4 +58,9 @@ describe('formatCalendarDate', () => {
   it('keeps the calendar day in any time zone', () => {
     expect(formatCalendarDate('2026-11-01')).toBe(formatDate(new Date(2026, 10, 1).toISOString()))
   })
+
+  it('shows text that is not a calendar date as is', () => {
+    expect(formatCalendarDate('pronto')).toBe('pronto')
+    expect(formatCalendarDate('2026-11-01T00:00:00Z')).toBe('2026-11-01T00:00:00Z')
+  })
 })

@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import type { Database, Tables } from './database.types'
+import { isRecord } from './guards'
 import { supabase } from './supabase'
 
 export const pageSize = 25
@@ -44,10 +45,6 @@ export type UserRow = Omit<GeneratedUser, 'display_name' | 'organizations'> & {
 }
 
 export type Page<T> = { rows: T[]; total: number }
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
 
 export function parseStats(value: unknown): AdminStats {
   if (!isRecord(value)) throw new Error('Unexpected admin_stats result')
@@ -282,6 +279,10 @@ export async function fetchHives(apiaryId: string): Promise<Hive[]> {
   return data
 }
 
+export function hiveQuery(id: string) {
+  return queryOptions({ queryKey: ['admin-hive', id], queryFn: () => fetchHive(id) })
+}
+
 export async function fetchHive(id: string): Promise<Hive | null> {
   if (!uuidPattern.test(id)) return null
   const { data, error } = await supabase
@@ -383,8 +384,8 @@ export async function fetchPhotos(hiveId: string, page: number): Promise<Page<Ph
 
 const photoBucket = 'hive-photos'
 export const signedUrlSeconds = 3600
-// Refreshing signed URLs at 50 min keeps every image loadable.
-export const signedUrlStaleTime = 50 * 60_000
+// Signed URL queries refetch every 50 min (refetchInterval), so an open page never holds an expired one.
+export const signedUrlRefresh = 50 * 60_000
 
 export function thumbnailPath(storagePath: string): string {
   return storagePath.replace(/\.jpg$/, '.thumb.jpg')
@@ -399,20 +400,20 @@ export async function signThumbnails(storagePaths: string[]): Promise<Record<str
     signedUrlSeconds,
   )
   if (error) throw error
+  // Results are matched by the path they carry, never by position.
   const urls: Record<string, string> = {}
-  const missing: string[] = []
-  storagePaths.forEach((path, index) => {
-    const signed = data[index]
-    if (signed && !signed.error && signed.signedUrl) urls[path] = signed.signedUrl
-    else missing.push(path)
-  })
+  for (const signed of data) {
+    if (!signed.error && signed.path && signed.signedUrl) {
+      urls[signed.path.replace(/\.thumb\.jpg$/, '.jpg')] = signed.signedUrl
+    }
+  }
+  const missing = storagePaths.filter((path) => !urls[path])
   if (missing.length > 0) {
     const fallback = await bucket.createSignedUrls(missing, signedUrlSeconds)
     if (fallback.error) throw fallback.error
-    missing.forEach((path, index) => {
-      const signed = fallback.data[index]
-      if (signed && !signed.error && signed.signedUrl) urls[path] = signed.signedUrl
-    })
+    for (const signed of fallback.data) {
+      if (!signed.error && signed.path && signed.signedUrl) urls[signed.path] = signed.signedUrl
+    }
   }
   return urls
 }

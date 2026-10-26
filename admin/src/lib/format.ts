@@ -20,10 +20,12 @@ export function formatDate(iso: string): string {
   return dateFormat.format(new Date(iso))
 }
 
-/** A calendar date ("2026-11-01") read as a local day, so it never shifts to the day before. */
+/** A calendar date ("2026-11-01") read as a local day, so it never shifts to the day before. Other text shows as is. */
 export function formatCalendarDate(date: string): string {
-  const [year = 0, month = 1, day = 1] = date.split('-').map(Number)
-  return dateFormat.format(new Date(year, month - 1, day))
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  if (!match) return date
+  const parsed = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+  return Number.isNaN(parsed.getTime()) ? date : dateFormat.format(parsed)
 }
 
 export function formatDateTime(iso: string): string {

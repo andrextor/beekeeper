@@ -25,11 +25,12 @@ function outOfFive(value: number | null): string | null {
 }
 
 function varroa(inspection: Inspection): string | null {
-  if (inspection.varroa_method === null || inspection.varroa_count === null) return null
+  if (inspection.varroa_count === null) return null
   const sample = inspection.varroa_sample_size
-  return `${label(varroaMethodLabels, inspection.varroa_method)}: ${formatNumber(inspection.varroa_count)}${
-    sample ? ` en ${formatNumber(sample)} abejas` : ''
-  }`
+  const count = `${formatNumber(inspection.varroa_count)}${sample ? ` en ${formatNumber(sample)} abejas` : ''}`
+  return inspection.varroa_method
+    ? `${label(varroaMethodLabels, inspection.varroa_method)}: ${count}`
+    : count
 }
 
 /** One line for the timeline: "Fuerza 4 · Reina vista · 7 cuadros de cría · Reservas: Pocas". */

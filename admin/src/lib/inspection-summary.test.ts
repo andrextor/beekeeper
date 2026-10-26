@@ -74,6 +74,12 @@ describe('inspectionSummary', () => {
 })
 
 describe('inspectionFields', () => {
+  it('keeps a varroa count recorded without a method', () => {
+    expect(inspectionFields({ ...empty, varroa_count: 12 })).toEqual([
+      { label: 'Varroa', value: '12' },
+    ])
+  })
+
   it('labels every recorded field and hides the rest', () => {
     expect(inspectionFields(full)).toEqual([
       { label: 'Fuerza', value: '4 de 5' },

@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { ErrorState } from '../../components/ui/ErrorState'
 import { IconButton } from '../../components/ui/IconButton'
 import { Skeleton } from '../../components/ui/Skeleton'
-import { type Photo, signedUrlStaleTime, signPhoto } from '../../lib/admin-api'
+import { type Photo, signedUrlRefresh, signPhoto } from '../../lib/admin-api'
 import { formatDate, formatDateTime } from '../../lib/format'
 
 export function photoAlt(photo: Photo): string {
@@ -17,7 +17,8 @@ export function Lightbox({ photo, onClose }: { photo: Photo | null; onClose: () 
   const full = useQuery({
     queryKey: ['admin-photo', photo?.storage_path],
     queryFn: photo ? () => signPhoto(photo.storage_path) : skipToken,
-    staleTime: signedUrlStaleTime,
+    staleTime: signedUrlRefresh,
+    refetchInterval: signedUrlRefresh,
   })
 
   useEffect(() => {

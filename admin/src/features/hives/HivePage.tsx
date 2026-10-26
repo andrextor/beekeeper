@@ -8,7 +8,7 @@ import { NotFoundState } from '../../components/ui/NotFoundState'
 import { QueryError } from '../../components/ui/QueryError'
 import { Segmented } from '../../components/ui/Segmented'
 import { Skeleton } from '../../components/ui/Skeleton'
-import { apiaryQuery, fetchHive, type Hive, organizationSummaryQuery } from '../../lib/admin-api'
+import { apiaryQuery, type Hive, hiveQuery, organizationSummaryQuery } from '../../lib/admin-api'
 import { formatColonyAge, plural } from '../../lib/format'
 import { colonyOriginLabels, hiveTypeLabels, label, queenOriginLabels } from '../../lib/labels'
 import { PhotosTab } from './PhotosTab'
@@ -40,7 +40,7 @@ function queen(hive: Hive) {
   ].filter((part): part is string => typeof part === 'string')
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
-      <QueenMark hive={hive} />
+      {(hive.queen_year || hive.queen_color) && <QueenMark hive={hive} />}
       {extra.length > 0 && <span>{extra.join(' · ')}</span>}
     </span>
   )
@@ -86,7 +86,7 @@ export function HivePage() {
   const [params, setParams] = useSearchParams()
   const tab: Tab = params.get('tab') === 'fotos' ? 'fotos' : 'historial'
   const organization = useQuery(organizationSummaryQuery(id))
-  const hive = useQuery({ queryKey: ['admin-hive', hiveId], queryFn: () => fetchHive(hiveId) })
+  const hive = useQuery(hiveQuery(hiveId))
   const found = hive.data && hive.data.organization_id === id ? hive.data : null
   const apiaryId = found?.apiary_id ?? ''
   const apiary = useQuery({ ...apiaryQuery(apiaryId), enabled: apiaryId !== '' })

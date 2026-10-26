@@ -1,4 +1,5 @@
 import { formatCalendarDate, formatNumber, plural } from './format'
+import { isRecord } from './guards'
 import {
   eventTypeLabels,
   feedLabels,
@@ -82,10 +83,7 @@ const summaries: Record<string, (details: Details) => Array<string | false | und
 export function eventSummary(type: string, details: unknown): string {
   if (!Object.hasOwn(eventTypeLabels, type)) return 'Evento'
   const title = label(eventTypeLabels, type)
-  const record: Details =
-    typeof details === 'object' && details !== null && !Array.isArray(details)
-      ? (details as Details)
-      : {}
+  const record: Details = isRecord(details) ? details : {}
   const parts = Object.hasOwn(summaries, type) ? (summaries[type]?.(record) ?? []) : []
   return [
     title,
