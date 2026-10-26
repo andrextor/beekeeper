@@ -64,7 +64,9 @@ supabase db reset  # apply every migration + seed from scratch (~75 s, restarts 
 pnpm db:migrate    # apply only new migrations (~3 s)
 supabase test db   # pgTAP
 pnpm check:quick   # lint + pgTAP without a reset (~9 s), the inner loop
-pnpm ci:check      # lint + reset + pgTAP (~90 s), what CI runs
+pnpm admin:check   # admin typecheck + Vitest + build
+pnpm db:types      # regenerate admin/src/lib/database.types.ts after a migration
+pnpm ci:check      # lint + admin:check + reset + pgTAP (~2 min), what CI runs
 ```
 
 **Iván runs the tests and checks, never the session** (Iván, 2026-10-26). The session does not run `pnpm test:db`, `pnpm check:quick`, `pnpm ci:check` or any test command, not even the one test it just wrote. Write the code and the tests, commit each task, and when every task is done hand Iván the exact command to run (`pnpm db:migrate && pnpm check:quick`, or `pnpm ci:check` before merging); he pastes back whatever fails. Applying migrations to the local stack (`pnpm db:migrate`, `pnpm db:reset`) to inspect data is allowed; running tests is not.
