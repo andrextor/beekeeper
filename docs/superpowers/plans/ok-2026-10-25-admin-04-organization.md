@@ -1,6 +1,6 @@
 # A4 · Admin organization detail — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-admin-04-organization-design.md` · Branch: `feat/a4-admin-organization` · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-admin-04-organization-design.md` · Branch: `feat/a4-admin-organization` · Status: **approved 2026-10-28**
 
 1. **API**: `admin/src/lib/admin-api.ts` gets three functions, plus tests in `admin-api.test.ts` for the parser:
    - `fetchOrganizationSummary(id)`, with `parseOrganizationSummary(unknown)` guarded by `isRecord`.

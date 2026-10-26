@@ -27,7 +27,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 | A1 | Scaffold + design system (Vite, React, Tailwind 4, Lucide, tokens, shell) | `specs/2026-10-25-admin-01-scaffold-design.md` | `plans/ok-2026-10-25-admin-01-scaffold.md` | 0.7.0 |
 | A2 | Sign-in (email + password) and access gate | `specs/2026-10-25-admin-02-sign-in-design.md` | `plans/ok-2026-10-25-admin-02-sign-in.md` | 0.8.0 |
 | A3 | Dashboard and beekeepers list | `specs/2026-10-25-admin-03-dashboard-design.md` | `plans/ok-2026-10-25-admin-03-dashboard.md` | 0.9.0 |
-| A4 | Organization detail: members, apiaries, hives | `specs/2026-10-25-admin-04-organization-design.md` | `plans/2026-10-25-admin-04-organization.md` | 0.10.0 |
+| A4 | Organization detail: members, apiaries, hives | `specs/2026-10-25-admin-04-organization-design.md` | `plans/ok-2026-10-25-admin-04-organization.md` | 0.10.0 |
 | A5 | Hive detail: timeline, inspections, events, photos | `specs/2026-10-25-admin-05-hive-timeline-design.md` | `plans/2026-10-25-admin-05-hive-timeline.md` | 0.11.0 |
 
 ## Phase 3 — Go live (external accounts, each step asks first)

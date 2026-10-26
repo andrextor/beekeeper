@@ -1,6 +1,6 @@
 # A4 · Admin organization detail — spec
 
-Date: 2026-10-25 · Refreshed: 2026-10-28 · Branch: `feat/a4-admin-organization` · Status: **awaiting OK** · Version: 0.10.0
+Date: 2026-10-25 · Refreshed: 2026-10-28 · Branch: `feat/a4-admin-organization` · Status: **approved 2026-10-28** · Version: 0.10.0
 
 ## Problem
 
