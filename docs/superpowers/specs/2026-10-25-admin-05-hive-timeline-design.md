@@ -1,6 +1,6 @@
 # A5 · Admin hive detail and timeline — spec
 
-Date: 2026-10-25 · Refreshed: 2026-10-28 · Branch: `feat/a5-admin-hive-timeline` · Status: **awaiting OK** · Version: 0.11.0
+Date: 2026-10-25 · Refreshed: 2026-10-28 · Branch: `feat/a5-admin-hive-timeline` · Status: **approved 2026-10-28** · Version: 0.11.0
 
 ## Problem
 

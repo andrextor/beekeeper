@@ -1,6 +1,6 @@
 # A5 · Admin hive detail and timeline — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-admin-05-hive-timeline-design.md` · Branch: `feat/a5-admin-hive-timeline` · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-admin-05-hive-timeline-design.md` · Branch: `feat/a5-admin-hive-timeline` · Status: **approved 2026-10-28**
 
 1. **Seed photos** — `scripts/seed-photos.sh` (rules in `.claude/rules/scripts.md`), `supabase/seed-photos/{1,2}.jpg` + `.thumb.jpg`, `package.json` script `seed:photos`, a line in `docs/api.md` Local development.
 2. **Labels** — `lib/labels.ts`: `feedLabels`, `unitLabels`, `treatmentMethodLabels`, `harvestProductLabels`, `lossCauseLabels`, `queenChangeReasonLabels`; the same table in `docs/api.md` Events. Test in `labels.test.ts`.
