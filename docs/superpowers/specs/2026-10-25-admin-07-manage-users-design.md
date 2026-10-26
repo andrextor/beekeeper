@@ -102,7 +102,7 @@ Every action that changes access (role, remove, admin off, deactivate) asks in a
 - Every endpoint checks the platform admin flag server-side; membership RPCs lock before checking.
 - An admin cannot remove their own flag, deactivate themselves, or leave the platform with no active admin.
 - Passwords are never logged or echoed by the server; the panel shows a new password once.
-- A deactivated user's existing access token works until it expires (≤ 1 h). Accepted: RLS does not read `deactivated_at`. A `ponytail:` note in the spec's place in code names the upgrade (an RLS check) if that hour matters.
+- A deactivated user's existing access token works until it expires (≤ 1 h). Accepted: RLS does not read `deactivated_at`. A `ponytail:` comment in `admin-update-user` names the upgrade (an RLS check on `deactivated_at`) if that hour ever matters.
 
 ## Impact on the mobile contract
 
