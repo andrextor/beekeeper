@@ -50,6 +50,32 @@ Conexión, una vez (Vercel → Add New → Project):
 
 `admin/vercel.json` manda toda ruta a `index.html` (recargar `/apicultores` no da 404) y fija los encabezados de seguridad. Su `Content-Security-Policy` nombra el proyecto `dhacyrwngqegqjffpten`: si el backend cambia de proyecto, hay que cambiarlo ahí también o el panel no podrá conectarse.
 
+## Crear cuentas desde el panel (A6)
+
+Los admins de plataforma crean apicultores, revisores y otros admins en Usuarios → Nuevo usuario. Lo hace la Edge Function `admin-create-user`, que usa la clave secreta que Supabase le inyecta: la clave nunca sale de Supabase.
+
+Publicar la función (la primera vez y cada vez que cambie), en tu terminal después de mergear:
+
+```bash
+pnpm exec supabase functions deploy admin-create-user
+```
+
+Quién es admin: Usuarios muestra la insignia **Admin**. Para quitarle el permiso a alguien, en el SQL Editor:
+
+```sql
+update public.profiles set is_platform_admin = false where email = 'correo@ejemplo.com';
+```
+
+Comprobar que un no-admin es rechazado (con la sesión de esa cuenta; debe responder `not_platform_admin`):
+
+```bash
+curl -s -X POST "$SUPABASE_URL/functions/v1/admin-create-user" \
+  -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "content-type: application/json" -d '{}'
+```
+
+`ACCESS_TOKEN` es el token de sesión de esa cuenta (DevTools → Application → Local Storage → `sb-…-auth-token` → `access_token`); se pega en la terminal, nunca en un archivo.
+
 ## Subir una migración nueva
 
 Después de mergear el release a `main`:

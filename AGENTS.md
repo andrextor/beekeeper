@@ -22,7 +22,7 @@ Trivial fixes may skip the spec, never the OK. Code reviews go to `docs/superpow
 |------|---------|
 | `supabase/migrations/` | The full schema, one timestamped migration per change. This repo is the schema's source of truth |
 | `supabase/tests/` | pgTAP tests (`supabase test db`): RLS isolation and every RPC |
-| `supabase/functions/` | Edge Functions (Deno), only when SQL + RLS cannot do it |
+| `supabase/functions/` | Edge Functions (Deno), only when SQL + RLS cannot do it. Today: `admin-create-user` (A6) |
 | `supabase/seed.sql` | Local demo data only, never run against the remote |
 | `docs/api.md` | The contract the mobile app relies on: tables, RPCs, storage paths, sync rules |
 | `docs/deploy.md` | Remote Supabase project: where each key lives, migrations, backups, restore (Spanish) |
