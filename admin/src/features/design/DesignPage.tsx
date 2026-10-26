@@ -25,7 +25,7 @@ export function DesignPage() {
     <main className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 py-6 lg:px-8">
       <header className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Sistema de diseño</h1>
-        <ThemeToggle className="hover:bg-border/40" />
+        <ThemeToggle className="hover:bg-glass-field" />
       </header>
 
       <Section title="Colores">
@@ -37,6 +37,8 @@ export function DesignPage() {
           ['bg-danger', 'danger'],
           ['bg-success-bg', 'success-bg'],
           ['bg-warning-bg', 'warning-bg'],
+          ['glass', 'glass'],
+          ['bg-glass-field', 'glass-field'],
         ].map(([className, name]) => (
           <div key={name} className="flex flex-col items-center gap-1">
             <div className={`size-16 rounded-control border border-border ${className}`} />

@@ -32,19 +32,24 @@ Source: *Manual de Identidad Finca Landak 2025* (colors; its typeface, Arsenal, 
 
 | Token | Light | Dark |
 |-------|-------|------|
-| `--color-bg` | `stone-50` | `#021e25` |
-| `--color-surface` | `#ffffff` | `deep` `#04303b` |
-| `--color-border` | `stone-200` | `#0d4654` |
-| `--color-text` | `deep` | `stone-100` |
-| `--color-text-muted` | `stone-500` | `#9fb3b8` |
+| `--color-bg` | `#f4f7f2` (soft sage) | `#121511` (olive black) |
+| `--color-surface` | `#ffffff` | `#1a1e18` |
+| `--color-border` | `#dfe7dc` | `#242a22` |
+| `--color-text` | `#18211a` | `#eaeee7` |
+| `--color-text-muted` | `#617065` (5:1 on bg) | `#9aa595` |
 | `--color-primary` | `leaf` | `sprout` |
-| `--color-on-primary` | `#ffffff` | `deep` |
+| `--color-on-primary` | `#ffffff` | `#121511` |
 | `--color-accent` | `honey` | `honey` |
-| `--color-on-accent` | `deep` | `deep` |
+| `--color-on-accent` | `#18211a` | `#121511` |
 | `--color-danger` | `#b42318` | `#f97066` |
-| `--color-on-danger` | `#ffffff` | `deep` (white on `#f97066` is 2.6:1) |
-| `--color-warning-bg` | `#fff4e0` | `#3d2e10` |
-| `--color-success-bg` | `#e7f4e4` | `#0b3a1f` |
+| `--color-on-danger` | `#ffffff` | `#121511` (white on `#f97066` is 2.6:1) |
+| `--color-warning-bg` | `#fff4e0` | `#3a2f17` |
+| `--color-success-bg` | `#e7f4e4` | `#1c3317` |
+| `--color-glass` | `rgb(255 255 255 / .66)` | `rgb(29 34 27 / .6)` |
+| `--color-glass-field` | `rgb(255 255 255 / .55)` | `rgb(18 21 17 / .5)` |
+| `--color-glass-border` | `rgb(255 255 255 / .85)` | `rgb(255 255 255 / .07)` |
+
+Palette **"Bosque claro"** (chosen 2026-10-26 among five, after the deep-teal dark background was rejected as too heavy): green never fills a background, it marks actions and states; honey marks what is active or pending. `deep` stays a brand color but is no longer a surface.
 
 ### Record states (shared vocabulary with the app)
 
@@ -77,9 +82,10 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 ## Layout
 
 - Mobile first (390 px), then 1024 and 1440. The admin is used mostly on a laptop but must work on a phone.
-- Shell: sidebar 248 px on ≥ `lg` (background `deep`, text `stone-100`, active item `honey` left bar); on smaller screens a top bar with a menu sheet.
+- Shell: sidebar 248 px on ≥ `lg` (glass panel, `text` color, active item `accent` left bar on a 15 % `accent` tint); on smaller screens a glass top bar with a menu sheet. The deep-green sidebar was dropped on 2026-10-26: too heavy.
+- **Glass** (admin only; the app stays opaque for sun readability): the page background carries two soft glows (`sprout` top-left, `honey` bottom-right, 22/16 % light, 8/6 % dark); sidebar, top bar and cards use the `glass` utility (`--app-glass` translucent surface, 16 px blur, hairline `--app-glass-border`, soft shadow). With `prefers-reduced-transparency` it falls back to the solid `surface`. Every component follows it: secondary buttons are glass; ghost and icon buttons hover to `glass-field`; inputs and badges sit on `glass-field` (a lighter see-through fill, see `--color-glass-field`) with a `glass-border` hairline; skeletons are `text` at 10 %. Primary and danger buttons stay solid: they are the actions.
 - Content max width 1200 px, gutter 16 px (mobile) / 32 px (desktop), 8-px spacing grid.
-- Radius: 8 px controls, 12 px cards. Shadow only on overlays.
+- Radius: 8 px controls, 12 px cards. Shadow only on overlays and glass panels.
 - Tables become stacked cards below `md`.
 
 ## Components (`admin/src/components/ui/`)

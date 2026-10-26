@@ -5,7 +5,7 @@ import { TopBar } from './TopBar'
 export function AppShell() {
   return (
     <div className="min-h-dvh lg:pl-62">
-      <aside className="fixed inset-y-0 left-0 hidden w-62 lg:block">
+      <aside className="fixed inset-y-0 left-0 hidden w-62 animate-slide-in lg:block">
         <Sidebar />
       </aside>
       <TopBar />

@@ -14,7 +14,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
-      <Icon size={48} className="text-muted" aria-hidden />
+      <Icon size={48} className="animate-pop text-muted" aria-hidden />
       <p className="font-display text-xl">{title}</p>
       {hint && <p className="max-w-sm text-sm text-muted">{hint}</p>}
       {action}

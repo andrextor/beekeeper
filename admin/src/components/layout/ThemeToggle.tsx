@@ -28,9 +28,9 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       }}
       aria-label={`${labels[preference]}. Cambiar tema`}
       title={labels[preference]}
-      className={`inline-flex size-11 items-center justify-center rounded-control ${className}`}
+      className={`inline-flex size-11 items-center justify-center rounded-control transition duration-200 ease-out hover:scale-110 active:scale-90 ${className}`}
     >
-      <Icon size={20} aria-hidden />
+      <Icon key={preference} size={20} className="animate-pop" aria-hidden />
     </button>
   )
 }

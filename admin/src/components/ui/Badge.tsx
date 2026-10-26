@@ -5,12 +5,12 @@ import { cx } from '../../lib/cx'
 export type BadgeTone = 'neutral' | 'primary' | 'accent' | 'danger' | 'success' | 'warning'
 
 const tones: Record<BadgeTone, string> = {
-  neutral: 'border-border text-muted',
-  primary: 'border-primary text-primary',
+  neutral: 'border-glass-border bg-glass-field text-muted',
+  primary: 'border-primary/40 bg-glass-field text-primary',
   accent: 'border-accent bg-accent text-on-accent',
-  danger: 'border-danger text-danger',
-  success: 'border-transparent bg-success-bg text-text',
-  warning: 'border-transparent bg-warning-bg text-text',
+  danger: 'border-danger/40 bg-glass-field text-danger',
+  success: 'border-glass-border bg-success-bg/70 text-text',
+  warning: 'border-glass-border bg-warning-bg/70 text-text',
 }
 
 export function Badge({
@@ -25,7 +25,7 @@ export function Badge({
   return (
     <span
       className={cx(
-        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium backdrop-blur-sm transition duration-200 hover:scale-105',
         tones[tone],
       )}
     >
