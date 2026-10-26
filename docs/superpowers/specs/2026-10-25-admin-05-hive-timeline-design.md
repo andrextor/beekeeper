@@ -41,7 +41,7 @@ From the apiary page the admin opens a hive and needs its records (every inspect
 
 ### Seed photos
 
-The seed has no photos: Storage files cannot be written from `seed.sql`. `scripts/seed-photos.sh` (local only) signs in as `owner@landak.test` with the publishable key, uploads two sample JPEGs (main + thumbnail) for C-01 and upserts their `photos` rows, one linked to the latest inspection. It goes through RLS and the storage policies like the app; no service-role key. Sample files: `supabase/seed-photos/` (~60 KB in all).
+The seed has no photos: Storage files cannot be written from `seed.sql`. `scripts/seed-photos.sh` (local only) signs in as `owner@landak.test` with the publishable key, uploads two sample JPEGs (main + thumbnail) for C-01 and upserts their `photos` rows, one linked to the latest inspection. It goes through RLS and the storage policies like the app; no service-role key. Sample files: `supabase/seed-photos/` (~200 KB in all).
 
 ## Changed from the first draft
 

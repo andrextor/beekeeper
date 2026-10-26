@@ -18,6 +18,7 @@
     "ci:check": "pnpm lint && pnpm admin:check && pnpm db:reset && pnpm test:db",
     "db:types": "supabase gen types typescript --local --schema public > admin/src/lib/database.types.ts",
     "admin:env": "scripts/admin-env.sh",
+    "seed:photos": "scripts/seed-photos.sh",
     "admin:check": "pnpm --filter admin typecheck && pnpm --filter admin test && pnpm --filter admin build"
   },
   "devDependencies": {

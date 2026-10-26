@@ -346,7 +346,7 @@ const { data: rows } = await supabase.rpc('admin_list_organizations', { p_search
 | Mailpit (no email is sent today; kept for when recovery emails exist) | http://127.0.0.1:54324 |
 | Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 
-`pnpm db:start` prints the local publishable key. Seed users (`owner@`, `reviewer@`, `other@`, `admin@landak.test`) sign in with the password `landak-2026`. Auth config changes need `pnpm db:stop && pnpm db:start`; `db:reset` does not reload them.
+`pnpm db:start` prints the local publishable key. Seed users (`owner@`, `reviewer@`, `other@`, `admin@landak.test`) sign in with the password `landak-2026`. Auth config changes need `pnpm db:stop && pnpm db:start`; `db:reset` does not reload them. `seed.sql` cannot write Storage files: after a reset, `pnpm seed:photos` uploads two sample photos to C-01 as `owner@landak.test` (photos `9000-…01`, linked to inspection `e000-…03`, and `…02`).
 
 ### Impersonate a user in Studio's SQL editor
 
