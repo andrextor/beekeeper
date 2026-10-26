@@ -1,17 +1,19 @@
 import type { ReactNode } from 'react'
+import { useNavigate } from 'react-router'
 import { cx } from '../../lib/cx'
 import { Card } from './Card'
 import { Skeleton } from './Skeleton'
 
 export type Column<T> = { header: string; cell: (row: T) => ReactNode; className?: string }
 
-/** A table from md up and stacked cards below (DESIGN.md → Layout). */
+/** A table from md up and stacked cards below (DESIGN.md → Layout); `loading` dims the previous rows while a new page loads. */
 export function DataTable<T>({
   caption,
   columns,
   rows,
   rowKey,
   card,
+  rowHref,
   loading = false,
   empty,
 }: {
@@ -20,10 +22,14 @@ export function DataTable<T>({
   rows: ReadonlyArray<T> | undefined
   rowKey: (row: T) => string
   card: (row: T) => ReactNode
+  /** Row click target; keep a link in a cell too, for the keyboard. */
+  rowHref?: (row: T) => string
   loading?: boolean
   empty: ReactNode
 }) {
-  if (loading && !rows) {
+  const navigate = useNavigate()
+
+  if (!rows) {
     return (
       <div className="flex flex-col gap-3" aria-busy>
         {[0, 1, 2, 3, 4].map((index) => (
@@ -61,7 +67,13 @@ export function DataTable<T>({
             {rows.map((row) => (
               <tr
                 key={rowKey(row)}
-                className="relative border-b border-glass-border transition-colors last:border-0 hover:bg-glass-field"
+                onClick={
+                  rowHref ? () => navigate(rowHref(row), { viewTransition: true }) : undefined
+                }
+                className={cx(
+                  'border-b border-glass-border transition-colors last:border-0 hover:bg-glass-field',
+                  rowHref && 'cursor-pointer',
+                )}
               >
                 {columns.map((column) => (
                   <td key={column.header} className={cx('px-4 py-3', column.className)}>

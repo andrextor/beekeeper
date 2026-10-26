@@ -1,14 +1,14 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { SearchX, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { type Column, DataTable } from '../../components/ui/DataTable'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { ListEmpty } from '../../components/ui/ListEmpty'
 import { Pagination } from '../../components/ui/Pagination'
 import { QueryError } from '../../components/ui/QueryError'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { fetchOrganizations, type OrganizationRow, pageCount } from '../../lib/admin-api'
-import { formatDate, formatNumber, formatRelative } from '../../lib/format'
+import { formatDate, formatLastInspection, formatNumber, formatRelative } from '../../lib/format'
 import { useListParams } from '../../lib/useListParams'
 
 function lastInspection(row: OrganizationRow): string {
@@ -22,11 +22,7 @@ function owners(row: OrganizationRow): string {
 function Name({ row }: { row: OrganizationRow }) {
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
-      <Link
-        to={`/apicultores/${row.id}`}
-        viewTransition
-        className="font-medium hover:underline md:after:absolute md:after:inset-0"
-      >
+      <Link to={`/apicultores/${row.id}`} viewTransition className="font-medium hover:underline">
         {row.name}
       </Link>
       {row.deleted_at && <Badge tone="danger">Eliminado</Badge>}
@@ -67,8 +63,7 @@ function OrganizationCard({ row }: { row: OrganizationRow }) {
       </span>
       <span className="truncate text-sm text-muted">{owners(row)}</span>
       <span className="text-sm">
-        {hives} ·{' '}
-        {row.last_inspection_at ? `última revisión ${lastInspection(row)}` : 'sin revisiones'}
+        {hives} · {formatLastInspection(row.last_inspection_at)}
       </span>
     </Link>
   )
@@ -103,17 +98,16 @@ export function OrganizationsPage() {
             rows={list.data?.rows}
             rowKey={(row) => row.id}
             card={(row) => <OrganizationCard row={row} />}
-            loading={list.isFetching}
+            rowHref={(row) => `/apicultores/${row.id}`}
+            loading={list.isPlaceholderData}
             empty={
-              q ? (
-                <EmptyState
-                  icon={SearchX}
-                  title="Sin resultados"
-                  hint={`Nada coincide con “${q}”.`}
-                />
-              ) : (
-                <EmptyState icon={Users} title="Aún no hay apicultores" />
-              )
+              <ListEmpty
+                q={q}
+                page={page}
+                onFirstPage={() => setPage(1)}
+                icon={Users}
+                title="Aún no hay apicultores"
+              />
             }
           />
           <Pagination page={page} pageCount={pageCount(list.data?.total ?? 0)} onChange={setPage} />

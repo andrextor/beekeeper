@@ -12,12 +12,13 @@ import {
   Users,
 } from 'lucide-react'
 import { Link } from 'react-router'
+import { Badge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { QueryError } from '../../components/ui/QueryError'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { type AdminStats, fetchOrganizations, fetchStats } from '../../lib/admin-api'
-import { formatNumber, formatRelative } from '../../lib/format'
+import { formatLastInspection, formatNumber } from '../../lib/format'
 import { StorageCard } from './StorageCard'
 
 const staleTime = 60_000
@@ -102,11 +103,12 @@ function RecentActivity() {
                   viewTransition
                   className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-glass-field md:px-6"
                 >
-                  <span className="font-medium">{organization.name}</span>
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium">{organization.name}</span>
+                    {organization.deleted_at && <Badge tone="danger">Eliminado</Badge>}
+                  </span>
                   <span className="text-right text-sm text-muted">
-                    {organization.last_inspection_at
-                      ? `Última revisión ${formatRelative(organization.last_inspection_at)}`
-                      : 'Sin revisiones'}
+                    {formatLastInspection(organization.last_inspection_at)}
                   </span>
                 </Link>
               </li>

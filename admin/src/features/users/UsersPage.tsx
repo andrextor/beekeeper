@@ -1,9 +1,9 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { SearchX, ShieldCheck, UserRound } from 'lucide-react'
+import { ShieldCheck, UserRound } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { type Column, DataTable } from '../../components/ui/DataTable'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { ListEmpty } from '../../components/ui/ListEmpty'
 import { Pagination } from '../../components/ui/Pagination'
 import { QueryError } from '../../components/ui/QueryError'
 import { SearchInput } from '../../components/ui/SearchInput'
@@ -92,17 +92,15 @@ export function UsersPage() {
             rows={list.data?.rows}
             rowKey={(row) => row.id}
             card={(row) => <UserCard row={row} />}
-            loading={list.isFetching}
+            loading={list.isPlaceholderData}
             empty={
-              q ? (
-                <EmptyState
-                  icon={SearchX}
-                  title="Sin resultados"
-                  hint={`Nada coincide con “${q}”.`}
-                />
-              ) : (
-                <EmptyState icon={UserRound} title="Aún no hay usuarios" />
-              )
+              <ListEmpty
+                q={q}
+                page={page}
+                onFirstPage={() => setPage(1)}
+                icon={UserRound}
+                title="Aún no hay usuarios"
+              />
             }
           />
           <Pagination page={page} pageCount={pageCount(list.data?.total ?? 0)} onChange={setPage} />

@@ -106,10 +106,14 @@ export async function fetchOrganizations(
   return { rows: data, total: data[0]?.total_count ?? 0 }
 }
 
-export async function fetchUsers(search: string, page: number): Promise<Page<UserRow>> {
+export async function fetchUsers(
+  search: string,
+  page: number,
+  size = pageSize,
+): Promise<Page<UserRow>> {
   const { data, error } = await supabase.rpc('admin_list_users', {
     p_search: search || undefined,
-    ...range(page, pageSize),
+    ...range(page, size),
   })
   if (error) throw error
   return {
