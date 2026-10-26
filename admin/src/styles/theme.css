@@ -92,49 +92,51 @@
 
 :root {
   color-scheme: light;
-  --app-bg: var(--color-stone-50);
+  /* Palette "Bosque claro" (2026-10-26): soft sage by day, olive black by night; green only for actions. */
+  --app-bg: #f4f7f2;
   --app-surface: #ffffff;
-  --app-border: var(--color-stone-200);
-  --app-text: var(--color-deep);
-  --app-text-muted: var(--color-stone-500);
+  --app-border: #dfe7dc;
+  --app-text: #18211a;
+  --app-text-muted: #617065;
   --app-primary: var(--color-leaf);
   --app-on-primary: #ffffff;
   --app-accent: var(--color-honey);
-  --app-on-accent: var(--color-deep);
+  --app-on-accent: #18211a;
   --app-danger: #b42318;
   --app-on-danger: #ffffff;
   --app-warning-bg: #fff4e0;
   --app-success-bg: #e7f4e4;
   /* Glass: translucent panels over a softly lit page (sidebar, top bar, cards). */
-  --app-glass: rgb(255 255 255 / 0.62);
-  --app-glass-border: rgb(255 255 255 / 0.7);
+  --app-glass: rgb(255 255 255 / 0.66);
+  --app-glass-border: rgb(255 255 255 / 0.85);
   /* Fields, chips and hovers inside glass panels: lighter than a panel, still see-through. */
   --app-glass-field: rgb(255 255 255 / 0.55);
-  --app-glass-shadow: 0 8px 32px rgb(4 48 59 / 0.08);
-  --app-glow-honey: color-mix(in srgb, var(--color-honey) 22%, transparent);
-  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 20%, transparent);
+  --app-glass-shadow: 0 8px 32px rgb(24 33 26 / 0.07);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 22%, transparent);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 16%, transparent);
 }
 
 /* src/lib/theme.ts resolves "system" to light or dark, so the dark tokens live in one block. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --app-bg: #021e25;
-  --app-surface: var(--color-deep);
-  --app-border: #0d4654;
-  --app-text: var(--color-stone-100);
-  --app-text-muted: #9fb3b8;
+  --app-bg: #121511;
+  --app-surface: #1a1e18;
+  --app-border: #242a22;
+  --app-text: #eaeee7;
+  --app-text-muted: #9aa595;
   --app-primary: var(--color-sprout);
-  --app-on-primary: var(--color-deep);
+  --app-on-primary: #121511;
+  --app-on-accent: #121511;
   --app-danger: #f97066;
-  --app-on-danger: var(--color-deep);
-  --app-warning-bg: #3d2e10;
-  --app-success-bg: #0b3a1f;
-  --app-glass: rgb(4 48 59 / 0.55);
-  --app-glass-border: rgb(255 255 255 / 0.08);
-  --app-glass-field: rgb(2 30 37 / 0.45);
-  --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
-  --app-glow-honey: color-mix(in srgb, var(--color-honey) 8%, transparent);
-  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 10%, transparent);
+  --app-on-danger: #121511;
+  --app-warning-bg: #3a2f17;
+  --app-success-bg: #1c3317;
+  --app-glass: rgb(29 34 27 / 0.6);
+  --app-glass-border: rgb(255 255 255 / 0.07);
+  --app-glass-field: rgb(18 21 17 / 0.5);
+  --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 8%, transparent);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 6%, transparent);
 }
 
 /* Children enter one after another; put it on a list or a form. */
@@ -178,8 +180,8 @@
     @apply font-sans text-text antialiased;
     /* Two soft glows give the glass panels something to blur; fixed so they do not scroll away. */
     background:
-      radial-gradient(60rem 40rem at 0% 0%, var(--app-glow-honey), transparent 70%),
-      radial-gradient(50rem 40rem at 100% 100%, var(--app-glow-sprout), transparent 70%),
+      radial-gradient(60rem 40rem at 0% 0%, var(--app-glow-sprout), transparent 70%),
+      radial-gradient(50rem 40rem at 100% 100%, var(--app-glow-honey), transparent 70%),
       var(--app-bg);
     background-attachment: fixed;
   }
