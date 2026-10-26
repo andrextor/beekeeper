@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 /** Every item but the last links back; the last is the current page. */
 export function Breadcrumbs({ items }: { items: ReadonlyArray<{ label: string; to?: string }> }) {
   return (
-    <nav aria-label="Ruta">
+    <nav aria-label="Ruta" className="print:hidden">
       <ol className="flex flex-wrap items-center gap-1 text-sm text-muted">
         {items.map((item, index) => (
           <li key={item.to ?? item.label} className="flex items-center gap-1">

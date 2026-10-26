@@ -13,7 +13,7 @@ export function Pagination({
   if (pageCount <= 1) return null
 
   return (
-    <nav aria-label="Páginas" className="flex items-center justify-end gap-2">
+    <nav aria-label="Páginas" className="flex items-center justify-end gap-2 print:hidden">
       <IconButton
         icon={ChevronLeft}
         label="Página anterior"

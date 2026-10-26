@@ -204,6 +204,51 @@
   }
 }
 
+/* Print and "Guardar como PDF" (A6): always the light palette on a white page, no glass effects. */
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+    color-scheme: light;
+    --app-bg: #ffffff;
+    --app-surface: #ffffff;
+    --app-border: #d0d5cf;
+    --app-text: #000000;
+    --app-text-muted: #444b45;
+    --app-primary: var(--color-leaf);
+    --app-on-primary: #ffffff;
+    --app-on-accent: #18211a;
+    --app-danger: #b42318;
+    --app-on-danger: #ffffff;
+    --app-warning-bg: #fff4e0;
+    --app-success-bg: #e7f4e4;
+    --app-glass: #ffffff;
+    --app-glass-border: #d0d5cf;
+    --app-glass-field: #ffffff;
+    --app-field-border: #7f8d83;
+    --app-glass-shadow: none;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  .glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  li,
+  tr,
+  .glass {
+    break-inside: avoid;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
 /* Page changes cross-fade and rise (React Router viewTransition links and navigations). */
 ::view-transition-old(root) {
   animation: 180ms ease-in both view-out;

@@ -13,7 +13,7 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void
 }) {
   return (
-    <fieldset className="glass inline-flex gap-1 self-start rounded-control p-1">
+    <fieldset className="glass inline-flex gap-1 self-start rounded-control p-1 print:hidden">
       <legend className="sr-only">{label}</legend>
       {options.map((option) => (
         <button

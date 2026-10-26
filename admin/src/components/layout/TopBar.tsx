@@ -9,7 +9,7 @@ export function TopBar() {
   const close = () => dialog.current?.close()
 
   return (
-    <header className="glass sticky top-0 z-10 flex items-center gap-2 rounded-none border-x-0 border-t-0 px-2 lg:hidden">
+    <header className="glass sticky top-0 z-10 flex items-center gap-2 rounded-none border-x-0 border-t-0 px-2 lg:hidden print:hidden">
       <IconButton icon={Menu} label="Abrir menú" onClick={() => dialog.current?.showModal()} />
       <Hexagon size={20} className="text-primary" aria-hidden />
       <span className="font-display text-lg font-bold">Landak Apiario</span>
