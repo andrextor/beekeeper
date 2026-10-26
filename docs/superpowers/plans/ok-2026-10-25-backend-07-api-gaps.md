@@ -14,7 +14,7 @@ Spec: `docs/superpowers/specs/2026-10-25-backend-07-api-gaps-design.md` · Branc
 
 ## 2. Docs
 
-- `docs/api.md`: `deactivated_at` in `profiles`; Sync push (re-check on every upsert, order, tombstones under a deleted parent pass, live edits are dropped on `parent_mismatch`); `parent_mismatch` row; Organizations (a deleted organization returns nothing to its members and refuses their writes with `42501`, which the app drops).
+- `docs/api.md`: `deactivated_at` in `profiles`; Sync push (re-check on every upsert, order, tombstones under a deleted parent pass, live edits are dropped on `parent_mismatch`); `parent_mismatch` row; Organizations (a deleted organization returns nothing to its members and refuses their writes with `42501`; handled like a lost membership).
 - `.claude/rules/tenancy.md`: membership helpers ignore deleted organizations. `.claude/rules/sql.md`: BEFORE INSERT fires on upsert.
 - `docs/ROADMAP.md`: B7 row. `CHANGELOG.md` under Unreleased.
 

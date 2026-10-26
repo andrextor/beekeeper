@@ -47,7 +47,7 @@ A check violation (`23514`, constraint name in `message`) means the client sent 
 
 | `details` | Message | When |
 |-----------|---------|------|
-| `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one, including restoring (`deleted_at = null`) a child whose parent is deleted |
+| `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one, including restoring (`deleted_at = null`) a child whose parent is deleted. A soft-deleted child (a tombstone) is accepted under a deleted parent of the same organization/hive |
 | `immutable_column` | "Un registro no puede cambiar de organización." | An update changes `organization_id` |
 | `immutable_column` | "Un registro no puede cambiar de colmena." | An update changes `inspections.hive_id` or `photos.hive_id` (delete it and record it again on the right hive) |
 | `missing_author` | "Falta el autor del registro." | Server-side insert without `created_by` (never from clients) |
@@ -73,6 +73,8 @@ Repeat until a page returns fewer than 500 rows. The new cursor is the last row'
 ### Sync push
 
 `upsert` by `id` (`on conflict (id) do update`), which is idempotent: a retried request writes the same row. The outbox retries with backoff 5 s → 30 s → 2 min → 10 min (cap). A `P0001`, `23505`, `42501` or other 4xx marks the entry **Requiere atención**; retrying would never succeed.
+
+Every upsert re-checks the parent: Postgres fires `before insert` triggers on `on conflict do update` too, even when the row exists. So the outbox pushes live rows **parent-first** (apiary → hive → inspection → events and photos) and soft deletes **child-first** (a hive before its apiary, or the apiary gets `apiary_not_empty`). A soft delete whose parent someone else already deleted goes through; a live edit under a deleted parent gets `parent_mismatch` and is dropped, not shown as **Requiere atención** (the parent is gone for everyone).
 
 ## Auth
 
@@ -106,7 +108,7 @@ After signing in: `rpc('my_memberships')`. No memberships → onboarding offers 
 
 | Table | Columns | Who sees it |
 |-------|---------|-------------|
-| `profiles` | `id`, `email`, `display_name`, `is_platform_admin`, `created_at`, `updated_at` | Yourself, people who share an organization with you, platform admin |
+| `profiles` | `id`, `email`, `display_name`, `is_platform_admin`, `deactivated_at` (A7, set while the admin has the account deactivated), `created_at`, `updated_at` | Yourself, people who share an organization with you, platform admin |
 | `organizations` | `id`, `name`, `created_by`, `created_at`, `updated_at`, `deleted_at` | Members, platform admin |
 | `organization_members` | `organization_id`, `user_id`, `role` (`owner` \| `reviewer`), `created_at`, `updated_at` | Members, platform admin |
 | `organization_invites` | `id`, `organization_id`, `label`, `role`, `invited_by`, `created_at`, `expires_at`, `accepted_at`, `accepted_by`, `revoked_at` — **list these columns explicitly**: `select=*` is refused because `code_hash` is not readable | Owners, platform admin |
@@ -116,6 +118,8 @@ Direct writes allowed: `profiles.display_name` (own row), `organizations.name` a
 Members screen: `from('organization_members').select('role, user_id, profiles(email, display_name)').eq('organization_id', id)`.
 
 Memberships are **hard-deleted** and are not part of the cursor pull: on every sync, compare `my_memberships()` with the local list and purge the local rows of any organization that disappeared. Rows still in the outbox for it end as "Requiere atención".
+
+A soft-deleted organization (`organizations.deleted_at`) grants nothing to its members: RLS returns none of its rows and refuses their writes with `42501`; owner RPCs answer `organization_deleted`. It leaves `my_memberships()`, so the app purges it like a lost membership (above). Only the platform admin still reads it. It cannot be restored from a client.
 
 ### RPCs (`supabase.rpc(name, params)`)
 

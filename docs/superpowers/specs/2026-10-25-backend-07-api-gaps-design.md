@@ -37,7 +37,7 @@ Tightening only: no grant is added, every check that existed still runs. The tom
 
 - `profiles.deactivated_at` listed.
 - Sync push: every upsert re-checks the parent; push live rows parent-first, soft deletes child-first; a soft delete under a deleted parent now succeeds; a live edit under a deleted parent is `parent_mismatch` and the app drops it.
-- A deleted organization returns nothing to its former members and refuses their writes with `42501`. The app already filters pulls by `my_memberships()`; a `42501` on a row of an organization that left `my_memberships()` is dropped, not shown as **Requiere atención**.
+- A deleted organization returns nothing to its former members and refuses their writes with `42501`. It leaves `my_memberships()`, so the app handles it like a lost membership (purge; outbox rows end as **Requiere atención**, as `docs/api.md` already says).
 
 Not breaking for the app as specified (M3 already orders the push and filters by `my_memberships()`).
 
