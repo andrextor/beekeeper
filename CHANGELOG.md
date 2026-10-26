@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-10-28
+
+### Fixed
+
+- The dashboard, the beekeeper list and the apiary cards no longer count inspections and events of deleted hives, so an apiary no longer shows a recent inspection on a hive that is gone.
+
 ## [0.11.0] - 2026-10-28
 
 ### Added
@@ -13,6 +19,10 @@ All notable changes to this project are documented here. The format follows [Kee
 - Fotos view: thumbnails 48 per page, the full photo on click with its date, caption and inspection.
 - Spanish labels for feeding, treatment, harvest, loss and queen change details, in the panel and in `docs/api.md`.
 - `pnpm seed:photos` uploads two sample photos to C-01 after a local reset.
+
+### Changed
+
+- `docs/api.md` labels `attention_level = none` "Sin novedad", as the panel and the app show it.
 
 ## [0.10.0] - 2026-10-28
 

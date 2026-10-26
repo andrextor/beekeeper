@@ -330,7 +330,7 @@ Same write rules as inspections: members insert, the owner edits any, a reviewer
 
 ## Admin
 
-Read-only RPCs for the platform admin panel. All run under RLS (`security invoker`) and refuse anyone without `profiles.is_platform_admin`: `P0001`, `not_platform_admin`, "Solo administradores de la plataforma.". Counts skip soft-deleted rows. Searches are trimmed, cut at 80 characters, case-insensitive, and treat `%` and `_` literally. `p_limit` is clamped to 1..100; pages by `p_offset`.
+Read-only RPCs for the platform admin panel. All run under RLS (`security invoker`) and refuse anyone without `profiles.is_platform_admin`: `P0001`, `not_platform_admin`, "Solo administradores de la plataforma.". Counts skip soft-deleted rows and the inspections and events of deleted hives (their history is kept, and clients hide it). Searches are trimmed, cut at 80 characters, case-insensitive, and treat `%` and `_` literally. `p_limit` is clamped to 1..100; pages by `p_offset`.
 
 | RPC | Returns |
 |-----|---------|

@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(21);
+select plan(24);
 
 select tests.create_user('owner-a@landak.test') as owner_a \gset
 select tests.create_user('reviewer-a@landak.test') as reviewer_a \gset
@@ -21,8 +21,13 @@ insert into public.apiaries (id, organization_id, name) values (:'apiary_a', :'o
 insert into public.hives (id, organization_id, apiary_id, name, qr_code) values
   (:'hive_a', :'org_a', :'apiary_a', 'C-01', 'AAAAAAAAAA'),
   (:'hive_gone', :'org_a', :'apiary_a', 'C-02', 'AAAAAAAAAB');
+insert into public.inspections (id, organization_id, hive_id, inspected_at, source) values
+  (gen_random_uuid(), :'org_a', :'hive_a', now() - interval '30 minutes', 'manual'),
+  (gen_random_uuid(), :'org_a', :'hive_gone', now(), 'manual');
+insert into public.hive_events (id, organization_id, hive_id, type, occurred_at)
+values (gen_random_uuid(), :'org_a', :'hive_gone', 'feeding', now());
+-- A deleted hive keeps its history; the admin counts must skip it.
 update public.hives set deleted_at = now() where id = :'hive_gone';
-insert into public.inspections (id, organization_id, hive_id, inspected_at, source) values (gen_random_uuid(), :'org_a', :'hive_a', now(), 'manual');
 insert into storage.objects (bucket_id, name, owner_id, metadata)
 values ('hive-photos', format('%s/%s/%s.jpg', :'org_a', :'hive_a', gen_random_uuid()), :'owner_a', '{"size": 1000}');
 select tests.authenticate_as(:'reviewer_a');
@@ -58,10 +63,12 @@ select tests.authenticate_as(:'admin_id');
 select is((public.admin_stats() ->> 'organizations')::integer, 2, 'stats count organizations');
 select is((public.admin_stats() ->> 'users')::integer, 4, 'stats count users');
 select is((public.admin_stats() ->> 'hives_active')::integer, 1, 'a soft-deleted hive is not counted');
-select is((public.admin_stats() ->> 'inspections_30d')::integer, 1, 'stats count recent inspections');
+select is(
+  (public.admin_stats() ->> 'inspections_30d')::integer, 1, 'stats count recent inspections, not those of a deleted hive'
+);
 select is((public.admin_stats() ->> 'reviewers')::integer, 1, 'stats count reviewers');
 select is((public.admin_stats() ->> 'apiaries')::integer, 1, 'a deleted organization''s apiaries are not counted');
-select is((public.admin_stats() ->> 'events_30d')::integer, 0, 'nor its events');
+select is((public.admin_stats() ->> 'events_30d')::integer, 0, 'nor its events, nor a deleted hive''s');
 select is((public.admin_stats() ->> 'photos')::integer, 0, 'nor its photos');
 select ok((public.admin_stats() ->> 'storage_bytes')::bigint >= 1000, 'stats sum the bytes stored in hive-photos');
 
@@ -83,6 +90,14 @@ select is(
   (select members from public.admin_list_organizations('Finca A')), 2,
   'the list counts members'
 );
+select is(
+  (select inspections_30d from public.admin_list_organizations('Finca A')), 1,
+  'the list skips the inspections of a deleted hive'
+);
+select is(
+  (select last_inspection_at from public.admin_list_organizations('Finca A')), now() - interval '30 minutes',
+  'and its last inspection is one of a live hive'
+);
 
 select is(
   jsonb_array_length(public.admin_organization_summary(:'org_a') -> 'pending_invites'), 1,
@@ -91,6 +106,11 @@ select is(
 select is(
   (public.admin_organization_summary(:'org_a') -> 'apiaries' -> 0 ->> 'hives_total')::integer, 1,
   'the summary leaves soft-deleted hives out'
+);
+select is(
+  (public.admin_organization_summary(:'org_a') -> 'apiaries' -> 0 ->> 'last_inspection_at')::timestamptz,
+  now() - interval '30 minutes',
+  'an apiary''s last inspection skips its deleted hives'
 );
 
 select is(
