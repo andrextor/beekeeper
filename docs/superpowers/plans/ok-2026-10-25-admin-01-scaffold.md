@@ -11,7 +11,7 @@ New dependencies (approval asked here, current versions on 2026-10-26):
 | `@tanstack/react-query` | 5.104.5 | `tailwindcss`, `@tailwindcss/vite` | 4.3.3 |
 | `@supabase/supabase-js` | 2.118.0 | `typescript` | 7.0.2 |
 | `lucide-react` | 1.61.0 | `@types/react`, `@types/react-dom` | 19.3.0 |
-| `@fontsource/arsenal`, `@fontsource-variable/inter` | 5.3.0 | `vitest` | 5.0.5 |
+| `@fontsource-variable/plus-jakarta-sans`, `@fontsource-variable/inter` | 5.3.0 | `vitest` | 5.0.5 |
 
 Exact versions pinned (no `^`), like the root.
 

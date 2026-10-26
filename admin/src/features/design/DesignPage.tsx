@@ -48,8 +48,8 @@ export function DesignPage() {
       <Section title="Tipografía">
         <div className="flex flex-col gap-2">
           <p className="font-display text-4xl font-bold">1.234 colmenas</p>
-          <h1 className="text-3xl font-bold">Título h1 · Arsenal</h1>
-          <h3 className="text-xl">Subtítulo h3 · Arsenal</h3>
+          <h1 className="text-3xl font-bold">Título h1 · Plus Jakarta Sans</h1>
+          <h3 className="text-xl font-semibold">Subtítulo h3 · Plus Jakarta Sans</h3>
           <p>Texto de cuerpo en Inter. Revisión del 24 oct 2026.</p>
           <p className="text-sm text-muted">Texto secundario y de tablas.</p>
         </div>

@@ -1,6 +1,5 @@
 @import "tailwindcss";
-@import "@fontsource/arsenal/400.css";
-@import "@fontsource/arsenal/700.css";
+@import "@fontsource-variable/plus-jakarta-sans";
 @import "@fontsource-variable/inter";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -21,7 +20,7 @@
   --color-stone-900: #1f1d19;
 
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Arsenal", ui-serif, Georgia, serif;
+  --font-display: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
 
   --radius-control: 8px;
   --radius-card: 12px;
