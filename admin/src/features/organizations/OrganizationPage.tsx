@@ -7,6 +7,7 @@ import { Card } from '../../components/ui/Card'
 import { type Column, DataTable } from '../../components/ui/DataTable'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { NotFoundState } from '../../components/ui/NotFoundState'
+import { ReportTitle } from '../../components/ui/PrintButton'
 import { QueryError } from '../../components/ui/QueryError'
 import { Segmented } from '../../components/ui/Segmented'
 import { Skeleton } from '../../components/ui/Skeleton'
@@ -147,10 +148,12 @@ function Header({ summary }: { summary: OrganizationSummary }) {
   ]
   return (
     <header className="flex flex-col gap-2">
-      <span className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">{organization.name}</h1>
-        {organization.deleted_at && <Badge tone="danger">Eliminado</Badge>}
-      </span>
+      <ReportTitle>
+        <span className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-bold">{organization.name}</h1>
+          {organization.deleted_at && <Badge tone="danger">Eliminado</Badge>}
+        </span>
+      </ReportTitle>
       <p className="text-sm text-muted">{facts.join(' · ')}</p>
     </header>
   )

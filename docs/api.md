@@ -133,7 +133,7 @@ Share text for an invite (app): "Te invité a mi apiario en Landak Apiario. Inst
 
 ### Platform admin
 
-`profiles.is_platform_admin` is set only by SQL: `update public.profiles set is_platform_admin = true where email = '…';`. It reads every organization and writes nothing.
+`profiles.is_platform_admin` is set by SQL (`update public.profiles set is_platform_admin = true where email = '…';`) or by another admin through `admin-create-user`. It reads every organization; its only write is creating accounts (Admin → Create accounts). The app never calls admin endpoints.
 
 ## Apiaries
 
@@ -346,6 +346,23 @@ const { data: stats } = await supabase.rpc('admin_stats')
 const { data: rows } = await supabase.rpc('admin_list_organizations', { p_search: 'landak', p_limit: 25, p_offset: 0 })
 // rows[0].total_count → number of pages
 ```
+
+### Create accounts (Edge Function `admin-create-user`)
+
+Only for platform admins; owners and reviewers are refused. `POST /functions/v1/admin-create-user` with the admin's session (`supabase.functions.invoke('admin-create-user', { body })`).
+
+| Field | Rule |
+|-------|------|
+| `kind` | `beekeeper` (account + new farm, as `owner`), `reviewer` (account + `reviewer` of an existing farm) or `admin` (account with `is_platform_admin`, no farm) |
+| `email` | valid, ≤ 254; stored lowercase |
+| `password` | at least 8 characters, at most 72 bytes (UTF-8) |
+| `display_name` | 1–80 |
+| `organization_name` | beekeeper only, 1–120 |
+| `organization_id` | reviewer only, a live organization |
+
+Answers `200 { user_id, organization_id }` (`organization_id` null for an admin). Errors answer `{ error: code }`: `400` `invalid_body`, `invalid_kind`, `invalid_email`, `invalid_password`, `invalid_name`, `invalid_organization_name`, `invalid_organization`; `401` `not_signed_in`; `403` `not_platform_admin`; `404` `organization_not_found`; `409` `email_taken`; `500` `server_error`. The account is confirmed (no email is sent) and is deleted again if the farm step fails. The password is never echoed or logged.
+
+It calls `admin_provision_member(p_actor_id, p_user_id, p_display_name, p_role, p_organization_id, p_organization_name)`, which only `service_role` can execute; no client can call it.
 
 ## Local development
 

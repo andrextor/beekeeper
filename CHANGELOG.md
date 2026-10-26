@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-25
+
+### Added
+
+- Platform admins create accounts from Usuarios → Nuevo usuario: a beekeeper with their own farm, a reviewer in an existing farm, or another admin. The account is ready to sign in with the password the admin sets or generates; the panel shows it once to share privately. Beekeepers and reviewers can never create accounts.
+- Imprimir on the beekeeper, apiary and hive pages: the browser's print dialog, where "Guardar como PDF" downloads the report. It prints on a white page without the menu or buttons, with inspections expanded and the print date.
+
+### Changed
+
+- The platform admin is no longer only a reader: creating accounts is its one write. Everything else in the panel stays read-only.
+
 ## [0.13.1] - 2026-10-25
 
 ### Fixed

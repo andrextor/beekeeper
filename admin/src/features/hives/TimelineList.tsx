@@ -189,10 +189,15 @@ export function TimelineList({ hiveId }: { hiveId: string }) {
       {timeline.isFetchNextPageError && (
         <QueryError error={timeline.error} onRetry={() => timeline.fetchNextPage()} />
       )}
+      {timeline.hasNextPage && (
+        <p className="hidden text-sm text-muted print:block">
+          Mostrando los {items.length} registros cargados.
+        </p>
+      )}
       {timeline.hasNextPage && !timeline.isFetchNextPageError && (
         <Button
           variant="secondary"
-          className="self-center"
+          className="self-center print:hidden"
           loading={timeline.isFetchingNextPage}
           onClick={() => timeline.fetchNextPage()}
         >

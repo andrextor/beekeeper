@@ -8,6 +8,7 @@ import { DashboardPage } from './features/dashboard/DashboardPage'
 import { HivePage } from './features/hives/HivePage'
 import { OrganizationPage } from './features/organizations/OrganizationPage'
 import { OrganizationsPage } from './features/organizations/OrganizationsPage'
+import { NewUserPage } from './features/users/NewUserPage'
 import { UsersPage } from './features/users/UsersPage'
 
 // import.meta.env.DEV is replaced at build time, so the gallery and its import never reach production.
@@ -41,6 +42,7 @@ export const router = createBrowserRouter([
       { path: 'apicultores/:id/apiarios/:apiaryId', Component: ApiaryPage },
       { path: 'apicultores/:id/colmenas/:hiveId', Component: HivePage },
       { path: 'usuarios', Component: UsersPage },
+      { path: 'usuarios/nuevo', Component: NewUserPage },
     ],
   },
   ...devRoutes,

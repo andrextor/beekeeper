@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../../components/ui/Breadcrumbs'
 import { Card } from '../../components/ui/Card'
 import { FactList } from '../../components/ui/FactList'
 import { NotFoundState } from '../../components/ui/NotFoundState'
+import { ReportTitle } from '../../components/ui/PrintButton'
 import { QueryError } from '../../components/ui/QueryError'
 import { Segmented } from '../../components/ui/Segmented'
 import { Skeleton } from '../../components/ui/Skeleton'
@@ -50,10 +51,12 @@ function Header({ hive }: { hive: Hive }) {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">{hive.name}</h1>
-          <HiveStatusBadge hive={hive} />
-        </div>
+        <ReportTitle>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold">{hive.name}</h1>
+            <HiveStatusBadge hive={hive} />
+          </div>
+        </ReportTitle>
         <p className="text-sm text-muted">
           QR <span className="font-mono text-text">{hive.qr_code}</span>
         </p>

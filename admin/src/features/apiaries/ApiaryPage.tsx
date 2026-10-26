@@ -8,6 +8,7 @@ import { type Column, DataTable } from '../../components/ui/DataTable'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { FactList } from '../../components/ui/FactList'
 import { NotFoundState } from '../../components/ui/NotFoundState'
+import { ReportTitle } from '../../components/ui/PrintButton'
 import { QueryError } from '../../components/ui/QueryError'
 import { Segmented } from '../../components/ui/Segmented'
 import { Skeleton } from '../../components/ui/Skeleton'
@@ -188,7 +189,9 @@ export function ApiaryPage() {
         />
       ) : (
         <>
-          <h1 className="text-3xl font-bold">{found.name}</h1>
+          <ReportTitle>
+            <h1 className="text-3xl font-bold">{found.name}</h1>
+          </ReportTitle>
           <Facts apiary={found} />
           <Hives apiaryId={found.id} />
         </>

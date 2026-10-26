@@ -425,3 +425,20 @@ export async function signPhoto(storagePath: string): Promise<string> {
   if (error) throw error
   return data.signedUrl
 }
+
+export type FarmOption = { id: string; name: string }
+
+/** Live farms by name, for pickers: deleted ones never take a place in the 10. */
+export async function searchLiveOrganizations(search: string): Promise<FarmOption[]> {
+  let query = supabase
+    .from('organizations')
+    .select('id, name')
+    .is('deleted_at', null)
+    .order('name')
+    .limit(10)
+  const term = search.trim()
+  if (term) query = query.ilike('name', `%${term}%`)
+  const { data, error } = await query
+  if (error) throw error
+  return data
+}
