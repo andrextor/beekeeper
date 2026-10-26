@@ -320,7 +320,22 @@ Same write rules as inspections: members insert, the owner edits any, a reviewer
 
 ## Admin
 
-*Filled in by B6.*
+Read-only RPCs for the platform admin panel. All run under RLS (`security invoker`) and refuse anyone without `profiles.is_platform_admin`: `P0001`, `not_platform_admin`, "Solo administradores de la plataforma.". Counts skip soft-deleted rows. Searches are trimmed, cut at 80 characters, case-insensitive, and treat `%` and `_` literally. `p_limit` is clamped to 1..100; pages by `p_offset`.
+
+| RPC | Returns |
+|-----|---------|
+| `admin_stats()` | `{ organizations, users, apiaries, hives_active, hives_total, inspections_30d, events_30d, photos, storage_bytes, reviewers }` — `storage_bytes` is everything in `hive-photos` (main files, thumbnails, orphans), the number the free tier counts |
+| `admin_list_organizations(p_search?, p_limit = 25, p_offset = 0)` | rows `{ id, name, deleted_at, owner_emails, members, apiaries, hives_active, inspections_30d, last_inspection_at, created_at, total_count }`, most recently inspected first; `p_search` matches the name or an owner's email; soft-deleted organizations are listed with `deleted_at` |
+| `admin_organization_summary(p_organization_id)` | `{ organization: { id, name, created_at, deleted_at }, members: [{ user_id, email, display_name, role, joined_at }], pending_invites: [{ id, label, role, created_at, expires_at }], apiaries: [{ id, name, hives_active, hives_total, last_inspection_at }] }`, or `null` if it does not exist |
+| `admin_list_users(p_search?, p_limit = 25, p_offset = 0)` | rows `{ id, email, display_name, is_platform_admin, organizations: [{ id, name, role }], created_at, total_count }`, newest first; `p_search` matches email or display name |
+
+Apiary → hive → timeline screens use plain selects under RLS (`hives?apiary_id=eq.…`) and `hive_timeline`.
+
+```ts
+const { data: stats } = await supabase.rpc('admin_stats')
+const { data: rows } = await supabase.rpc('admin_list_organizations', { p_search: 'landak', p_limit: 25, p_offset: 0 })
+// rows[0].total_count → number of pages
+```
 
 ## Local development
 
