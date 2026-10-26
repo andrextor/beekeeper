@@ -4,7 +4,7 @@ const storageKey = 'landak-theme'
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
 const listeners = new Set<() => void>()
 const notify = () => {
-  notify()
+  for (const listener of listeners) listener()
 }
 
 function isPreference(value: unknown): value is ThemePreference {

@@ -42,3 +42,28 @@ export function formatLastInspection(iso: string | null): string {
 export function formatNumber(value: number): string {
   return numberFormat.format(value)
 }
+
+export function formatAltitude(meters: number): string {
+  return `${formatNumber(meters)} m`
+}
+
+function plural(count: number, one: string, many: string): string {
+  return `${count} ${count === 1 ? one : many}`
+}
+
+/** Colony age from a calendar date ("2025-03-14"): "3 meses", "1 año y 7 meses". */
+export function formatColonyAge(startedOn: string, now: Date = new Date()): string {
+  const [year = 0, month = 1, day = 1] = startedOn.split('-').map(Number)
+  // A start on the 31st completes its month on the last day of a shorter month.
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const months =
+    (now.getFullYear() - year) * 12 +
+    (now.getMonth() + 1 - month) -
+    (now.getDate() < Math.min(day, lastDay) ? 1 : 0)
+  if (months < 1) return 'Menos de un mes'
+  const years = Math.floor(months / 12)
+  const rest = months % 12
+  if (years === 0) return plural(rest, 'mes', 'meses')
+  const yearsText = plural(years, 'año', 'años')
+  return rest ? `${yearsText} y ${plural(rest, 'mes', 'meses')}` : yearsText
+}
