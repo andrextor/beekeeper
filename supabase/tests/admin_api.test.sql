@@ -38,7 +38,7 @@ insert into public.apiaries (id, organization_id, name) values (:'apiary_gone', 
 insert into public.hives (id, organization_id, apiary_id, name, qr_code) values
   (:'hive_closed', :'org_gone', :'apiary_gone', 'V-01', 'AAAAAAAAAC');
 insert into public.inspections (id, organization_id, hive_id, inspected_at, source)
-values (gen_random_uuid(), :'org_gone', :'hive_closed', now(), 'manual');
+values (gen_random_uuid(), :'org_gone', :'hive_closed', now() - interval '1 hour', 'manual');
 insert into public.hive_events (id, organization_id, hive_id, type, occurred_at)
 values (gen_random_uuid(), :'org_gone', :'hive_closed', 'feeding', now());
 insert into public.photos (id, organization_id, hive_id, storage_path, taken_at)
