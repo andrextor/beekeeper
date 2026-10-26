@@ -8,7 +8,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       <Card className="flex w-full max-w-[400px] flex-col gap-6">
         <div className="flex flex-col items-center gap-2 text-center">
           <Hexagon size={40} className="text-primary" aria-hidden />
-          <h1 className="text-2xl font-bold text-balance">Landak Apiario · Administración</h1>
+          <div>
+            <h1 className="text-2xl font-bold">Landak Apiario</h1>
+            <p className="text-sm text-muted">Panel de administración</p>
+          </div>
         </div>
         {children}
       </Card>

@@ -31,7 +31,7 @@ Only platform admins may use the panel. Anyone can create an account (the app ne
 
 ### UI
 
-Centered card on `bg`, 400 px max, Plus Jakarta Sans title "Landak Apiario · Administración", `hexagon` mark in `leaf`. Inputs 48 px high, button full width. Enter submits; the button shows a spinner and is disabled while signing in. Works at 390 px.
+Centered card on `bg`, 400 px max, Plus Jakarta Sans title "Landak Apiario" with "Panel de administración" below in muted text, `hexagon` mark in `leaf`. Inputs 48 px high, button full width. Enter submits; the button shows a spinner and is disabled while signing in. Works at 390 px.
 
 ### Local configuration
 

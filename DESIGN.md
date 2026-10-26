@@ -77,9 +77,10 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 ## Layout
 
 - Mobile first (390 px), then 1024 and 1440. The admin is used mostly on a laptop but must work on a phone.
-- Shell: sidebar 248 px on ≥ `lg` (background `deep`, text `stone-100`, active item `honey` left bar); on smaller screens a top bar with a menu sheet.
+- Shell: sidebar 248 px on ≥ `lg` (glass panel, `text` color, active item `accent` left bar on a 15 % `accent` tint); on smaller screens a glass top bar with a menu sheet. The deep-green sidebar was dropped on 2026-10-26: too heavy.
+- **Glass** (admin only; the app stays opaque for sun readability): the page background carries two soft glows (`honey` top-left, `sprout` bottom-right, 20 % light / 8–10 % dark); sidebar, top bar and cards use the `glass` utility (`--app-glass` translucent surface, 16 px blur, hairline `--app-glass-border`, soft shadow). With `prefers-reduced-transparency` it falls back to the solid `surface`. Inputs, tables and text blocks stay solid for contrast.
 - Content max width 1200 px, gutter 16 px (mobile) / 32 px (desktop), 8-px spacing grid.
-- Radius: 8 px controls, 12 px cards. Shadow only on overlays.
+- Radius: 8 px controls, 12 px cards. Shadow only on overlays and glass panels.
 - Tables become stacked cards below `md`.
 
 ## Components (`admin/src/components/ui/`)

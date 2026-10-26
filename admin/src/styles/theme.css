@@ -58,6 +58,12 @@
   --app-on-danger: #ffffff;
   --app-warning-bg: #fff4e0;
   --app-success-bg: #e7f4e4;
+  /* Glass: translucent panels over a softly lit page (sidebar, top bar, cards). */
+  --app-glass: rgb(255 255 255 / 0.62);
+  --app-glass-border: rgb(255 255 255 / 0.7);
+  --app-glass-shadow: 0 8px 32px rgb(4 48 59 / 0.08);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 22%, transparent);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 20%, transparent);
 }
 
 /* src/lib/theme.ts resolves "system" to light or dark, so the dark tokens live in one block. */
@@ -74,11 +80,36 @@
   --app-on-danger: var(--color-deep);
   --app-warning-bg: #3d2e10;
   --app-success-bg: #0b3a1f;
+  --app-glass: rgb(4 48 59 / 0.55);
+  --app-glass-border: rgb(255 255 255 / 0.08);
+  --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 8%, transparent);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 10%, transparent);
+}
+
+@utility glass {
+  background-color: var(--app-glass);
+  border: 1px solid var(--app-glass-border);
+  box-shadow: var(--app-glass-shadow);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--app-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 @layer base {
   body {
-    @apply bg-bg font-sans text-text antialiased;
+    @apply font-sans text-text antialiased;
+    /* Two soft glows give the glass panels something to blur; fixed so they do not scroll away. */
+    background:
+      radial-gradient(60rem 40rem at 0% 0%, var(--app-glow-honey), transparent 70%),
+      radial-gradient(50rem 40rem at 100% 100%, var(--app-glow-sprout), transparent 70%),
+      var(--app-bg);
+    background-attachment: fixed;
   }
 
   h1,
