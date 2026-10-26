@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Resumen: beekeepers, users, reviewers, apiaries, active hives of the total, inspections and events of the last 30 days, photos, photo storage against the 1 GB free limit (honey from 70 %, red from 90 %) and the 5 most recently inspected beekeepers.
+- Apicultores: every beekeeper with owners, members, apiaries, active hives, inspections in 30 days and last inspection; search by name or owner email; search and page live in the link, so a copied link opens the same list. Deleted beekeepers carry "Eliminado".
+- Usuarios: email, name, each organization with its role (links to the beekeeper), the Admin badge and the sign-up date; same search and pages.
+- Phones get cards instead of tables.
+
 ## [0.8.1] - 2026-10-28
 
 ### Fixed
