@@ -115,7 +115,7 @@ select is((select notes from public.inspections where id = :'insp_rev'), 'Correg
 
 select throws_ok(
   format('update public.inspections set hive_id = %L where id = %L', :'hive_a2', :'insp_rev'),
-  'P0001', 'Una revisión no puede cambiar de colmena.', 'an inspection cannot move to another hive'
+  'P0001', 'Un registro no puede cambiar de colmena.', 'an inspection cannot move to another hive'
 );
 
 -- Open tasks
