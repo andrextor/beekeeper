@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-25
+
+### Added
+
+- The admin panel is published on Vercel from `main`, with its own preview link for every pull request. Reloading any page opens it instead of a 404.
+- Browser security headers on the panel: it only talks to the Supabase project, cannot be framed by another site and is not indexed by search engines.
+- `docs/deploy.md`: how the panel is connected to Vercel and which values it needs.
+
 ## [0.12.1] - 2026-10-25
 
 ### Fixed
