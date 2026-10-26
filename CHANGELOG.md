@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-26
+
+### Added
+
+- Admin panel base (`admin/`): Vite + React 19 + TypeScript strict, Tailwind 4 with the `DESIGN.md` tokens, light/dark/system theme, Plus Jakarta Sans (headings, big numbers) + Inter self-hosted, Lucide icons.
+- App shell: sidebar on desktop, top bar with a menu on phones, placeholder pages for Resumen, Apicultores and Usuarios.
+- Base components (button, icon button, input, card, badge, skeleton, empty and error states) and a dev-only `/_design` gallery.
+- Spanish dates, numbers and labels for every API enum; typed Supabase client generated from the database (`pnpm db:types`).
+- `pnpm admin:check` (typecheck, tests, build), part of `pnpm ci:check` and of CI.
+- `on-danger` color token (white text on the dark-mode danger red was unreadable).
+
 ## [0.6.0] - 2026-10-26
 
 ### Added
