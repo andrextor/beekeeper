@@ -1,6 +1,6 @@
 # A3 · Admin dashboard and beekeepers list — spec
 
-Date: 2026-10-25 (revised 2026-10-28 after B6/A2) · Branch: `feat/a3-admin-dashboard` · Status: **awaiting OK** · Version: 0.9.0
+Date: 2026-10-25 (revised 2026-10-28 after B6/A2) · Branch: `feat/a3-admin-dashboard` · Status: **approved 2026-10-28** · Version: 0.9.0
 
 ## Problem
 

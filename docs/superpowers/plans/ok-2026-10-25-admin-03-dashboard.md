@@ -1,6 +1,6 @@
 # A3 · Admin dashboard and lists — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-admin-03-dashboard-design.md` · Branch: `feat/a3-admin-dashboard` · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-admin-03-dashboard-design.md` · Branch: `feat/a3-admin-dashboard` · Status: **approved 2026-10-28**
 
 1. **API layer** — `admin/src/lib/admin-api.ts`: typed wrappers for `admin_stats`, `admin_list_organizations`, `admin_list_users` over the generated `database.types.ts` (`unknown` + guards for the jsonb results, no `any`), `pageCount(total, size)` and the `not_platform_admin` check; `admin-api.test.ts` for the guards and `pageCount`.
 2. **Shared list pieces** — `components/ui/SearchInput.tsx` (on `Input`, 300 ms debounce), `components/ui/Pagination.tsx`, `components/ui/DataTable.tsx` (table from `md`, cards below), `lib/useListParams.ts` (`q`/`page` in the URL, new search → page 1).
