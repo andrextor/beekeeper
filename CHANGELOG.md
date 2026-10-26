@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-26
+
+### Added
+
+- Admin sign-in (`/ingresar`) with email and password, show/hide password and Spanish error messages.
+- Only platform admins get into the panel: other accounts see "Esta cuenta no tiene acceso al panel de administración." with a sign-out button; signed-out visitors are sent to sign in and come back to the page they asked for (internal paths only).
+- Signed-in email and "Cerrar sesión" in the sidebar.
+- `pnpm admin:env` writes `admin/.env.local` from the local stack (API URL and publishable key only).
+
+### Changed
+
+- The whole admin design system is glass (sidebar, top bar, cards, secondary buttons, inputs, badges) over a softly lit background, instead of the heavy deep-green sidebar.
+- New palette "Bosque claro": soft sage background by day, olive black by night (no more deep-teal dark background); green only for actions and states.
+- Entrance, stagger and page-transition animations, and hover/press motion on every control (off with reduced motion).
+
 ## [0.7.0] - 2026-10-26
 
 ### Added
