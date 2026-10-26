@@ -1,6 +1,6 @@
 # B7 · Contract gaps found by the mobile specs — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-backend-07-api-gaps-design.md` · Branch: `fix/b7-api-gaps` (on top of `docs/mobile-copy`) · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-backend-07-api-gaps-design.md` · Branch: `fix/b7-api-gaps` (on top of `docs/mobile-copy`) · Status: **approved 2026-10-25**
 
 ## 1. SQL
 
