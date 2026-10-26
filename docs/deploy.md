@@ -24,7 +24,7 @@ La secret key, la contraseña de la base y el token nunca van al repositorio, a 
    pnpm exec supabase login
    pnpm exec supabase link --project-ref dhacyrwngqegqjffpten   # pide la contraseña de la base
    ```
-3. **Esquema**: `pnpm exec supabase db push`. Sube todas las migraciones; el seed nunca se corre en el remoto.
+3. **Esquema**: `pnpm exec supabase db push --linked`. Sube todas las migraciones; el seed nunca se corre en el remoto.
 4. **Fotos**: el bucket `hive-photos` lo crea una migración. En Storage debe aparecer como privado.
 5. **Auth** (Authentication → Sign In / Providers → Email): proveedor de email activo, **Confirm email apagado**, contraseña mínima de 8, registros activos. En URL Configuration: Site URL = la URL del panel (D2) y `landak://` en Redirect URLs.
 6. **Primer admin**: crea tu cuenta (desde la app o Authentication → Add user, marcando auto-confirm) y en el SQL Editor:
@@ -39,10 +39,10 @@ Después de mergear el release a `main`:
 
 ```bash
 git switch main && git pull
-pnpm exec supabase db push
+pnpm exec supabase db push --linked
 ```
 
-`db push` solo aplica las migraciones que el remoto no tiene y pide confirmación antes de hacerlo.
+`--linked` porque el CLI pronto apuntará a la base local por defecto. `db push` solo aplica las migraciones que el remoto no tiene y pide confirmación antes de hacerlo.
 
 ## Backups
 

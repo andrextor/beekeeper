@@ -5,7 +5,7 @@ Spec: `docs/superpowers/specs/2026-10-25-deploy-01-supabase-design.md` · Branch
 Every task marked 🔑 is done by Iván (or with him, on his screen) because it uses his accounts; the session prepares the commands and checks the result.
 
 1. 🔑 **Create project** — dashboard, `us-east-1`, name `landak-apiario` (done, ref `dhacyrwngqegqjffpten`).
-2. 🔑 **Link and push** — `pnpm exec supabase link --project-ref <ref>`, `pnpm exec supabase db push`; `supabase/.temp` stays gitignored.
+2. 🔑 **Link and push** — `pnpm exec supabase link --project-ref <ref>`, `pnpm exec supabase db push --linked`; `supabase/.temp` stays gitignored.
 3. 🔑 **Auth settings** — confirm email off, password ≥ 8, signups on; secret key saved for `scripts/reset-password.sh`.
 4. 🔑 **First admin** — sign in, set the flag by SQL.
 5. **Backup workflow** — `.github/workflows/backup.yml`: weekly (and on demand) `supabase db dump` of roles, schema and data, encrypted with `gpg` (AES-256, passphrase in the `BACKUP_PASSPHRASE` secret) because the repository is public and any GitHub user can download its artifacts; uploaded as an artifact kept 90 days.
