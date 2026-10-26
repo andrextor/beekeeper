@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Apicultor page: name, sign-up date, apiaries, active hives of the total and people; an Apiarios view (one card per apiary with active hives and last inspection) and a Personas view (members with their role and since when, pending invitations with label and expiry). The view lives in the link.
+- Apiario page: farm, place, altitude, flora, water, notes and a map link when it has coordinates; its hives with type, status, brood boxes and supers, queen year and marking colour, and colony age; Activas by default, Todas on demand.
+- Breadcrumbs on both pages, and a "no existe" state for unknown or deleted beekeepers and apiaries.
+
 ## [0.9.0] - 2026-10-28
 
 ### Added
