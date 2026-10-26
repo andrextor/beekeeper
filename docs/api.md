@@ -265,6 +265,16 @@ The database checks only `type`, that `details` is an object of at most 8 KB, an
 | `loss` | Pérdida | `{ cause?: 'starvation' \| 'pests' \| 'disease' \| 'absconding' \| 'pesticide' \| 'unknown' }` |
 | `qr_relabel` | Cambio de etiqueta QR | `{ old_qr_code: string, new_qr_code: string }` |
 
+Spanish labels for the `details` values (the app and the admin use exactly these):
+
+| Key | Value → label |
+|-----|---------------|
+| `feeding.feed` | `sugar_syrup` Jarabe de azúcar · `fondant` Fondant · `pollen_patty` Torta proteica · `honey` Miel · `other` Otro alimento |
+| `treatment.method` | `strip` Tiras · `drip` Goteo · `vapor` Vapor · `dust` Espolvoreo · `other` Otro método |
+| `harvest.product` | `honey` Miel · `pollen` Polen · `propolis` Propóleo · `wax` Cera |
+| `loss.cause` | `starvation` Hambre · `pests` Plagas · `disease` Enfermedad · `absconding` Fuga · `pesticide` Pesticida · `unknown` Causa desconocida |
+| `queen_change.reason` | `failing` Reina fallando · `aggressive` Colmena agresiva · `lost` Reina perdida · `planned` Planificado |
+
 Events never change the hive by themselves (a `loss` does not set `hives.status`). The owner's app upserts the hive change in the same outbox batch; a reviewer's app shows "Avisa al propietario". They are two upserts: if the hive update is refused, the event stays and the hive change shows "Requiere atención".
 
 ## Hive timeline
