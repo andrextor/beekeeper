@@ -1,6 +1,6 @@
 # A1 · Admin scaffold — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-admin-01-scaffold-design.md` · Branch: `feat/a1-admin-scaffold` · Status: **awaiting OK** (revised 2026-10-26)
+Spec: `docs/superpowers/specs/2026-10-25-admin-01-scaffold-design.md` · Branch: `feat/a1-admin-scaffold` · Status: **approved** (2026-10-26)
 
 New dependencies (approval asked here, current versions on 2026-10-26):
 

@@ -1,6 +1,6 @@
 # A1 · Admin scaffold and design system — spec
 
-Date: 2026-10-25 · Branch: `feat/a1-admin-scaffold` · Status: **awaiting OK** (revised 2026-10-26) · Version: 0.7.0
+Date: 2026-10-25 · Branch: `feat/a1-admin-scaffold` · Status: **approved** (2026-10-26) · Version: 0.7.0
 
 ## Problem
 
