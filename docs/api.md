@@ -290,6 +290,10 @@ Ids are lowercase uuids. Any other name is refused (`403` from Storage). Members
 
 1. Main file → 2. thumbnail → 3. upsert the `photos` row. The row is written last, so a crash leaves at most an orphan file, never a row pointing at nothing. Orphan cleanup is a later job.
 
+Once the row exists the files cannot be replaced (Storage answers `403` to an upsert): a photo is history. **Permanent failures**, shown as "Requiere atención" and never retried: Storage `403` (the hive was deleted or the user left the organization while the photo was queued) and `parent_mismatch` on the row. Network errors, `5xx` and `429` are retried with backoff.
+
+Deleting a hive keeps its history: its inspections, events and photos stay as they are, and clients hide the children of a deleted hive.
+
 ### Table `photos`
 
 Common columns plus:
