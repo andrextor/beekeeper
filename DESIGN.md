@@ -2,7 +2,7 @@
 
 Design system of the web admin (`admin/`). The Android app has its own `beekeeper-mobile/DESIGN.md` built on **the same palette, fonts and icon set**; a change to a token here is copied there in the same week.
 
-Source: *Manual de Identidad Finca Landak 2025* (colors and Arsenal). The product must not look like every account belongs to Finca Landak: the brand colors are used as an agricultural, honey-and-leaf palette, the Finca Landak logo is not used.
+Source: *Manual de Identidad Finca Landak 2025* (colors; its typeface, Arsenal, was tried in the admin and replaced by Plus Jakarta Sans on 2026-10-26). The product must not look like every account belongs to Finca Landak: the brand colors are used as an agricultural, honey-and-leaf palette, the Finca Landak logo is not used.
 
 ## Palette
 
@@ -42,6 +42,7 @@ Source: *Manual de Identidad Finca Landak 2025* (colors and Arsenal). The produc
 | `--color-accent` | `honey` | `honey` |
 | `--color-on-accent` | `deep` | `deep` |
 | `--color-danger` | `#b42318` | `#f97066` |
+| `--color-on-danger` | `#ffffff` | `deep` (white on `#f97066` is 2.6:1) |
 | `--color-warning-bg` | `#fff4e0` | `#3d2e10` |
 | `--color-success-bg` | `#e7f4e4` | `#0b3a1f` |
 
@@ -58,7 +59,7 @@ Source: *Manual de Identidad Finca Landak 2025* (colors and Arsenal). The produc
 
 ## Typography
 
-- **Arsenal** (Google Fonts, OFL) for headings and numbers in stat cards: 700 for h1/h2, 400 for h3.
+- **Plus Jakarta Sans** (Google Fonts, OFL; `@fontsource-variable/plus-jakarta-sans`) for headings and numbers in stat cards: 700 for h1/h2, 600 for h3.
 - **Inter** (Google Fonts, OFL) for UI and body, `font-feature-settings: 'tnum'` in tables.
 - Not used: *pastyu* (license not confirmed) and *Bellota Text* (adds weight with little gain).
 - Scale (rem): 0.75 caption · 0.875 table/body-sm · 1 body · 1.25 h3 · 1.5 h2 · 2 h1 · 2.5 stat number.

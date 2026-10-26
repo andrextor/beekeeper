@@ -11,7 +11,7 @@ From the list, the admin opens one beekeeper and needs its people (owners, revie
 ### `/apicultores/:orgId`
 
 - One request: `admin_organization_summary(orgId)` (B6).
-- Header: organization name (Arsenal h1), created date, counts.
+- Header: organization name (Plus Jakarta Sans h1), created date, counts.
 - Tabs (URL `?tab=`): **Apiarios** (default) · **Personas**.
 - Apiarios: cards with name, farm name, place, "N activas de M", last inspection (relative), `map-pin` link to Google Maps only when coordinates exist. Card click → `/apicultores/:orgId/apiarios/:apiaryId`.
 - Personas: table Correo · Nombre · Rol (badge) · Desde; then "Invitaciones pendientes": Correo · Rol · Invitado por · Fecha.
