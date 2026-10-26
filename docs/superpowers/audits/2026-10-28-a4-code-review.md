@@ -9,7 +9,7 @@ Branch `feat/a4-admin-organization`, `/code-review` over the diff from `main`.
 | R3 | A hive-list error replaced the whole section, heading and filter included | **Fixed**: the error shows under the heading |
 | R4 | `fetchHives` has no limit, so PostgREST max-rows could cut the list silently | **Accepted ceiling**: one apiary holds tens of hives; marked with a `ponytail:` comment |
 | R5 | The apiary page runs the full summary RPC only for the breadcrumb name | **Kept**: it is cached from the organization page, organizations hold a handful of apiaries, and it is the admin check of R2 |
-| R6 | The summary RPC's `last_inspection_at` counts inspections of soft-deleted hives | **Deferred**: a migration, outside A4's no-migration scope. Next backend fix |
+| R6 | The summary RPC's `last_inspection_at` counts inspections of soft-deleted hives | **Fixed** in 0.11.1 (`20261028100000_admin_skip_deleted_hives.sql`): every admin count of inspections and events skips deleted hives |
 | R7 | `formatColonyAge` never completed the month for starts on the 29th–31st in shorter months | **Fixed** + tests |
 | R8 | The hive URL was written three times | **Fixed**: `hivePath(hive)` from `hive.organization_id` |
 | R9 | `hiveColumns` rebuilt every render | **Fixed**: module-level, thanks to R8 |
