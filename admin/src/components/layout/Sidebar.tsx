@@ -1,5 +1,5 @@
 import { Hexagon, LogOut } from 'lucide-react'
-import { NavLink } from 'react-router'
+import { Link, NavLink } from 'react-router'
 import { cx } from '../../lib/cx'
 import { signOut, useSession } from '../../lib/session'
 import { navigation } from './navigation'
@@ -49,9 +49,15 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         </ul>
       </nav>
       <div className="flex flex-col gap-2 border-t border-glass-border px-3 py-4">
-        <p className="truncate px-3 text-sm text-muted" title={email}>
+        <Link
+          to="/mi-cuenta"
+          viewTransition
+          onClick={onNavigate}
+          className="truncate px-3 text-sm text-muted hover:text-text hover:underline"
+          title={`${email ?? ''} · Mi cuenta`}
+        >
           {email}
-        </p>
+        </Link>
         <div className="flex items-center justify-between">
           <button
             type="button"

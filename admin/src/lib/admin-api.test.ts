@@ -81,6 +81,7 @@ describe('parseOrganizationSummary', () => {
         display_name: null,
         role: 'owner',
         joined_at: '2026-10-25T00:00:00Z',
+        deactivated_at: null,
       },
     ],
     pending_invites: [

@@ -5,6 +5,7 @@ const messages: Record<string, string> = {
   invalid_credentials: 'Correo o contraseña incorrectos.',
   validation_failed: 'Revisa el correo y la contraseña.',
   over_request_rate_limit: 'Demasiados intentos. Espera un minuto.',
+  user_banned: 'Esta cuenta está desactivada.',
 }
 
 export const networkErrorMessage = 'No hay conexión. Revisa tu internet e inténtalo de nuevo.'

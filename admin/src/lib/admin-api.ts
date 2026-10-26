@@ -39,8 +39,9 @@ export type Membership = {
   deleted_at: string | null
 }
 
-export type UserRow = Omit<GeneratedUser, 'display_name' | 'organizations'> & {
+export type UserRow = Omit<GeneratedUser, 'display_name' | 'deactivated_at' | 'organizations'> & {
   display_name: string | null
+  deactivated_at: string | null
   organizations: Membership[]
 }
 
@@ -61,7 +62,7 @@ function isNullableString(value: unknown): value is string | null {
   return value === null || typeof value === 'string'
 }
 
-function isRole(value: unknown): value is Role {
+export function isRole(value: unknown): value is Role {
   return value === 'owner' || value === 'reviewer'
 }
 
@@ -88,6 +89,7 @@ export type Member = {
   display_name: string | null
   role: Role
   joined_at: string
+  deactivated_at: string | null
 }
 
 export type PendingInvite = {
@@ -120,7 +122,8 @@ function isMember(value: unknown): value is Member {
     typeof value.email === 'string' &&
     isNullableString(value.display_name) &&
     isRole(value.role) &&
-    typeof value.joined_at === 'string'
+    typeof value.joined_at === 'string' &&
+    isNullableString(value.deactivated_at)
   )
 }
 
@@ -229,7 +232,7 @@ export async function fetchUsers(
 }
 
 // A hand-edited URL must read as "not found", not as a database error.
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export async function fetchOrganizationSummary(id: string): Promise<OrganizationSummary | null> {
   if (!uuidPattern.test(id)) return null
