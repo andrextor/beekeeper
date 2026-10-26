@@ -37,7 +37,7 @@ Rejected: a Node/Nest/Express server on Render/Railway/Fly. Free tiers there sle
 4. Auth (dashboard → Authentication → Providers → Email): email provider on, **Confirm email off**, minimum password length 8, signups on (same as `supabase/config.toml`); site URL = admin URL from D2; redirect `landak://`.
 5. Iván keeps the project's secret key in his password manager for `scripts/reset-password.sh` (the only password recovery in the pilot).
 6. Iván creates his account (app or Studio → Authentication → Add user), then in the SQL editor: `update public.profiles set is_platform_admin = true where email = '<his email>';`.
-7. GitHub secrets for the backup workflow: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_REF`, `BACKUP_PASSPHRASE` (also in Iván's password manager: without it a backup cannot be opened).
+7. GitHub secrets for the backup workflow: `SUPABASE_DB_URL` (session pooler connection string: it reaches only this database, while an access token controls the whole Supabase account) and `BACKUP_PASSPHRASE` (also in Iván's password manager: without it a backup cannot be opened).
 8. `docs/deploy.md` (Spanish): every step above, how to apply a new migration (`supabase db push` from `main` after a release), how to restore a paused project, where the keys live.
 
 ## Security constraints

@@ -9,8 +9,9 @@ URL de la API: `https://dhacyrwngqegqjffpten.supabase.co`. El entorno de desarro
 |-------|-----------|--------------|
 | URL de la API y **publishable key** (`sb_publishable_…`) | Dashboard → Project Settings → API Keys | La app y el panel. No es secreta: RLS protege los datos |
 | **Secret key** (`sb_secret_…`) | Dashboard → API Keys y el gestor de contraseñas de Iván | Solo `scripts/reset-password.sh`, en la máquina de Iván. Salta RLS |
-| Contraseña de la base | Gestor de contraseñas y el secreto `SUPABASE_DB_PASSWORD` de GitHub | `supabase link`, `db push` y el backup |
-| Token de acceso de Supabase | Llavero del Mac (`supabase login`) y el secreto `SUPABASE_ACCESS_TOKEN` de GitHub | El CLI |
+| Contraseña de la base | Gestor de contraseñas | `supabase link` y `db push` |
+| Cadena de conexión (Session pooler, con la contraseña) | Secreto `SUPABASE_DB_URL` de GitHub | Solo el backup. Llega a esta base y a nada más |
+| Token de acceso de Supabase | Solo el llavero del Mac (`supabase login`) | El CLI. Controla toda la cuenta: nunca en GitHub |
 | Frase del backup | Gestor de contraseñas y el secreto `BACKUP_PASSPHRASE` de GitHub | Cifrar y abrir los backups. Sin ella un backup no se puede abrir |
 
 La secret key, la contraseña de la base y el token nunca van al repositorio, a una variable de la app ni a un chat.
@@ -30,7 +31,7 @@ La secret key, la contraseña de la base y el token nunca van al repositorio, a 
    ```sql
    update public.profiles set is_platform_admin = true where email = 'tu-correo@ejemplo.com';
    ```
-7. **Secretos de GitHub** (Settings → Secrets and variables → Actions): `SUPABASE_ACCESS_TOKEN` (un token nuevo de Account → Access Tokens, solo para GitHub), `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_REF` y `BACKUP_PASSPHRASE` (una frase larga nueva).
+7. **Secretos de GitHub** (Settings → Secrets and variables → Actions → Secrets): `SUPABASE_DB_URL` (Dashboard → Connect → Session pooler, con `[YOUR-PASSWORD]` reemplazado por la contraseña de la base) y `BACKUP_PASSPHRASE` (una frase larga nueva).
 
 ## Subir una migración nueva
 
