@@ -47,7 +47,8 @@ A check violation (`23514`, constraint name in `message`) means the client sent 
 
 | `details` | Message | When |
 |-----------|---------|------|
-| `parent_mismatch` | "El registro relacionado no existe, fue eliminado o es de otra organización." | A child points at a parent of another organization or a soft-deleted one, including restoring (`deleted_at = null`) a child whose parent is deleted. A soft-deleted child (a tombstone) is accepted under a deleted parent of the same organization/hive |
+| `parent_mismatch` | "El registro relacionado no existe o es de otra organización." | A child points at a missing parent, at a parent of another organization, or (`inspection_id`) at an inspection of another hive. Always a client bug: **Requiere atención** |
+| `parent_deleted` | "El registro relacionado fue eliminado." | A live child (insert, edit or restore with `deleted_at = null`) whose parent is soft-deleted. A soft-deleted child (a tombstone) is accepted under a deleted parent |
 | `immutable_column` | "Un registro no puede cambiar de organización." | An update changes `organization_id` |
 | `immutable_column` | "Un registro no puede cambiar de colmena." | An update changes `inspections.hive_id` or `photos.hive_id` (delete it and record it again on the right hive) |
 | `missing_author` | "Falta el autor del registro." | Server-side insert without `created_by` (never from clients) |
@@ -74,7 +75,7 @@ Repeat until a page returns fewer than 500 rows. The new cursor is the last row'
 
 `upsert` by `id` (`on conflict (id) do update`), which is idempotent: a retried request writes the same row. The outbox retries with backoff 5 s → 30 s → 2 min → 10 min (cap). A `P0001`, `23505`, `42501` or other 4xx marks the entry **Requiere atención**; retrying would never succeed.
 
-Every upsert re-checks the parent: Postgres fires `before insert` triggers on `on conflict do update` too, even when the row exists. So the outbox pushes live rows **parent-first** (apiary → hive → inspection → events and photos) and soft deletes **child-first** (a hive before its apiary, or the apiary gets `apiary_not_empty`). A soft delete whose parent someone else already deleted goes through; a live edit under a deleted parent gets `parent_mismatch` and is dropped, not shown as **Requiere atención** (the parent is gone for everyone).
+Every upsert re-checks the parent: Postgres fires `before insert` triggers on `on conflict do update` too, even when the row exists. So the outbox pushes live rows **parent-first** (apiary → hive → inspection → events and photos) and soft deletes **child-first** (a hive before its apiary, or the apiary gets `apiary_not_empty`). A soft delete whose parent someone else already deleted goes through. A live row under a deleted parent gets `parent_deleted`: an edit of a row the server already has is dropped (the parent is gone for everyone); a row created offline that never reached the server is **not** dropped silently: it goes to **Requiere atención** so the person sees it was not saved. `parent_mismatch` is always **Requiere atención**.
 
 ## Auth
 
@@ -119,7 +120,7 @@ Members screen: `from('organization_members').select('role, user_id, profiles(em
 
 Memberships are **hard-deleted** and are not part of the cursor pull: on every sync, compare `my_memberships()` with the local list and purge the local rows of any organization that disappeared. Rows still in the outbox for it end as "Requiere atención".
 
-A soft-deleted organization (`organizations.deleted_at`) grants nothing to its members: RLS returns none of its rows and refuses their writes with `42501`; owner RPCs answer `organization_deleted`. It leaves `my_memberships()`, so the app purges it like a lost membership (above). Only the platform admin still reads it. It cannot be restored from a client.
+A soft-deleted organization (`organizations.deleted_at`) grants nothing to its members: RLS returns none of its rows and refuses their inserts and upserts with `42501` (a plain `PATCH` changes nothing and returns empty, see Writes refused by RLS); owner RPCs answer `organization_deleted`. It leaves `my_memberships()`, so the app purges it like a lost membership (above). Only the platform admin still reads it. It cannot be restored from a client.
 
 ### RPCs (`supabase.rpc(name, params)`)
 
@@ -203,7 +204,7 @@ Table `inspections`. Common columns (`id`, `organization_id`, `created_by`, `cre
 
 | Column | Type | Values |
 |--------|------|--------|
-| `hive_id` | uuid | a hive of the same organization, not deleted (`parent_mismatch`) |
+| `hive_id` | uuid | a hive of the same organization (`parent_mismatch`), not deleted (`parent_deleted`) |
 | `inspected_at` | timestamptz | ≤ now + 1 day (`future_date`) |
 | `inspected_by` | uuid | defaults to the signed-in user; must be a member (`not_member`) |
 | `source` | text | `manual`, `voice` |
@@ -253,7 +254,7 @@ View `hive_open_tasks` (RLS applies): one row per non-deleted hive that has an i
 
 ## Events
 
-Table `hive_events`. Common columns plus `hive_id`, `inspection_id` (optional; an inspection of the **same hive**, not deleted, else `parent_mismatch`), `type`, `occurred_at` (≤ now + 1 day, `future_date`), `details jsonb` (default `{}`). Same write rules as inspections.
+Table `hive_events`. Common columns plus `hive_id`, `inspection_id` (optional; an inspection of the **same hive** (`parent_mismatch`), not deleted (`parent_deleted`)), `type`, `occurred_at` (≤ now + 1 day, `future_date`), `details jsonb` (default `{}`). Same write rules as inspections.
 
 The database checks only `type`, that `details` is an object of at most 8 KB, and that a `note` has `text` (1..2000 chars) (`23514` on `hive_events_details_check`). The shapes below are validated by the app (Zod); a new optional key needs no migration.
 
@@ -306,7 +307,7 @@ Ids are lowercase uuids. Any other name is refused (`403` from Storage). Members
 
 1. Main file → 2. thumbnail → 3. upsert the `photos` row. The row is written last, so a crash leaves at most an orphan file, never a row pointing at nothing. Orphan cleanup is a later job.
 
-Once the row exists the files cannot be replaced (Storage answers `403` to an upsert): a photo is history. **Permanent failures**, shown as "Requiere atención" and never retried: Storage `403` (the hive was deleted or the user left the organization while the photo was queued) and `parent_mismatch` on the row. Network errors, `5xx` and `429` are retried with backoff.
+Once the row exists the files cannot be replaced (Storage answers `403` to an upsert): a photo is history. **Permanent failures**, shown as "Requiere atención" and never retried: Storage `403` (the hive was deleted or the user left the organization while the photo was queued) `parent_mismatch` on the row, and `parent_deleted` on a photo that never reached the server (an edit of a photo the server has is dropped, see Sync push). Network errors, `5xx` and `429` are retried with backoff.
 
 Deleting a hive keeps its history: its inspections, events and photos stay as they are, and clients hide the children of a deleted hive.
 
@@ -317,7 +318,7 @@ Common columns plus:
 | Column | Type | Rule |
 |--------|------|------|
 | `hive_id` | uuid | a hive of the same organization, not deleted; cannot change (`immutable_column`) |
-| `inspection_id` | uuid | optional; an inspection of the same hive, not deleted (`parent_mismatch`) |
+| `inspection_id` | uuid | optional; an inspection of the same hive (`parent_mismatch`), not deleted (`parent_deleted`) |
 | `storage_path` | text | exactly `{organization_id}/{hive_id}/{id}.jpg` (`23514` on `photos_storage_path_check`) |
 | `taken_at` | timestamptz | ≤ now + 1 day (`future_date`) |
 | `width`, `height` | integer | 1..10000 |

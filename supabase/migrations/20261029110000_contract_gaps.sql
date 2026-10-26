@@ -2,7 +2,8 @@
 
 -- BEFORE INSERT fires on every upsert, so this check runs on each push even when the row exists. A soft-deleted
 -- parent still takes a soft-deleted child (a tombstone pushed after someone else deleted the parent); the
--- matched column is checked either way.
+-- matched column is checked either way. A deleted parent gets its own detail so clients can tell it from a
+-- broken link (parent_mismatch, a bug worth surfacing).
 create or replace function private.check_parent()
 returns trigger
 language plpgsql
@@ -29,17 +30,20 @@ begin
     into v_parent_value, v_parent_deleted_at
     using v_parent_id;
 
-  if v_parent_value is distinct from (to_jsonb(new) ->> v_match)
-    or (v_parent_deleted_at is not null and new.deleted_at is null) then
-    raise exception 'El registro relacionado no existe, fue eliminado o es de otra organización.'
+  if v_parent_value is distinct from (to_jsonb(new) ->> v_match) then
+    raise exception 'El registro relacionado no existe o es de otra organización.'
       using errcode = 'P0001', detail = 'parent_mismatch';
+  end if;
+  if v_parent_deleted_at is not null and new.deleted_at is null then
+    raise exception 'El registro relacionado fue eliminado.' using errcode = 'P0001', detail = 'parent_deleted';
   end if;
   return new;
 end;
 $$;
 
--- Memberships of a soft-deleted organization grant nothing. These helpers are stable, so inside the owner's
--- own soft-delete update they still see the organization as live and the update passes.
+-- Memberships of a soft-deleted organization grant nothing. The rule lives only in my_organization_ids; the
+-- other helpers go through it. They are stable, so inside the owner's own soft-delete update they still see
+-- the organization as live and the update passes.
 create or replace function private.my_organization_ids()
 returns setof uuid
 language sql
@@ -60,12 +64,7 @@ stable
 security definer
 set search_path = ''
 as $$
-  select exists (
-    select 1
-    from public.organization_members m
-    join public.organizations o on o.id = m.organization_id and o.deleted_at is null
-    where m.organization_id = p_organization_id and m.user_id = (select auth.uid())
-  );
+  select p_organization_id in (select private.my_organization_ids());
 $$;
 
 create or replace function private.has_role(p_organization_id uuid, p_role text)
@@ -78,9 +77,21 @@ as $$
   select exists (
     select 1
     from public.organization_members m
-    join public.organizations o on o.id = m.organization_id and o.deleted_at is null
     where m.organization_id = p_organization_id and m.user_id = (select auth.uid()) and m.role = p_role
+      and p_organization_id in (select private.my_organization_ids())
   );
+$$;
+
+create or replace function private.co_member_ids()
+returns setof uuid
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select distinct m.user_id
+  from public.organization_members m
+  where m.organization_id in (select private.my_organization_ids());
 $$;
 
 -- has_role no longer sees a deleted organization, so its owners are told so before the generic refusal.

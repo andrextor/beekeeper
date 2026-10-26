@@ -75,7 +75,7 @@ select throws_ok(
 );
 select throws_ok(
   format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_b', 'C-04', 'BBBBBBBBBB'),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a hive cannot point at another organization''s apiary'
+  'P0001', 'El registro relacionado no existe o es de otra organización.', 'a hive cannot point at another organization''s apiary'
 );
 select throws_ok(
   format('update public.hives set organization_id = %L where id = %L', :'org_b', :'hive_a'),
@@ -122,11 +122,11 @@ update public.hives set deleted_at = now() where id = :'hive_a';
 update public.apiaries set deleted_at = now() where id = :'apiary_a';
 select throws_ok(
   format('update public.hives set deleted_at = null where id = %L', :'hive_a'),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a hive cannot be restored into a deleted apiary'
+  'P0001', 'El registro relacionado fue eliminado.', 'a hive cannot be restored into a deleted apiary'
 );
 select throws_ok(
   format('update public.hives set apiary_id = %L where name = %L', :'apiary_a', 'c-01 BIS'),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a hive cannot move into a deleted apiary'
+  'P0001', 'El registro relacionado fue eliminado.', 'a hive cannot move into a deleted apiary'
 );
 select lives_ok(
   format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_a2', 'Nueva', '7K2M9QXA4B'),
@@ -134,7 +134,7 @@ select lives_ok(
 );
 select throws_ok(
   format('insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (%L, %L, %L, %L, %L)', gen_random_uuid(), :'org_a', :'apiary_a', 'C-05', 'DDDDDDDDDD'),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a hive cannot be added to a deleted apiary'
+  'P0001', 'El registro relacionado fue eliminado.', 'a hive cannot be added to a deleted apiary'
 );
 
 select * from finish();

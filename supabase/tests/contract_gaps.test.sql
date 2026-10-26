@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(13);
+select plan(14);
 
 select tests.create_user('owner-a@landak.test') as owner_a \gset
 select tests.create_user('reviewer-a@landak.test') as reviewer_a \gset
@@ -54,7 +54,7 @@ select throws_ok(
      on conflict (id) do update set details = excluded.details',
     :'ev_rev', :'org_a', :'hive_a', 'note', '{"text": "Corregida", "source": "text"}'
   ),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a live edit under a deleted hive is refused'
+  'P0001', 'El registro relacionado fue eliminado.', 'a live edit under a deleted hive is refused'
 );
 select lives_ok(
   format(
@@ -74,14 +74,14 @@ select lives_ok(
 );
 select throws_ok(
   format('update public.photos set deleted_at = null where id = %L', :'photo_rev'),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a child is not restored under a deleted hive'
+  'P0001', 'El registro relacionado fue eliminado.', 'a child is not restored under a deleted hive'
 );
 select throws_ok(
   format(
     'insert into public.photos (id, organization_id, hive_id, storage_path, taken_at, deleted_at) values (%L, %L, %L, %L, now(), now())',
     :'photo_x', :'org_a', :'hive_b', format('%s/%s/%s.jpg', :'org_a', :'hive_b', :'photo_x')
   ),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a tombstone still cannot point at another organization''s hive'
+  'P0001', 'El registro relacionado no existe o es de otra organización.', 'a tombstone still cannot point at another organization''s hive'
 );
 
 select tests.authenticate_as(:'owner_a');
@@ -110,6 +110,10 @@ select is(
     + (select count(*) from public.photos where organization_id = :'org_a'),
   0::bigint,
   'a reviewer no longer reads the hives, inspections, events or photos of a deleted organization'
+);
+select is(
+  (select count(*) from public.profiles where id = :'owner_a'), 0::bigint,
+  'nor the profiles of people they only shared that organization with'
 );
 
 select tests.authenticate_as(:'admin_id');

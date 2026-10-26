@@ -59,7 +59,7 @@ select is((select details ->> 'text' from public.hive_events where id = :'note_i
 
 select throws_ok(
   format('insert into public.inspections (id, organization_id, hive_id, inspected_at, source) values (%L, %L, %L, now(), %L)', gen_random_uuid(), :'org_a', :'hive_b', 'manual'),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'an inspection cannot point at another organization''s hive'
+  'P0001', 'El registro relacionado no existe o es de otra organización.', 'an inspection cannot point at another organization''s hive'
 );
 select throws_ok(
   format('insert into public.inspections (id, organization_id, hive_id, inspected_at, source, inspected_by) values (%L, %L, %L, now(), %L, %L)', gen_random_uuid(), :'org_a', :'hive_a', 'manual', :'owner_b'),
@@ -91,7 +91,7 @@ select throws_ok(
 );
 select throws_ok(
   format('insert into public.hive_events (id, organization_id, hive_id, inspection_id, type, occurred_at) values (%L, %L, %L, %L, %L, now())', gen_random_uuid(), :'org_a', :'hive_a2', :'insp_rev', 'feeding'),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'an event cannot link an inspection of another hive'
+  'P0001', 'El registro relacionado no existe o es de otra organización.', 'an event cannot link an inspection of another hive'
 );
 
 -- Owner A
