@@ -224,6 +224,7 @@
   }
 }
 
+/* biome-ignore-start lint/complexity/noImportantStyles: reduced motion must beat every animation and utility */
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -237,3 +238,4 @@
     transition-duration: 0.01ms !important;
   }
 }
+/* biome-ignore-end lint/complexity/noImportantStyles: reduced motion must beat every animation and utility */
