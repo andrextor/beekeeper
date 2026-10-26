@@ -29,7 +29,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 | A3 | Dashboard and beekeepers list | `specs/2026-10-25-admin-03-dashboard-design.md` | `plans/ok-2026-10-25-admin-03-dashboard.md` | 0.9.0 |
 | A4 | Organization detail: members, apiaries, hives | `specs/2026-10-25-admin-04-organization-design.md` | `plans/ok-2026-10-25-admin-04-organization.md` | 0.10.0 |
 | A5 | Hive detail: timeline, inspections, events, photos | `specs/2026-10-25-admin-05-hive-timeline-design.md` | `plans/ok-2026-10-25-admin-05-hive-timeline.md` | 0.11.0 |
-| A6 | Platform admin creates beekeepers and reviewers | `specs/2026-10-25-admin-06-create-users-design.md` | `plans/2026-10-25-admin-06-create-users.md` | 0.14.0 |
+| A6 | Platform admin creates beekeepers and reviewers; print reports | `specs/2026-10-25-admin-06-create-users-design.md` | `plans/ok-2026-10-25-admin-06-create-users.md` | 0.14.0 |
 
 ## Phase 3 — Go live (external accounts, each step asks first)
 

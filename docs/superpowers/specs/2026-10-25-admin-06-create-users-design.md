@@ -1,6 +1,6 @@
-# A6 · Platform admin creates beekeepers and reviewers — spec
+# A6 · Platform admin creates beekeepers and reviewers, and prints reports — spec
 
-Date: 2026-10-25 · Branch: `feat/admin-create-users` · Status: **awaiting OK** · Version: 0.14.0
+Date: 2026-10-25 · Branch: `feat/admin-create-users` · Status: **approved 2026-10-25** · Version: 0.14.0
 
 ## Problem
 
@@ -104,6 +104,33 @@ admin_provision_member(
 
   Never technical text (no codes, no English).
 
+## Print and save as PDF
+
+Iván asked (2026-10-25) for a print button that lets the reader save a report as PDF.
+
+**Decision: the browser's own print, no library.** A **Imprimir** button calls `window.print()`; the browser's print dialog has "Guardar como PDF" (Chrome, Edge, Safari, Firefox), so the PDF is downloaded without any code or dependency of ours. A print stylesheet makes the page read as a report.
+
+Rejected: generating the PDF in JavaScript (`jspdf`, `react-pdf`, `html2canvas`): a new dependency of hundreds of KB, its own layout to maintain, and worse text (often an image). A server-side PDF: needs a server or an Edge Function with a headless browser, far beyond the free tier's spirit.
+
+Where the button goes (top right of the page title, `print:hidden`):
+
+| Page | What prints |
+|------|-------------|
+| Apicultor | name, sign-up date, counts, and the view on screen (Apiarios or Personas) |
+| Apiario | its details and its hive table (the filter on screen: Activas or Todas) |
+| Colmena | its details and the view on screen: Historial (every loaded item, inspections **expanded**) or Fotos |
+
+- The button opens every `<details>` on the page before printing and closes the ones it opened afterwards, so inspections print with all their fields.
+- Historial prints what is loaded. To include older items, "Cargar más" first; the printed page ends with "Mostrando los N registros cargados." when more exist, so the reader knows it is not the whole history.
+- A print-only line under the title: "Impreso el <fecha y hora>".
+
+Print stylesheet (`admin/src/styles/theme.css`, `@media print`):
+
+- Always the light palette, even in dark mode; white page, black text; no glows, no blur, no shadows, no animations.
+- Sidebar, top bar, buttons, search, pagination, the Segmented control and the theme toggle hidden (`print:hidden`); the content uses the full page width.
+- Cards become a thin grey border; a card, a timeline item and a table row never split across pages (`break-inside: avoid`).
+- Links print as plain text.
+
 ## Security constraints
 
 - The secret key stays in the Supabase function runtime. The panel and Vercel keep only the URL and the publishable key.
@@ -129,4 +156,4 @@ One function invocation per account created; the free plan allows 500,000 a mont
 
 ## Out of scope
 
-Editing or deleting users, adding an existing account to another farm, resetting passwords from the panel (a natural next step that would retire `scripts/reset-password.sh`), forcing a password change on first sign-in, removing owners' invite codes.
+Printing the Resumen or the lists, a PDF made without the print dialog, editing or deleting users, adding an existing account to another farm, resetting passwords from the panel (a natural next step that would retire `scripts/reset-password.sh`), forcing a password change on first sign-in, removing owners' invite codes.

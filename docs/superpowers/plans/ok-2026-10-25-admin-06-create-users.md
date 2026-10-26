@@ -1,6 +1,6 @@
-# A6 · Admin creates users — plan
+# A6 · Admin creates users, print reports — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-admin-06-create-users-design.md` · Branch: `feat/admin-create-users` · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-admin-06-create-users-design.md` · Branch: `feat/admin-create-users` · Status: **approved 2026-10-25**
 
 Each task is one commit. No new dependency: the function imports the same pinned `@supabase/supabase-js` the panel uses, through Deno's `npm:` specifier.
 
@@ -32,16 +32,24 @@ Each task is one commit. No new dependency: the function imports the same pinned
 - `admin/src/routes.tsx`: `usuarios/nuevo`. `admin/src/features/users/UsersPage.tsx`: the **Nuevo usuario** button.
 - Check: `pnpm admin:check`.
 
-## 4. Docs and rules
+## 4. Print reports
+
+- `admin/src/components/ui/PrintButton.tsx`: Lucide `Printer`, secondary button "Imprimir", `print:hidden`; opens the closed `<details>` in `main`, `window.print()`, closes them again.
+- `admin/src/components/ui/PrintedAt.tsx`: print-only "Impreso el …" (`hidden print:block`).
+- `OrganizationPage.tsx`, `ApiaryPage.tsx`, `HivePage.tsx`: the button next to the title and `PrintedAt`; `TimelineList.tsx`: print-only "Mostrando los N registros cargados." when `hasNextPage`.
+- `AppShell.tsx` / `TopBar.tsx` / controls: `print:hidden` and `print:p-0`; `theme.css`: `@media print` block from the spec.
+- Check: `pnpm admin:check`; manual: print preview of each page in light and dark mode.
+
+## 5. Docs and rules
 
 - `docs/api.md` → Admin: `admin-create-user` (admin-only, request, answer, codes) and `admin_provision_member` (service role only).
 - `docs/deploy.md`: deploying the function; that platform admins can create accounts.
 - CLAUDE.md, AGENTS.md, `.claude/rules/tenancy.md`: the admin writes only through this function; access can also come from a platform admin.
 - `docs/ROADMAP.md`: A6 plan link renamed to `ok-…` on approval.
 
-## 5. Release — `chore(release): 0.14.0`
+## 6. Release — `chore(release): 0.14.0`
 
-CHANGELOG `[0.14.0]` Added; `package.json` version.
+CHANGELOG `[0.14.0]` Added (accounts, print); `package.json` version.
 
 ## How Iván tests it
 
@@ -52,4 +60,5 @@ CHANGELOG `[0.14.0]` Added; `package.json` version.
    3. Nuevo usuario → Revisor, farm Finca Landak → Apicultores → Finca Landak → Personas shows them as Revisor.
    4. Same email again → "Ya existe una cuenta con ese correo."
    5. Signed in as `owner@landak.test` (not admin), the panel never shows the page; calling the function with that session answers `not_platform_admin` (the curl is in `docs/deploy.md`).
-3. **Remote**, after merging: in your terminal `pnpm exec supabase db push --linked` and `pnpm exec supabase functions deploy admin-create-user`, then repeat 2.1–2.4 on https://beekeeper-one.vercel.app.
+3. **Print** (local): on a Colmena with history, expand nothing, press **Imprimir** → the preview shows every inspection expanded, no sidebar or buttons, white page; "Guardar como PDF" downloads it. Same on Apiario and Apicultor, and once with the dark theme on (the PDF stays light).
+4. **Remote**, after merging: in your terminal `pnpm exec supabase db push --linked` and `pnpm exec supabase functions deploy admin-create-user`, then repeat 2.1–2.4 on https://beekeeper-one.vercel.app.
