@@ -27,11 +27,13 @@ export function Input({ label, hint, error, trailing, id, className, ...props }:
           className={cx(
             'min-h-11 w-full rounded-control border bg-surface px-3 text-base text-text placeholder:text-muted',
             error ? 'border-danger' : 'border-border',
-            trailing && 'pr-12',
+            trailing != null && 'pr-12',
           )}
           {...props}
         />
-        {trailing && <div className="absolute inset-y-0 right-0 flex items-center">{trailing}</div>}
+        {trailing != null && (
+          <div className="absolute inset-y-0 right-0 flex items-center">{trailing}</div>
+        )}
       </div>
       {error ? (
         <p id={`${inputId}-error`} className="text-sm text-danger">
