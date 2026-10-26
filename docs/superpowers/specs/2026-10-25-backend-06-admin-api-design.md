@@ -1,6 +1,6 @@
 # B6 · Platform admin read API — spec
 
-Date: 2026-10-25 · Branch: `feat/b6-admin-api` · Status: **awaiting OK** (revised 2026-10-26 with B2–B5 lessons) · Version: 0.6.0
+Date: 2026-10-25 · Branch: `feat/b6-admin-api` · Status: **approved** (2026-10-26) · Version: 0.6.0
 
 ## Problem
 

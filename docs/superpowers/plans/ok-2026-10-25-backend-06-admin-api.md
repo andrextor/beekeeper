@@ -1,6 +1,6 @@
 # B6 · Platform admin read API — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-backend-06-admin-api-design.md` · Branch: `feat/b6-admin-api` · Status: **awaiting OK** (revised 2026-10-26)
+Spec: `docs/superpowers/specs/2026-10-25-backend-06-admin-api-design.md` · Branch: `feat/b6-admin-api` · Status: **approved** (2026-10-26)
 
 1. **RPCs and index** — `<ts>_admin_rpcs.sql`: index `inspections_org_recent_idx`, `admin_stats`, `admin_list_organizations`, `admin_organization_summary`, `admin_list_users`; `revoke execute from public`, `grant to authenticated`.
 2. **Tests** — `supabase/tests/admin_api.test.sql`.
