@@ -35,6 +35,10 @@ export function formatRelative(iso: string, now: Date = new Date()): string {
   return relativeFormat.format(Math.round(diffMs / dayMs), 'day')
 }
 
+export function formatLastInspection(iso: string | null): string {
+  return iso ? `Última revisión ${formatRelative(iso)}` : 'Sin revisiones'
+}
+
 export function formatNumber(value: number): string {
   return numberFormat.format(value)
 }
