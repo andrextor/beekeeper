@@ -1,6 +1,6 @@
 # D2 · Admin on Vercel — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-deploy-02-admin-vercel-design.md` · Branch: `chore/d2-admin-vercel` · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-deploy-02-admin-vercel-design.md` · Branch: `chore/d2-admin-vercel` · Status: **approved 2026-10-25**
 
 1. **Config** — `admin/vercel.json` (rewrite + headers from the spec).
 2. 🔑 **Vercel project** — Iván imports `andrextor/beekeeper`, root directory `admin`, framework Vite, the two env vars (Production + Preview), deploy. Only from `main` after this branch is merged.

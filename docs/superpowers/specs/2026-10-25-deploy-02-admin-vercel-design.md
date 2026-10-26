@@ -1,6 +1,6 @@
 # D2 · Admin panel on Vercel — spec
 
-Date: 2026-10-25, revised 2026-10-25 after D1 · Branch: `chore/d2-admin-vercel` · Status: **awaiting OK** · Version: 0.13.0
+Date: 2026-10-25, revised 2026-10-25 after D1 · Branch: `chore/d2-admin-vercel` · Status: **approved 2026-10-25** · Version: 0.13.0
 
 ## Problem
 
