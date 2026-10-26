@@ -1,16 +1,16 @@
 # B5 · Photos — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-backend-05-photos-design.md` · Branch: `feat/b5-photos` · Status: **awaiting OK**
+Spec: `docs/superpowers/specs/2026-10-25-backend-05-photos-design.md` · Branch: `feat/b5-photos` · Status: **awaiting OK** (revised 2026-10-26)
 
-1. **Photos table** — `<ts>_photos.sql`: table, `storage_path` check and unique index, triggers (`set_updated_at`, `force_author`, `check_parent`, inspection-same-hive check reused from B4), indexes, RLS + grants.
-2. **Bucket and policies** — `<ts>_hive_photos_bucket.sql`: insert into `storage.buckets` (private, 5 MB, jpeg), `private.path_org`, `private.path_hive`, the four `storage.objects` policies.
-3. **Tests** — `supabase/tests/photos.test.sql`, `supabase/tests/storage.test.sql`.
-4. **Seed** — `supabase/seed/photos/` with two small sample JPEGs + thumbnails and `scripts/seed-photos.sh` that uploads them through the local Storage API after `db reset` (Storage files are not part of SQL seeds), exposed as `pnpm seed:photos`; rows for them in `seed.sql`.
-5. **Docs** — `docs/api.md` Photos section: path rule, upload order, signed URLs, sizes.
-6. **Release** — `chore(release): 0.5.0`. Check: `pnpm ci:check`.
+1. **Photos table** — `<ts>_photos.sql`: table, `storage_path` check and unique index, indexes `(organization_id, updated_at)` and `(hive_id, taken_at desc, id desc)`, triggers `10`–`50` (reusing `set_timestamps`, `force_author`, `check_parent`, `check_not_future`), `delete_inspection_events` → `delete_inspection_children` (events + photos), RLS + grants.
+2. **Bucket and policies** — `<ts>_hive_photos_bucket.sql`: `storage.buckets` row (private, 5 MB, `image/jpeg`), `private.path_org`, `private.path_hive`, `private.can_upload_photo`, three `storage.objects` policies (select, insert, update; no delete).
+3. **Tests** — `supabase/tests/photos.test.sql` (row rules, RLS, inspection cascade), `supabase/tests/storage.test.sql` (path rules, other org, bad names, admin read-only, retry cannot move a file).
+4. **Seed** — photo rows are not seeded (a row without its file would break the admin); files come with A5.
+5. **Docs** — `docs/api.md` Photos section (path, sizes, upload order, signed URLs, thumbnail fallback, free-tier budget); `.claude/rules/sql.md` gains the `coalesce` rule for checks on optional JSON keys.
+6. **Release** — `chore(release): 0.5.0`, CHANGELOG, ROADMAP.
 
 ## How Iván tests it
 
-1. `pnpm db:reset && pnpm seed:photos && pnpm test:db` → green.
-2. Studio → Storage → `hive-photos`: folders by organization id, two photos with thumbnails.
-3. Studio → Storage: the bucket shows as private; opening a file without a signed URL fails.
+1. `pnpm ci:check` → green.
+2. Studio → Storage: bucket `hive-photos` exists, private, 5 MB limit, JPEG only.
+3. Studio → Storage → upload any file to `hive-photos` from the dashboard (service role, bypasses RLS) and open it without a signed URL → refused.

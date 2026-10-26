@@ -1,6 +1,6 @@
 # B5 · Photos: table and private bucket — spec
 
-Date: 2026-10-25 · Branch: `feat/b5-photos` · Status: **awaiting OK** · Version: 0.5.0
+Date: 2026-10-25 · Branch: `feat/b5-photos` · Status: **awaiting OK** (revised 2026-10-26 with B4 lessons) · Version: 0.5.0
 
 ## Problem
 
@@ -27,9 +27,9 @@ Common columns (B3) plus:
 | Column | Type | Rule |
 |--------|------|------|
 | `hive_id` | uuid → hives | same organization |
-| `inspection_id` | uuid → inspections | nullable, same hive |
+| `inspection_id` | uuid → inspections | nullable, same hive and not deleted (`check_parent('inspections', 'inspection_id', 'hive_id')`) |
 | `storage_path` | text | equals `organization_id || '/' || hive_id || '/' || id || '.jpg'` (check constraint), unique |
-| `taken_at` | timestamptz | not null |
+| `taken_at` | timestamptz | not null, ≤ now + 1 day (`check_not_future`) |
 | `width`, `height` | integer | 1..10000 |
 | `bytes` | integer | 1..5242880 (main file) |
 | `caption` | text | ≤ 300 |
@@ -42,18 +42,20 @@ The thumbnail has no column: its path is `storage_path` with `.jpg` replaced by 
 
 Object names must match `^<uuid>/<uuid>/<uuid>(\.thumb)?\.jpg$` (checked in the insert policy), so nothing else can be stored in the bucket.
 
-`private.path_org(name text) returns uuid`: first folder as uuid, `null` if it is not a uuid (no cast error). `private.path_hive(name)`: second folder likewise.
+`private.path_org(name text) returns uuid`: first folder as uuid, `null` if it is not a uuid (no cast error). `private.path_hive(name)`: second folder likewise. `private.can_upload_photo(name)` (security definer): the name matches the pattern, the caller is a member of `path_org`, and `path_hive` is a non-deleted hive of that organization; used by both insert and update policies.
 
 | Operation | Allowed when |
 |-----------|--------------|
 | select (download, signed URL) | `private.path_org(name) in (select private.my_organization_ids()) or (select private.is_platform_admin())` |
 | insert | `private.is_member(path_org(name))` and the hive `path_hive(name)` exists in that organization and is not deleted |
-| update (re-upload on retry) | `owner_id = auth.uid()::text` |
-| delete | `private.has_role(path_org(name), 'owner')` or `owner_id = auth.uid()::text` |
+| update (re-upload on retry) | `owner_id = auth.uid()::text` and still a member; `with check` repeats the insert rule, so a retry cannot move the file to another path |
+| delete | none: history is never hard-deleted by the app. A purge of soft-deleted photos is a later owner action with its own spec |
 
 ### Table RLS
 
 Same as inspections: read by membership or platform admin, insert `is_member`, update by owner or author. Soft delete keeps the file (history); a hard purge is a later owner action.
+
+Triggers (B3/B4 order): `photos_10_set_timestamps`, `20_force_author`, `30_check_hive`, `40_check_inspection` (`check_parent` with match column `hive_id`), `50_check_date`. `hive_id` cannot change (the path depends on it; enforced by the `storage_path` check). Soft-deleting an inspection soft-deletes its linked photos too: `private.delete_inspection_events()` becomes `private.delete_inspection_children()` and covers `hive_events` and `photos`.
 
 ### Reading photos
 
@@ -65,7 +67,7 @@ Clients call `storage.from('hive-photos').createSignedUrls(paths, 3600)` in one 
 
 ## Out of scope
 
-R2, orphan cleanup job, photo annotation, video.
+R2, orphan cleanup job, photo annotation, video, hard delete. Seed photo files (JPEGs + an upload script) are left to A5, when the admin first shows photos.
 
 ## Mobile impact
 
