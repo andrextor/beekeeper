@@ -98,7 +98,7 @@ Auth errors come in English; clients map `error_code` to Spanish:
 | `user_banned` | "Esta cuenta está desactivada." (a platform admin deactivated it, A7) |
 | network error | "No hay conexión. Revisa tu internet e inténtalo de nuevo." |
 
-After signing in: `rpc('my_memberships')`. No memberships → onboarding offers **Crear mi apiario** (`create_organization`) or **Tengo un código** (`accept_invite`).
+After signing in: `rpc('my_memberships')`. No memberships → onboarding offers **Crear mi finca** (`create_organization`) or **Tengo un código** (`accept_invite`).
 
 ## Organizations
 
@@ -131,7 +131,7 @@ Memberships are **hard-deleted** and are not part of the cursor pull: on every s
 
 Every RPC raises `not_signed_in` ("Inicia sesión para continuar.") without a session.
 
-Share text for an invite (app): "Te invité a mi apiario en Landak Apiario. Instala la app, crea tu cuenta y escribe este código: K7M2-9QXA (vence el 1 de noviembre)."
+Share text for an invite (app): "Te invité a <finca> en Landak Apiario. Instala la app (<install link>), crea tu cuenta y escribe este código: K7M2-9QXA. Vence el 1 de noviembre." In every Spanish text an organization is a **finca** (app and admin).
 
 ### Platform admin
 
