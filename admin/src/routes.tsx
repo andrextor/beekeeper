@@ -5,6 +5,7 @@ import { NoAccessPage } from './features/auth/NoAccessPage'
 import { RequireAdmin } from './features/auth/RequireAdmin'
 import { SignInPage } from './features/auth/SignInPage'
 import { DashboardPage } from './features/dashboard/DashboardPage'
+import { OrganizationPage } from './features/organizations/OrganizationPage'
 import { OrganizationsPage } from './features/organizations/OrganizationsPage'
 import { UsersPage } from './features/users/UsersPage'
 
@@ -35,7 +36,11 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: DashboardPage },
       { path: 'apicultores', Component: OrganizationsPage },
-      { path: 'apicultores/:id', element: <PagePlaceholder title="Apicultor" module="A4" /> },
+      { path: 'apicultores/:id', Component: OrganizationPage },
+      {
+        path: 'apicultores/:id/colmenas/:hiveId',
+        element: <PagePlaceholder title="Colmena" module="A5" />,
+      },
       { path: 'usuarios', Component: UsersPage },
     ],
   },

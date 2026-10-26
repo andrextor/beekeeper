@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import type { Database, Tables } from './database.types'
 import { supabase } from './supabase'
 
@@ -230,7 +231,11 @@ export async function fetchUsers(
   }
 }
 
+// A hand-edited URL must read as "not found", not as a database error.
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function fetchOrganizationSummary(id: string): Promise<OrganizationSummary | null> {
+  if (!uuidPattern.test(id)) return null
   const { data, error } = await supabase.rpc('admin_organization_summary', {
     p_organization_id: id,
   })
@@ -238,10 +243,20 @@ export async function fetchOrganizationSummary(id: string): Promise<Organization
   return parseOrganizationSummary(data)
 }
 
+/** Shared by the organization and apiary pages, so the breadcrumb reuses the cache. */
+export function organizationSummaryQuery(id: string) {
+  return queryOptions({
+    queryKey: ['admin-org', id],
+    queryFn: () => fetchOrganizationSummary(id),
+    staleTime: 60_000,
+  })
+}
+
 export type Apiary = Tables<'apiaries'>
 export type Hive = Tables<'hives'>
 
 export async function fetchApiary(id: string): Promise<Apiary | null> {
+  if (!uuidPattern.test(id)) return null
   const { data, error } = await supabase
     .from('apiaries')
     .select('*')
