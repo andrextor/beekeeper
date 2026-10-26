@@ -29,10 +29,10 @@ as $$
 $$;
 
 -- Same rule for the service_role functions, which get the actor's id instead of a session.
+-- Volatile, not stable: Postgres refuses `for share` in a stable function.
 create function private.is_active_admin(p_user_id uuid)
 returns boolean
 language sql
-stable
 security definer
 set search_path = ''
 as $$
