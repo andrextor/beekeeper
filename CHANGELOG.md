@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-10-28
+
 ### Fixed
 
 - The dashboard, the beekeeper list and the apiary cards no longer count inspections and events of deleted hives, so an apiary no longer shows a recent inspection on a hive that is gone.
