@@ -1,9 +1,9 @@
-@import 'tailwindcss';
-@import '@fontsource/arsenal/400.css';
-@import '@fontsource/arsenal/700.css';
-@import '@fontsource-variable/inter';
+@import "tailwindcss";
+@import "@fontsource/arsenal/400.css";
+@import "@fontsource/arsenal/700.css";
+@import "@fontsource-variable/inter";
 
-@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
   --color-deep: #04303b;
@@ -20,8 +20,8 @@
   --color-stone-700: #4a473f;
   --color-stone-900: #1f1d19;
 
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Arsenal', ui-serif, Georgia, serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Arsenal", ui-serif, Georgia, serif;
 
   --radius-control: 8px;
   --radius-card: 12px;
@@ -62,7 +62,7 @@
 }
 
 /* src/lib/theme.ts resolves "system" to light or dark, so the dark tokens live in one block. */
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   color-scheme: dark;
   --app-bg: #021e25;
   --app-surface: var(--color-deep);

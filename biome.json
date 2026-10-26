@@ -6,7 +6,14 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/*.md", "!pnpm-lock.yaml", "!supabase/.temp", "!supabase/.branches", "!admin/src/lib/database.types.ts"]
+    "includes": [
+      "**",
+      "!**/*.md",
+      "!pnpm-lock.yaml",
+      "!supabase/.temp",
+      "!supabase/.branches",
+      "!admin/src/lib/database.types.ts"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -36,6 +43,11 @@
       "source": {
         "organizeImports": "on"
       }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   }
 }
