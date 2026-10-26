@@ -257,14 +257,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"display_name": string | null,"email": string,"id": string,"is_platform_admin": boolean,"updated_at": string
+                    "created_at": string,"deactivated_at": string | null,"display_name": string | null,"email": string,"id": string,"is_platform_admin": boolean,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"display_name"?: string | null,"email": string,"id": string,"is_platform_admin"?: boolean,"updated_at"?: string
+                    "created_at"?: string,"deactivated_at"?: string | null,"display_name"?: string | null,"email": string,"id": string,"is_platform_admin"?: boolean,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string | null,"email"?: string,"id"?: string,"is_platform_admin"?: boolean,"updated_at"?: string
+                    "created_at"?: string,"deactivated_at"?: string | null,"display_name"?: string | null,"email"?: string,"id"?: string,"is_platform_admin"?: boolean,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -298,6 +298,9 @@ isOneToOne: false
             "accept_invite":
 { Args: { "p_code": string }; Returns: string
                            },
+"admin_add_member":
+{ Args: { "p_organization_id": string,"p_role": string,"p_user_id": string }; Returns: undefined
+                           },
 "admin_list_organizations":
 { Args: { "p_limit"?: number,"p_offset"?: number,"p_search"?: string }; Returns: {
               "apiaries": number,"created_at": string,"deleted_at": string,"hives_active": number,"id": string,"inspections_30d": number,"last_inspection_at": string,"members": number,"name": string,"owner_emails": (string)[],"total_count": number
@@ -305,11 +308,29 @@ isOneToOne: false
                            },
 "admin_list_users":
 { Args: { "p_limit"?: number,"p_offset"?: number,"p_search"?: string }; Returns: {
-              "created_at": string,"display_name": string,"email": string,"id": string,"is_platform_admin": boolean,"organizations": Json,"total_count": number
+              "created_at": string,"deactivated_at": string,"display_name": string,"email": string,"id": string,"is_platform_admin": boolean,"organizations": Json,"total_count": number
             }[]
                            },
 "admin_organization_summary":
 { Args: { "p_organization_id": string }; Returns: Json
+                           },
+"admin_provision_member":
+{ Args: { "p_actor_id": string,"p_display_name": string,"p_organization_id": string,"p_organization_name": string,"p_role": string,"p_user_id": string }; Returns: string
+                           },
+"admin_remove_member":
+{ Args: { "p_organization_id": string,"p_user_id": string }; Returns: undefined
+                           },
+"admin_set_deactivated":
+{ Args: { "p_actor_id": string,"p_user_id": string,"p_value": boolean }; Returns: undefined
+                           },
+"admin_set_display_name":
+{ Args: { "p_display_name": string,"p_user_id": string }; Returns: undefined
+                           },
+"admin_set_member_role":
+{ Args: { "p_organization_id": string,"p_role": string,"p_user_id": string }; Returns: undefined
+                           },
+"admin_set_platform_admin":
+{ Args: { "p_user_id": string,"p_value": boolean }; Returns: undefined
                            },
 "admin_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
