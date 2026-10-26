@@ -1,6 +1,6 @@
 # B5 · Photos: table and private bucket — spec
 
-Date: 2026-10-25 · Branch: `feat/b5-photos` · Status: **awaiting OK** (revised 2026-10-26 with B4 lessons) · Version: 0.5.0
+Date: 2026-10-25 · Branch: `feat/b5-photos` · Status: **approved** (2026-10-26) · Version: 0.5.0
 
 ## Problem
 

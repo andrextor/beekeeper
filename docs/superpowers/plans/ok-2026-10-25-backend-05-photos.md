@@ -1,6 +1,6 @@
 # B5 · Photos — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-backend-05-photos-design.md` · Branch: `feat/b5-photos` · Status: **awaiting OK** (revised 2026-10-26)
+Spec: `docs/superpowers/specs/2026-10-25-backend-05-photos-design.md` · Branch: `feat/b5-photos` · Status: **approved** (2026-10-26)
 
 1. **Photos table** — `<ts>_photos.sql`: table, `storage_path` check and unique index, indexes `(organization_id, updated_at)` and `(hive_id, taken_at desc, id desc)`, triggers `10`–`50` (reusing `set_timestamps`, `force_author`, `check_parent`, `check_not_future`), `delete_inspection_events` → `delete_inspection_children` (events + photos), RLS + grants.
 2. **Bucket and policies** — `<ts>_hive_photos_bucket.sql`: `storage.buckets` row (private, 5 MB, `image/jpeg`), `private.path_org`, `private.path_hive`, `private.can_upload_photo`, three `storage.objects` policies (select, insert, update; no delete).
