@@ -8,8 +8,8 @@ import { QueryError } from '../../components/ui/QueryError'
 import { Skeleton } from '../../components/ui/Skeleton'
 import {
   fetchPhotos,
-  pageCount,
   type Photo,
+  pageCount,
   photoPageSize,
   signedUrlRefresh,
   signThumbnails,
