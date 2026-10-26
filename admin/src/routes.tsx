@@ -4,6 +4,7 @@ import { PagePlaceholder } from './components/layout/PagePlaceholder'
 import { NoAccessPage } from './features/auth/NoAccessPage'
 import { RequireAdmin } from './features/auth/RequireAdmin'
 import { SignInPage } from './features/auth/SignInPage'
+import { ApiaryPage } from './features/apiaries/ApiaryPage'
 import { DashboardPage } from './features/dashboard/DashboardPage'
 import { OrganizationPage } from './features/organizations/OrganizationPage'
 import { OrganizationsPage } from './features/organizations/OrganizationsPage'
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
       { index: true, Component: DashboardPage },
       { path: 'apicultores', Component: OrganizationsPage },
       { path: 'apicultores/:id', Component: OrganizationPage },
+      { path: 'apicultores/:id/apiarios/:apiaryId', Component: ApiaryPage },
       {
         path: 'apicultores/:id/colmenas/:hiveId',
         element: <PagePlaceholder title="Colmena" module="A5" />,
