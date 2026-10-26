@@ -113,7 +113,7 @@
   /* Fields, chips and hovers inside glass panels: lighter than a panel, still see-through. */
   --app-glass-field: rgb(255 255 255 / 0.55);
   /* Field outlines and the focus ring need 3:1 against the glass (WCAG 1.4.11); honey on sage is 1.7:1. */
-  --app-field-border: #86948a;
+  --app-field-border: #7f8d83;
   --app-focus: var(--color-leaf);
   --app-glass-shadow: 0 8px 32px rgb(24 33 26 / 0.07);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 22%, transparent);

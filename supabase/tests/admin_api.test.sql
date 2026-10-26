@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(19);
+select plan(21);
 
 select tests.create_user('owner-a@landak.test') as owner_a \gset
 select tests.create_user('reviewer-a@landak.test') as reviewer_a \gset
@@ -30,8 +30,19 @@ select public.accept_invite(:'code');
 select tests.authenticate_as(:'owner_b');
 select public.create_organization(:'org_b', 'Miel 100% pura');
 select gen_random_uuid() as org_gone \gset
+select gen_random_uuid() as apiary_gone \gset
+select gen_random_uuid() as hive_closed \gset
+select gen_random_uuid() as photo_gone \gset
 select public.create_organization(:'org_gone', 'Cerrada');
-insert into public.apiaries (id, organization_id, name) values (gen_random_uuid(), :'org_gone', 'Vieja');
+insert into public.apiaries (id, organization_id, name) values (:'apiary_gone', :'org_gone', 'Vieja');
+insert into public.hives (id, organization_id, apiary_id, name, qr_code) values
+  (:'hive_closed', :'org_gone', :'apiary_gone', 'V-01', 'AAAAAAAAAC');
+insert into public.inspections (id, organization_id, hive_id, inspected_at, source)
+values (gen_random_uuid(), :'org_gone', :'hive_closed', now(), 'manual');
+insert into public.hive_events (id, organization_id, hive_id, type, occurred_at)
+values (gen_random_uuid(), :'org_gone', :'hive_closed', 'feeding', now());
+insert into public.photos (id, organization_id, hive_id, storage_path, taken_at)
+values (:'photo_gone', :'org_gone', :'hive_closed', format('%s/%s/%s.jpg', :'org_gone', :'hive_closed', :'photo_gone'), now());
 update public.organizations set deleted_at = now() where id = :'org_gone';
 
 -- Not an admin
@@ -50,6 +61,8 @@ select is((public.admin_stats() ->> 'hives_active')::integer, 1, 'a soft-deleted
 select is((public.admin_stats() ->> 'inspections_30d')::integer, 1, 'stats count recent inspections');
 select is((public.admin_stats() ->> 'reviewers')::integer, 1, 'stats count reviewers');
 select is((public.admin_stats() ->> 'apiaries')::integer, 1, 'a deleted organization''s apiaries are not counted');
+select is((public.admin_stats() ->> 'events_30d')::integer, 0, 'nor its events');
+select is((public.admin_stats() ->> 'photos')::integer, 0, 'nor its photos');
 select ok((public.admin_stats() ->> 'storage_bytes')::bigint >= 1000, 'stats sum the bytes stored in hive-photos');
 
 select is(

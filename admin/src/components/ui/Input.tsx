@@ -25,7 +25,7 @@ export function Input({ label, hint, error, trailing, id, className, ...props }:
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cx(
-            'min-h-11 w-full rounded-control border bg-glass-field px-3 text-base text-text backdrop-blur-sm transition duration-200 placeholder:text-muted hover:border-primary/50 focus:border-primary focus:shadow-[0_0_0_4px] focus:shadow-primary/15 focus:outline-none',
+            'min-h-11 w-full rounded-control border bg-glass-field px-3 text-base text-text backdrop-blur-sm transition duration-200 placeholder:text-muted hover:border-primary/50 focus:border-primary',
             error ? 'border-danger' : 'border-field-border',
             trailing != null && 'pr-12',
           )}

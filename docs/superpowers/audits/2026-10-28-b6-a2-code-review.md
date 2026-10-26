@@ -14,3 +14,16 @@ Date: 2026-10-28 · Branch: `fix/b6-a2-code-review` · Scope: `git diff 095c7a4 
 | F8 | Every component calling `useSession` opens its own Auth subscription | Rejected: each gets the stored session from memory at once; a shared provider is worth it when a screen needs the session in many places | None |
 | F9 | Deep links (`/apicultores`) will 404 on Vercel without an SPA rewrite | Deferred to D2 (deploy), where `vercel.json` is created | None now |
 | F10 | `admin_list_organizations` runs per-row subqueries with offset paging | Already marked `ponytail:` in B6; fine for tens of beekeepers | None |
+
+## Second pass (`/code-review` of this branch)
+
+| # | Finding | Verdict | Fix |
+|---|---------|---------|-----|
+| R1 | `safeNextPath` returned the parsed path, and `/.//evil.com` parses to `//evil.com` | Valid | A parsed path starting with `//` is refused; test added |
+| R2 | `URL.parse` is missing before Safari 18 / Chrome 126, so sign-in would go blank there | Valid | `new URL` in a `try` |
+| R3 | With blocked storage the toggle re-read `system` on every render and could never reach dark | Valid | `lib/theme.ts` keeps the preference in memory |
+| R4 | A theme change in another tab left this tab stale | Valid | `storage` event applies it and notifies the toggles |
+| R5 | `#86948a` is 2.94:1 against the sage page, not 3:1 | Valid | `#7f8d83` (3.2:1) |
+| R6 | Inputs kept `focus:outline-none`, so the new focus ring never showed on fields | Valid | Inputs use the global `:focus-visible` ring plus the primary border |
+| R7 | The deleted-organization test only checked apiaries | Valid | The deleted organization gets a hive, inspection, event and photo; events and photos asserted, hives and inspections already were |
+| R8 | "Live organization" filter repeated per aggregate; extract a helper or cascade the organization's soft delete | Rejected: within `admin_stats` it is one array (`v_orgs`); the other admin RPCs show deleted organizations on purpose, labelled with `deleted_at`. Cascading an organization's deletion is a product decision for the tenancy module, not a review fix | None |
