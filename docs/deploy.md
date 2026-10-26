@@ -35,6 +35,8 @@ La secret key, la contraseña de la base y el token nunca van al repositorio, a 
 
 ## Panel de administración (Vercel)
 
+URL: **https://beekeeper-one.vercel.app** (también es la Site URL de Supabase Auth).
+
 Proyecto de Vercel Hobby conectado a `andrextor/beekeeper`: cada merge a `main` publica el panel solo y cada PR tiene su URL de prueba (protegida con el login de Vercel de Iván, contra el mismo backend de producción; el panel solo lee).
 
 Conexión, una vez (Vercel → Add New → Project):
