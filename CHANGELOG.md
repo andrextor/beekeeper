@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.15.1] - 2026-10-25
+
+### Fixed
+
+- Deleting something offline no longer fails when someone else already deleted the hive or inspection it belonged to.
+- A deleted farm no longer shows its apiaries, hives and records to its members, and accepts no new records; the platform admin still sees everything.
+- `docs/api.md`: `profiles.deactivated_at`, push order (live rows parent-first, deletes child-first), deleted farms.
+- CI: the admin tests failed without `admin/.env.local` (A7); they now get placeholder Supabase values.
+
+### Changed
+
+- A record whose hive, apiary or inspection was deleted now answers `parent_deleted` ("El registro relacionado fue eliminado."); `parent_mismatch` ("El registro relacionado no existe o es de otra organización.") is only for a broken link.
+
 ## [0.15.0] - 2026-10-25
 
 ### Added

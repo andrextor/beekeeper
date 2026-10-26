@@ -16,6 +16,7 @@ paths:
 - Every domain row carries `organization_id`; children denormalize it and a trigger checks it against the parent, so policies never join.
 - `organization_members` and `organization_invites` have no insert/update/delete grants: changes go through RPCs. Every RPC that changes memberships (including `accept_invite`) takes `private.lock_organization` **first** and checks the caller's role **after** the lock, so a caller demoted while waiting is refused.
 - Admin membership RPCs follow the same lock-then-check order (`private.admin_lock_organization`); admin flag and deactivation changes lock every admin row (`private.lock_platform_admins`) so at least one active admin always remains.
+- Membership helpers (`my_organization_ids`, `is_member`, `has_role`) ignore soft-deleted organizations: their members read and write nothing there; only the platform admin reads it (B7).
 - Owner actions refuse a soft-deleted organization (`private.require_owner` raises `organization_deleted`); codes of a deleted organization are `invalid_code`.
 - Nothing is granted by email: the email is not verified (no mailer). Access comes from creating an organization, from an invite code, or from a platform admin creating the account (A6: `admin_provision_member`, executable by `service_role` only).
 - Invite codes are stored only as `sha256` of the normalized code, and **no client can read `code_hash`** (column grants list every other column): a 40-bit code is reversible offline from its hash. Clients select explicit columns from `organization_invites`; `select=*` is refused.

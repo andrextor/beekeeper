@@ -52,7 +52,7 @@ select throws_ok(
     'insert into public.photos (id, organization_id, hive_id, inspection_id, storage_path, taken_at) values (%L, %L, %L, %L, %L, now())',
     :'photo_x', :'org_a', :'hive_a2', :'insp_a', format('%s/%s/%s.jpg', :'org_a', :'hive_a2', :'photo_x')
   ),
-  'P0001', 'El registro relacionado no existe, fue eliminado o es de otra organización.', 'a photo cannot link an inspection of another hive'
+  'P0001', 'El registro relacionado no existe o es de otra organización.', 'a photo cannot link an inspection of another hive'
 );
 select throws_ok(
   format(

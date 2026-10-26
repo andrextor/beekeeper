@@ -19,6 +19,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 | B4 | Inspections, events and field notes | `specs/2026-10-25-backend-04-inspections-events-design.md` | `plans/ok-2026-10-25-backend-04-inspections-events.md` | 0.4.0 |
 | B5 | Photos: table + private bucket | `specs/2026-10-25-backend-05-photos-design.md` | `plans/ok-2026-10-25-backend-05-photos.md` | 0.5.0 |
 | B6 | Platform admin read API | `specs/2026-10-25-backend-06-admin-api-design.md` | `plans/ok-2026-10-25-backend-06-admin-api.md` | 0.6.0 |
+| B7 | Contract gaps found by the mobile specs (tombstones, deleted organizations, `deactivated_at`) | `specs/2026-10-25-backend-07-api-gaps-design.md` | `plans/ok-2026-10-25-backend-07-api-gaps.md` | 0.15.1 |
 
 ## Phase 2 — Admin panel (`beekeeper/admin`)
 
