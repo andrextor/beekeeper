@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { AdminError } from './admin-errors'
 import { networkErrorMessage } from './auth'
 import {
-  CreateUserError,
   type CreateUserForm,
   createUserErrorMessage,
   generatePassword,
@@ -78,22 +78,22 @@ describe('generatePassword', () => {
 
 describe('createUserErrorMessage', () => {
   it('maps each code to Spanish', () => {
-    expect(createUserErrorMessage(new CreateUserError('email_taken'))).toBe(
+    expect(createUserErrorMessage(new AdminError('email_taken'))).toBe(
       'Ya existe una cuenta con ese correo.',
     )
-    expect(createUserErrorMessage(new CreateUserError('organization_not_found'))).toBe(
+    expect(createUserErrorMessage(new AdminError('organization_not_found'))).toBe(
       'Esa finca ya no existe. Elige otra.',
     )
-    expect(createUserErrorMessage(new CreateUserError('not_platform_admin'))).toMatch(/permiso/)
-    expect(createUserErrorMessage(new CreateUserError('invalid_email'))).toBe(
+    expect(createUserErrorMessage(new AdminError('not_platform_admin'))).toMatch(/permiso/)
+    expect(createUserErrorMessage(new AdminError('invalid_email'))).toBe(
       'Revisa los datos del formulario.',
     )
-    expect(createUserErrorMessage(new CreateUserError('network'))).toBe(networkErrorMessage)
+    expect(createUserErrorMessage(new AdminError('network'))).toBe(networkErrorMessage)
     expect(createUserErrorMessage(new TypeError('Failed to fetch'))).toBe(networkErrorMessage)
   })
 
   it('never shows an unknown code', () => {
-    expect(createUserErrorMessage(new CreateUserError('server_error'))).toBe(
+    expect(createUserErrorMessage(new AdminError('server_error'))).toBe(
       'No pudimos crear el usuario. Inténtalo de nuevo.',
     )
     expect(createUserErrorMessage('boom')).toBe('No pudimos crear el usuario. Inténtalo de nuevo.')

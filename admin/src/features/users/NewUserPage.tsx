@@ -1,25 +1,23 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Check, Copy, Eye, EyeOff, ShieldAlert, Sparkles } from 'lucide-react'
-import { type FormEvent, useEffect, useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { ShieldAlert } from 'lucide-react'
+import { type FormEvent, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
-import { IconButton } from '../../components/ui/IconButton'
 import { Input } from '../../components/ui/Input'
-import { SearchInput } from '../../components/ui/SearchInput'
 import { Segmented } from '../../components/ui/Segmented'
-import { type FarmOption, searchLiveOrganizations } from '../../lib/admin-api'
+import type { FarmOption } from '../../lib/admin-api'
 import {
   type CreatedUser,
   type CreateUserField,
   type CreateUserForm,
   createUser,
   createUserErrorMessage,
-  generatePassword,
   type UserKind,
   validateCreateUser,
 } from '../../lib/create-user'
+import { CopyField, FarmPicker, PasswordField } from './fields'
 
 const kindParams: Readonly<Record<UserKind, string>> = {
   beekeeper: 'apicultor',
@@ -35,110 +33,6 @@ const kinds: ReadonlyArray<{ value: UserKind; label: string }> = [
 
 function kindFromParam(value: string | null): UserKind {
   return kinds.find((kind) => kindParams[kind.value] === value)?.value ?? 'beekeeper'
-}
-
-function CopyField({ label, value }: { label: string; value: string }) {
-  const [copied, setCopied] = useState<'yes' | 'failed' | null>(null)
-  useEffect(() => {
-    if (!copied) return
-    const timer = setTimeout(() => setCopied(null), 2000)
-    return () => clearTimeout(timer)
-  }, [copied])
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(value)
-      setCopied('yes')
-    } catch {
-      setCopied('failed')
-    }
-  }
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-sm text-muted">{label}</span>
-      <span className="flex items-center gap-2">
-        <span className="break-all font-mono text-lg">{value}</span>
-        <IconButton
-          icon={copied === 'yes' ? Check : Copy}
-          label={copied === 'yes' ? 'Copiado' : `Copiar ${label.toLowerCase()}`}
-          onClick={copy}
-        />
-      </span>
-      {copied === 'failed' && (
-        <span role="alert" className="text-sm text-danger">
-          No se pudo copiar. Selecciona el texto y cópialo a mano.
-        </span>
-      )}
-    </div>
-  )
-}
-
-function FarmPicker({
-  value,
-  onChange,
-  error,
-}: {
-  value: FarmOption | null
-  onChange: (farm: FarmOption | null) => void
-  error?: string
-}) {
-  const [search, setSearch] = useState('')
-  const farms = useQuery({
-    queryKey: ['admin-orgs', 'picker', search],
-    queryFn: () => searchLiveOrganizations(search),
-    enabled: value === null,
-  })
-
-  if (value) {
-    return (
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Finca</span>
-        <span className="flex flex-wrap items-center gap-3">
-          <span className="font-medium">{value.name}</span>
-          <button
-            type="button"
-            onClick={() => onChange(null)}
-            className="min-h-11 text-sm text-primary hover:underline"
-          >
-            Cambiar
-          </button>
-        </span>
-      </div>
-    )
-  }
-
-  const rows = farms.data ?? []
-  return (
-    <div className="flex flex-col gap-2">
-      <SearchInput
-        label="Finca"
-        placeholder="Nombre de la finca"
-        value={search}
-        onSearch={setSearch}
-      />
-      {error && <p className="text-sm text-danger">{error}</p>}
-      {farms.isError ? (
-        <p className="text-sm text-danger">No pudimos cargar las fincas. Inténtalo de nuevo.</p>
-      ) : farms.isPending ? (
-        <p className="text-sm text-muted">Cargando fincas…</p>
-      ) : rows.length === 0 ? (
-        <p className="text-sm text-muted">No hay fincas con ese nombre.</p>
-      ) : (
-        <ul className="flex flex-col gap-1">
-          {rows.map((farm) => (
-            <li key={farm.id}>
-              <button
-                type="button"
-                onClick={() => onChange(farm)}
-                className="flex min-h-11 w-full flex-col items-start rounded-control px-3 py-2 text-left transition hover:bg-glass-field"
-              >
-                <span className="font-medium">{farm.name}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
 }
 
 function Done({
@@ -189,7 +83,6 @@ export function NewUserPage() {
   const kind = kindFromParam(params.get('tipo'))
   const [fields, setFields] = useState(emptyForm)
   const [farm, setFarm] = useState<FarmOption | null>(null)
-  const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<CreateUserField, string>>>({})
 
   const form: CreateUserForm = { kind, ...fields, organizationId: farm?.id ?? null }
@@ -218,7 +111,6 @@ export function NewUserPage() {
     setFields(emptyForm)
     setFarm(null)
     setErrors({})
-    setShowPassword(false)
     create.reset()
   }
 
@@ -255,36 +147,13 @@ export function NewUserPage() {
               onChange={(event) => set('email')(event.target.value)}
               error={errors.email}
             />
-            <div className="flex flex-col gap-2">
-              <Input
-                label="Contraseña"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                hint="Mínimo 8 caracteres."
-                value={fields.password}
-                onChange={(event) => set('password')(event.target.value)}
-                error={errors.password}
-                trailing={
-                  <IconButton
-                    icon={showPassword ? EyeOff : Eye}
-                    label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                    onClick={() => setShowPassword((shown) => !shown)}
-                  />
-                }
-              />
-              <Button
-                variant="secondary"
-                size="sm"
-                className="self-start"
-                onClick={() => {
-                  set('password')(generatePassword())
-                  setShowPassword(true)
-                }}
-              >
-                <Sparkles size={16} aria-hidden />
-                Generar
-              </Button>
-            </div>
+            <PasswordField
+              label="Contraseña"
+              value={fields.password}
+              onChange={set('password')}
+              error={errors.password}
+              generate
+            />
             {kind === 'beekeeper' && (
               <Input
                 label="Nombre de la finca"

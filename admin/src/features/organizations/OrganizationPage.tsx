@@ -32,8 +32,19 @@ function RoleBadge({ role }: { role: Member['role'] }) {
   return <Badge tone={role === 'owner' ? 'primary' : 'neutral'}>{roleLabels[role]}</Badge>
 }
 
+function MemberEmail({ row }: { row: Member }) {
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <Link to={`/usuarios/${row.user_id}`} viewTransition className="font-medium hover:underline">
+        {row.email}
+      </Link>
+      {row.deactivated_at && <Badge tone="danger">Desactivado</Badge>}
+    </span>
+  )
+}
+
 const memberColumns: ReadonlyArray<Column<Member>> = [
-  { header: 'Correo', cell: (row) => <span className="font-medium">{row.email}</span> },
+  { header: 'Correo', cell: (row) => <MemberEmail row={row} /> },
   { header: 'Nombre', cell: (row) => row.display_name ?? '—' },
   { header: 'Rol', cell: (row) => <RoleBadge role={row.role} /> },
   { header: 'Desde', cell: (row) => formatDate(row.joined_at) },
@@ -50,7 +61,7 @@ function MemberCard({ row }: { row: Member }) {
   return (
     <div className="glass flex flex-col gap-2 rounded-card p-4">
       <span className="flex flex-wrap items-center gap-2">
-        <span className="font-medium">{row.email}</span>
+        <MemberEmail row={row} />
         <RoleBadge role={row.role} />
       </span>
       {row.display_name && <span className="text-sm text-muted">{row.display_name}</span>}

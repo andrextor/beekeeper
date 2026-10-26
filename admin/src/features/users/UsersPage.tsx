@@ -35,7 +35,10 @@ function Memberships({ row }: { row: UserRow }) {
 function Email({ row }: { row: UserRow }) {
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
-      <span className="font-medium">{row.email}</span>
+      <Link to={`/usuarios/${row.id}`} viewTransition className="font-medium hover:underline">
+        {row.email}
+      </Link>
+      {row.deactivated_at && <Badge tone="danger">Desactivado</Badge>}
       {row.is_platform_admin && (
         <Badge tone="accent" icon={ShieldCheck}>
           Admin
