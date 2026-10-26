@@ -13,9 +13,22 @@ const tones: Record<BadgeTone, string> = {
   warning: 'border-transparent bg-warning-bg text-text',
 }
 
-export function Badge({ tone = 'neutral', icon: Icon, children }: { tone?: BadgeTone; icon?: LucideIcon; children: ReactNode }) {
+export function Badge({
+  tone = 'neutral',
+  icon: Icon,
+  children,
+}: {
+  tone?: BadgeTone
+  icon?: LucideIcon
+  children: ReactNode
+}) {
   return (
-    <span className={cx('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium', tones[tone])}>
+    <span
+      className={cx(
+        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium',
+        tones[tone],
+      )}
+    >
       {Icon && <Icon size={14} aria-hidden />}
       {children}
     </span>

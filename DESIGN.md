@@ -42,6 +42,7 @@ Source: *Manual de Identidad Finca Landak 2025* (colors and Arsenal). The produc
 | `--color-accent` | `honey` | `honey` |
 | `--color-on-accent` | `deep` | `deep` |
 | `--color-danger` | `#b42318` | `#f97066` |
+| `--color-on-danger` | `#ffffff` | `deep` (white on `#f97066` is 2.6:1) |
 | `--color-warning-bg` | `#fff4e0` | `#3d2e10` |
 | `--color-success-bg` | `#e7f4e4` | `#0b3a1f` |
 

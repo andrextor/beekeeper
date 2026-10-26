@@ -1,7 +1,11 @@
 const locale = 'es-CO'
 const dayMs = 86_400_000
 
-const dateFormat = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+const dateFormat = new Intl.DateTimeFormat(locale, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+})
 const dateTimeFormat = new Intl.DateTimeFormat(locale, {
   day: 'numeric',
   month: 'short',

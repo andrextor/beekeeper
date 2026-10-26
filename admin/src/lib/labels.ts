@@ -59,7 +59,11 @@ export const queenCellsLabels = {
   not_checked: 'No revisado',
 } as const
 
-export const broodPatternLabels = { compact: 'Compacta', spotty: 'Salteada', not_checked: 'No revisado' } as const
+export const broodPatternLabels = {
+  compact: 'Compacta',
+  spotty: 'Salteada',
+  not_checked: 'No revisado',
+} as const
 
 export const storesLabels = {
   low: 'Pocas',
@@ -94,9 +98,18 @@ export const diseaseSignLabels = {
   other: 'Otro',
 } as const
 
-export const weatherLabels = { sunny: 'Soleado', cloudy: 'Nublado', rain: 'Lluvia', windy: 'Viento' } as const
+export const weatherLabels = {
+  sunny: 'Soleado',
+  cloudy: 'Nublado',
+  rain: 'Lluvia',
+  windy: 'Viento',
+} as const
 
-export const attentionLevelLabels = { none: 'Sin novedad', soon: 'Pronto', urgent: 'Urgente' } as const
+export const attentionLevelLabels = {
+  none: 'Sin novedad',
+  soon: 'Pronto',
+  urgent: 'Urgente',
+} as const
 
 export const plannedActionLabels = {
   feed: 'Alimentar',
@@ -127,7 +140,10 @@ export const eventTypeLabels = {
 } as const
 
 /** The database stores these as text; an unknown value (a newer server) shows as is instead of breaking. */
-export function label(labels: Readonly<Record<string, string>>, value: string | null | undefined): string {
+export function label(
+  labels: Readonly<Record<string, string>>,
+  value: string | null | undefined,
+): string {
   if (value == null) return '—'
   return Object.hasOwn(labels, value) ? (labels[value] ?? value) : value
 }

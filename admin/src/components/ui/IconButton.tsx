@@ -7,7 +7,13 @@ type IconButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>
   label: string
 }
 
-export function IconButton({ icon: Icon, label, className, type = 'button', ...props }: IconButtonProps) {
+export function IconButton({
+  icon: Icon,
+  label,
+  className,
+  type = 'button',
+  ...props
+}: IconButtonProps) {
   return (
     <button
       type={type}

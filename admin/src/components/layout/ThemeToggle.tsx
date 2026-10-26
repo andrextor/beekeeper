@@ -2,7 +2,11 @@ import { Monitor, Moon, Sun } from 'lucide-react'
 import { useState } from 'react'
 import { readThemePreference, setThemePreference, type ThemePreference } from '../../lib/theme'
 
-const next: Record<ThemePreference, ThemePreference> = { system: 'light', light: 'dark', dark: 'system' }
+const next: Record<ThemePreference, ThemePreference> = {
+  system: 'light',
+  light: 'dark',
+  dark: 'system',
+}
 const labels: Record<ThemePreference, string> = {
   system: 'Tema del sistema',
   light: 'Tema claro',

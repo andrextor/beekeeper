@@ -39,6 +39,7 @@
   --color-accent: var(--app-accent);
   --color-on-accent: var(--app-on-accent);
   --color-danger: var(--app-danger);
+  --color-on-danger: var(--app-on-danger);
   --color-warning-bg: var(--app-warning-bg);
   --color-success-bg: var(--app-success-bg);
 }
@@ -55,6 +56,7 @@
   --app-accent: var(--color-honey);
   --app-on-accent: var(--color-deep);
   --app-danger: #b42318;
+  --app-on-danger: #ffffff;
   --app-warning-bg: #fff4e0;
   --app-success-bg: #e7f4e4;
 }
@@ -70,6 +72,7 @@
   --app-primary: var(--color-sprout);
   --app-on-primary: var(--color-deep);
   --app-danger: #f97066;
+  --app-on-danger: var(--color-deep);
   --app-warning-bg: #3d2e10;
   --app-success-bg: #0b3a1f;
 }
