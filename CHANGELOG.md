@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-10-25
+
+### Fixed
+
+- The published panel loads every font: the browser blocked the smallest ones, which the build embeds in the page.
+
 ## [0.13.0] - 2026-10-25
 
 ### Added
