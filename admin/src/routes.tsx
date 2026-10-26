@@ -1,6 +1,9 @@
 import { createBrowserRouter, type RouteObject } from 'react-router'
 import { AppShell } from './components/layout/AppShell'
 import { PagePlaceholder } from './components/layout/PagePlaceholder'
+import { NoAccessPage } from './features/auth/NoAccessPage'
+import { RequireAdmin } from './features/auth/RequireAdmin'
+import { SignInPage } from './features/auth/SignInPage'
 
 // import.meta.env.DEV is replaced at build time, so the gallery and its import never reach production.
 const devRoutes: RouteObject[] = import.meta.env.DEV
@@ -17,9 +20,15 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
   : []
 
 export const router = createBrowserRouter([
+  { path: '/ingresar', Component: SignInPage },
+  { path: '/sin-acceso', Component: NoAccessPage },
   {
     path: '/',
-    Component: AppShell,
+    element: (
+      <RequireAdmin>
+        <AppShell />
+      </RequireAdmin>
+    ),
     children: [
       { index: true, element: <PagePlaceholder title="Resumen" module="A3" /> },
       { path: 'apicultores', element: <PagePlaceholder title="Apicultores" module="A3 y A4" /> },
