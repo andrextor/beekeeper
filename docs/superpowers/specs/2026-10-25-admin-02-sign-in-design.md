@@ -1,6 +1,6 @@
 # A2 · Admin sign-in and access gate — spec
 
-Date: 2026-10-25 · Branch: `feat/a2-admin-sign-in` · Status: **awaiting OK** · Version: 0.8.0 · Revised 2026-10-25: email + password (no email is sent, B2 §Authentication); 2026-10-26: local env script, `validation_failed`
+Date: 2026-10-25 · Branch: `feat/a2-admin-sign-in` · Status: **approved** (2026-10-26) · Version: 0.8.0 · Revised 2026-10-25: email + password (no email is sent, B2 §Authentication); 2026-10-26: local env script, `validation_failed`
 
 ## Problem
 

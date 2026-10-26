@@ -1,6 +1,6 @@
 # A2 · Admin sign-in — plan
 
-Spec: `docs/superpowers/specs/2026-10-25-admin-02-sign-in-design.md` · Branch: `feat/a2-admin-sign-in` · Status: **awaiting OK** (revised 2026-10-26)
+Spec: `docs/superpowers/specs/2026-10-25-admin-02-sign-in-design.md` · Branch: `feat/a2-admin-sign-in` · Status: **approved** (2026-10-26)
 
 No new dependencies.
 
