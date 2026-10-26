@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-28
+
 ### Added
 
 - Colmena page: QR code, type, brood boxes and supers, queen, origin, age, race and notes, with breadcrumbs back to the apiary and a "no existe" state.
