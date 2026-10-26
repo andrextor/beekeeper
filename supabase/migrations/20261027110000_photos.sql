@@ -43,8 +43,9 @@ $$;
 
 revoke execute on function private.check_fixed_hive() from public;
 
+-- 25: an immutability error wins over the parent check at 30 (B5 review F1).
 drop trigger inspections_40_fixed_hive on public.inspections;
-create trigger inspections_40_fixed_hive before update on public.inspections
+create trigger inspections_25_fixed_hive before update on public.inspections
   for each row execute function private.check_fixed_hive();
 drop function private.check_inspection_hive();
 
@@ -77,10 +78,10 @@ create trigger photos_10_set_timestamps before insert or update on public.photos
   for each row execute function private.set_timestamps();
 create trigger photos_20_force_author before insert or update on public.photos
   for each row execute function private.force_author();
+create trigger photos_25_fixed_hive before update on public.photos
+  for each row execute function private.check_fixed_hive();
 create trigger photos_30_check_hive before insert or update on public.photos
   for each row execute function private.check_parent('hives', 'hive_id');
-create trigger photos_40_fixed_hive before update on public.photos
-  for each row execute function private.check_fixed_hive();
 create trigger photos_50_check_inspection before insert or update on public.photos
   for each row execute function private.check_parent('inspections', 'inspection_id', 'hive_id');
 create trigger photos_60_check_date before insert or update of taken_at on public.photos

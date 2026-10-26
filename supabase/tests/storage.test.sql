@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(11);
+select plan(12);
 
 select tests.create_user('owner-a@landak.test') as owner_a \gset
 select tests.create_user('reviewer-a@landak.test') as reviewer_a \gset
@@ -65,6 +65,12 @@ select throws_ok(
 select throws_ok(
   format('update storage.objects set name = %L where name = %L', format('%s/%s/%s.jpg', :'org_b', :'hive_b', :'photo_id'), :'path_a'),
   '42501', null, 'an uploader cannot move their file into another organization'
+);
+insert into public.photos (id, organization_id, hive_id, storage_path, taken_at) values (:'photo_id', :'org_a', :'hive_a', :'path_a', now());
+update storage.objects set metadata = '{"replaced": true}' where name = :'path_a';
+select is(
+  (select metadata ->> 'replaced' from storage.objects where name = :'path_a'), null,
+  'once the photos row exists the file cannot be replaced'
 );
 
 select tests.authenticate_as(:'owner_b');
