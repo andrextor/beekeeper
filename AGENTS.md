@@ -69,7 +69,7 @@ pnpm db:types      # regenerate admin/src/lib/database.types.ts after a migratio
 pnpm ci:check      # lint + admin:check + reset + pgTAP (~2 min), what CI runs
 ```
 
-**Iván runs the tests and checks, never the session** (Iván, 2026-10-26). The session does not run `pnpm test:db`, `pnpm check:quick`, `pnpm ci:check` or any test command, not even the one test it just wrote. Write the code and the tests, commit each task, and when every task is done hand Iván the exact command to run (`pnpm db:migrate && pnpm check:quick`, or `pnpm ci:check` before merging); he pastes back whatever fails. Applying migrations to the local stack (`pnpm db:migrate`, `pnpm db:reset`) to inspect data is allowed; running tests is not.
+**Iván runs the tests and checks, never the session** (Iván, 2026-10-26). The session does not run `pnpm test:db`, `pnpm check:quick`, `pnpm ci:check` or any test command, not even the one test it just wrote. Write the code and the tests, commit each task, and when every task is done hand Iván the exact command to run (`pnpm db:migrate && pnpm check:quick`, or `pnpm ci:check` before merging); he pastes back whatever fails. Applying migrations to the local stack (`pnpm db:migrate`, `pnpm db:reset`) to inspect data is allowed; running tests is not. The session also never starts dev servers or long-running processes (`pnpm --filter admin dev`, `supabase start`); Iván starts them and the session asks when it needs one.
 
 ## Changelog
 

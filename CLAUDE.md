@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Never run tests or checks.** Iván runs them, always (2026-10-26). Do not run `pnpm test:db`, `pnpm check:quick`, `pnpm ci:check`, `pnpm test` or any test command, not even the test just written. Write the code and the tests, commit each task, and at the end hand Iván the exact one-line command to run; he pastes back whatever fails.
 
+**Never start dev servers or long-running processes.** Iván starts them (2026-10-26): no `pnpm --filter admin dev`, `vite`, `supabase start`/`pnpm db:start` or background shells. Hand him the command; for a browser check, ask him to start the server. One-shot commands that apply or inspect state (`pnpm db:migrate`, `pnpm db:reset`, `pnpm db:types`, git) are fine.
+
 ## Project
 
 Landak Apiario: a free, multi-beekeeper hive management system. Beekeepers own an organization, register apiaries (sites such as "Vallecito 1") and hives, and record inspections, events, notes and photos from an offline-first Android app (`beekeeper-mobile`). They invite other users as reviewers; a platform admin reads everything through `admin/` and edits nothing.
