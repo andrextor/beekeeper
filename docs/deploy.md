@@ -33,6 +33,21 @@ La secret key, la contraseña de la base y el token nunca van al repositorio, a 
    ```
 7. **Secretos de GitHub** (Settings → Secrets and variables → Actions → Secrets): `SUPABASE_DB_URL` (Dashboard → Connect → Session pooler, con `[YOUR-PASSWORD]` reemplazado por la contraseña de la base) y `BACKUP_PASSPHRASE` (una frase larga nueva).
 
+## Panel de administración (Vercel)
+
+Proyecto de Vercel Hobby conectado a `andrextor/beekeeper`: cada merge a `main` publica el panel solo y cada PR tiene su URL de prueba (protegida con el login de Vercel de Iván, contra el mismo backend de producción; el panel solo lee).
+
+Conexión, una vez (Vercel → Add New → Project):
+
+1. Importar `andrextor/beekeeper`.
+2. **Root Directory**: `admin`. Framework: Vite (lo detecta solo). Build y output por defecto (`pnpm build`, `dist`).
+3. **Environment Variables** (Production y Preview):
+   - `VITE_SUPABASE_URL` = `https://dhacyrwngqegqjffpten.supabase.co`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY` = la `sb_publishable_…`. Nunca la `sb_secret_…`: Supabase la rechaza en un navegador y habría que rotarla.
+4. Deploy. Con la URL `https://….vercel.app`: Supabase → Authentication → URL Configuration → Site URL.
+
+`admin/vercel.json` manda toda ruta a `index.html` (recargar `/apicultores` no da 404) y fija los encabezados de seguridad. Su `Content-Security-Policy` nombra el proyecto `dhacyrwngqegqjffpten`: si el backend cambia de proyecto, hay que cambiarlo ahí también o el panel no podrá conectarse.
+
 ## Subir una migración nueva
 
 Después de mergear el release a `main`:
