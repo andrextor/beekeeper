@@ -1,6 +1,6 @@
 # Fix · Admin counts skip the history of deleted hives — plan
 
-Trivial fix (no spec): finding R6 of `docs/superpowers/audits/2026-10-28-a4-code-review.md`. Branch: `fix/admin-deleted-hive-history` · Status: **awaiting OK** · Version: 0.11.1
+Trivial fix (no spec): finding R6 of `docs/superpowers/audits/2026-10-28-a4-code-review.md`. Branch: `fix/admin-deleted-hive-history` · Status: **approved 2026-10-28** · Version: 0.11.1
 
 ## Problem
 
