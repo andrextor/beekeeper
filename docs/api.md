@@ -83,7 +83,8 @@ Email + password. **No email is ever sent** (no domain yet): confirmation is off
 | Sign up | `auth.signUp({ email, password })` | Returns a session at once. Password ≥ 8 characters |
 | Sign in | `auth.signInWithPassword({ email, password })` | |
 | Sign out | `auth.signOut()` | Clients also wipe local data |
-| Forgot password | — | Show "Pide a tu administrador que restablezca tu contraseña." Iván runs `scripts/reset-password.sh <email>` |
+| Forgot password | — | Show "Pide a tu administrador que restablezca tu contraseña." A platform admin sets a new one in the panel (Usuarios → the person → Contraseña) |
+| Change own password | `auth.updateUser({ password })` | Check the current one first with `signInWithPassword` |
 
 Auth errors come in English; clients map `error_code` to Spanish:
 
@@ -94,6 +95,7 @@ Auth errors come in English; clients map `error_code` to Spanish:
 | `weak_password` | "La contraseña debe tener al menos 8 caracteres." |
 | `validation_failed` | "Revisa el correo y la contraseña." |
 | `over_request_rate_limit` | "Demasiados intentos. Espera un minuto." |
+| `user_banned` | "Esta cuenta está desactivada." (a platform admin deactivated it, A7) |
 | network error | "No hay conexión. Revisa tu internet e inténtalo de nuevo." |
 
 After signing in: `rpc('my_memberships')`. No memberships → onboarding offers **Crear mi apiario** (`create_organization`) or **Tengo un código** (`accept_invite`).
@@ -346,6 +348,31 @@ const { data: stats } = await supabase.rpc('admin_stats')
 const { data: rows } = await supabase.rpc('admin_list_organizations', { p_search: 'landak', p_limit: 25, p_offset: 0 })
 // rows[0].total_count → number of pages
 ```
+
+### Manage accounts (A7)
+
+`profiles.deactivated_at` is set while an account is deactivated (sign-in refused with `user_banned`; history kept). Admin RPCs, platform admin only (`not_platform_admin` otherwise); membership ones lock the organization first:
+
+| RPC | Does | Errors (`P0001` detail) |
+|-----|------|------------------------|
+| `admin_set_display_name(p_user_id, p_display_name)` | Renames (1–80) | `invalid_name`, `user_not_found` |
+| `admin_set_member_role(p_organization_id, p_user_id, p_role)` | owner ↔ reviewer | `invalid_role`, `organization_not_found`, `not_member`, `last_owner` |
+| `admin_add_member(p_organization_id, p_user_id, p_role)` | Adds to a live farm | `invalid_role`, `organization_not_found`, `user_not_found`, `already_member` |
+| `admin_remove_member(p_organization_id, p_user_id)` | Removes from a farm (history kept) | `organization_not_found`, `not_member`, `last_owner` |
+| `admin_set_platform_admin(p_user_id, p_value)` | Grants or removes the admin flag | `own_admin`, `last_admin`, `user_not_found` |
+
+`admin_list_users` rows and `admin_organization_summary` members carry `deactivated_at`.
+
+Edge Function `admin-update-user`, `POST { action, user_id, … }`, platform admin only, same error shape as `admin-create-user`:
+
+| `action` | Body | Errors |
+|----------|------|--------|
+| `set_email` | `email` (confirmed at once) | `invalid_email`, `email_taken`, `user_not_found` |
+| `set_password` | `password` (8 characters to 72 bytes) | `invalid_password`, `user_not_found` |
+| `deactivate` | — | `own_account`, `last_admin` (409), `user_not_found` |
+| `reactivate` | — | `user_not_found` |
+
+Answers `200 { ok: true }`; `400 invalid_body`, `invalid_user`, `invalid_action`. A password change does not end the person's open sessions; a deactivated account keeps its current access token until it expires (≤ 1 h). There is no hard delete: deactivating is deleting, because history keeps who did it. `deactivate` and the SQL half (`admin_set_deactivated`, `service_role` only) roll back together.
 
 ### Create accounts (Edge Function `admin-create-user`)
 

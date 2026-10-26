@@ -54,11 +54,16 @@ Conexión, una vez (Vercel → Add New → Project):
 
 Los admins de plataforma crean apicultores, revisores y otros admins en Usuarios → Nuevo usuario. Lo hace la Edge Function `admin-create-user`, que usa la clave secreta que Supabase le inyecta: la clave nunca sale de Supabase.
 
-Publicar la función (la primera vez y cada vez que cambie), en tu terminal después de mergear:
+Publicar las funciones (la primera vez y cada vez que cambien; las dos comparten `supabase/functions/_shared/`, así que si cambia ese archivo se publican las dos), en tu terminal después de mergear:
 
 ```bash
 pnpm exec supabase functions deploy admin-create-user
+pnpm exec supabase functions deploy admin-update-user
 ```
+
+Desde A7 la página de cada usuario (Usuarios → el correo) cambia nombre, correo y contraseña, sus fincas y su rol, el permiso de administrador, y **desactiva** o reactiva la cuenta. No hay borrado: desactivar es borrar, porque el historial guarda quién hizo cada cosa. Cambiar la contraseña no cierra las sesiones que la persona ya tenga abiertas, y una cuenta desactivada conserva hasta una hora la sesión que tenía.
+
+Si una persona debe desaparecer del todo (un pedido legal), es una tarea manual con Iván: reemplazar su nombre y correo en `profiles` y en Authentication → Users por datos anónimos y dejarla desactivada; nunca borrar la fila, porque el historial apunta a ella.
 
 Quién es admin: Usuarios muestra la insignia **Admin**. Para quitarle el permiso a alguien, en el SQL Editor:
 
@@ -110,7 +115,7 @@ Un proyecto gratis se pausa tras 7 días sin uso. Se restaura en el Dashboard co
 
 ## Recuperar una contraseña
 
-No se envían correos, así que la contraseña se cambia a mano en la máquina de Iván:
+No se envían correos. Lo normal es el panel: Usuarios → la persona → Contraseña (A7). Si el panel no está disponible, en la máquina de Iván:
 
 ```bash
 SUPABASE_URL=https://dhacyrwngqegqjffpten.supabase.co SUPABASE_SECRET_KEY=… scripts/reset-password.sh correo@ejemplo.com
