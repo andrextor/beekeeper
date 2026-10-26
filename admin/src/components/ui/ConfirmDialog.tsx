@@ -34,6 +34,10 @@ export function ConfirmDialog({
     <dialog
       ref={dialog}
       onClose={onCancel}
+      onCancel={(event) => {
+        // Esc while the change runs would hide its result.
+        if (pending) event.preventDefault()
+      }}
       aria-label={title}
       className="glass m-auto w-[min(100vw-2rem,28rem)] rounded-card p-6 text-text backdrop:bg-black/50 backdrop:backdrop-blur-sm"
     >

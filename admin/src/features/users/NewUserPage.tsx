@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { ShieldAlert } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
@@ -17,6 +17,7 @@ import {
   type UserKind,
   validateCreateUser,
 } from '../../lib/create-user'
+import { useRefreshAccounts } from '../../lib/manage-user'
 import { CopyField, FarmPicker, PasswordField } from './fields'
 
 const kindParams: Readonly<Record<UserKind, string>> = {
@@ -78,7 +79,7 @@ const emptyForm = {
 }
 
 export function NewUserPage() {
-  const queryClient = useQueryClient()
+  const refresh = useRefreshAccounts()
   const [params, setParams] = useSearchParams()
   const kind = kindFromParam(params.get('tipo'))
   const [fields, setFields] = useState(emptyForm)
@@ -89,12 +90,7 @@ export function NewUserPage() {
 
   const create = useMutation({
     mutationFn: createUser,
-    onSuccess: () =>
-      Promise.all(
-        ['admin-users', 'admin-orgs', 'admin-orgs-recent', 'admin-stats', 'admin-org'].map((key) =>
-          queryClient.invalidateQueries({ queryKey: [key] }),
-        ),
-      ),
+    onSuccess: refresh,
   })
 
   const set = (field: keyof typeof emptyForm) => (value: string) =>

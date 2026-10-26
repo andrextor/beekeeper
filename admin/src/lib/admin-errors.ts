@@ -26,6 +26,7 @@ const messages: Record<string, string> = {
   last_admin: 'Debe quedar al menos un administrador activo.',
   own_admin: 'No puedes quitarte tu propio permiso de administrador.',
   own_account: 'No puedes desactivar tu propia cuenta.',
+  use_my_account: 'Tu correo lo cambia otro administrador y tu contraseña se cambia en Mi cuenta.',
   wrong_password: 'La contraseña actual no es correcta.',
   same_password: 'La nueva contraseña debe ser distinta de la actual.',
 }

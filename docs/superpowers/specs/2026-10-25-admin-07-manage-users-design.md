@@ -91,6 +91,14 @@ Answers `200 { ok: true }`. Plus the common `invalid_body`, `invalid_action`, `n
 
 Every action that changes access (role, remove, admin off, deactivate) asks in a native `<dialog>` first: "¿Quitar a Ana de Finca Landak?" with Cancelar / the action.
 
+## Code review changes (2026-10-25)
+
+- A deactivated admin has no admin power (`private.is_platform_admin`, `private.is_active_admin`, the functions' caller check all require `deactivated_at is null`).
+- A deactivated owner does not count as an owner (`private.owner_count`); deactivating the only active owner of a live farm is refused (`last_owner`).
+- Your own email and password are not editable on your user page nor through the function (`use_my_account`): Mi cuenta asks for the current password.
+- Deactivate/reactivate: SQL first, then Auth's ban follows what SQL says at that moment; a failed ban reverts SQL only if this request changed it.
+- Audit: `docs/superpowers/audits/2026-10-25-a7-code-review.md`.
+
 ## Alternatives rejected
 
 - **Hard delete**: breaks history (above).

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { ShieldCheck } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Link, useParams } from 'react-router'
@@ -26,6 +26,7 @@ import {
   type UserDetail,
   type UserMembership,
   updateUserAuth,
+  useRefreshAccounts,
   userDetailQuery,
 } from '../../lib/manage-user'
 import { useSession } from '../../lib/session'
@@ -37,14 +38,6 @@ type Ask = (confirm: {
   body?: string
   run: () => Promise<void>
 }) => void
-
-const invalidatedKeys = ['admin-user', 'admin-users', 'admin-org', 'admin-orgs', 'admin-stats']
-
-function useRefreshUser() {
-  const queryClient = useQueryClient()
-  return () =>
-    Promise.all(invalidatedKeys.map((key) => queryClient.invalidateQueries({ queryKey: [key] })))
-}
 
 const roles: ReadonlyArray<{ value: Role; label: string }> = [
   { value: 'reviewer', label: roleLabels.reviewer },
@@ -65,7 +58,7 @@ function FieldForm({
   validate: (value: string) => string | undefined
   save: (value: string) => Promise<void>
 }) {
-  const refresh = useRefreshUser()
+  const refresh = useRefreshAccounts()
   const [value, setValue] = useState(initial)
   const [invalid, setInvalid] = useState<string>()
   const saving = useMutation({ mutationFn: save, onSuccess: refresh })
@@ -219,7 +212,7 @@ function MembershipRow({
 }
 
 function AddMembership({ user }: { user: UserDetail }) {
-  const refresh = useRefreshUser()
+  const refresh = useRefreshAccounts()
   const [farm, setFarm] = useState<FarmOption | null>(null)
   const [role, setRole] = useState<Role>('reviewer')
   const add = useMutation({
@@ -257,7 +250,7 @@ function AddMembership({ user }: { user: UserDetail }) {
 }
 
 function AccessSection({ user, selfId, ask }: { user: UserDetail; selfId: string; ask: Ask }) {
-  const refresh = useRefreshUser()
+  const refresh = useRefreshAccounts()
   const who = user.displayName ?? user.email
   const self = user.id === selfId
   const reactivate = useMutation({
@@ -352,7 +345,8 @@ function AccessSection({ user, selfId, ask }: { user: UserDetail; selfId: string
 }
 
 function UserDetailView({ user, selfId }: { user: UserDetail; selfId: string }) {
-  const refresh = useRefreshUser()
+  const self = user.id === selfId
+  const refresh = useRefreshAccounts()
   const [pending, setPending] = useState<Parameters<Ask>[0] | null>(null)
   const confirmed = useMutation({
     mutationFn: (run: () => Promise<void>) => run(),
@@ -388,18 +382,31 @@ function UserDetailView({ user, selfId }: { user: UserDetail; selfId: string }) 
           validate={nameError}
           save={(value) => setDisplayName(user.id, value)}
         />
-        <FieldForm
-          label="Correo"
-          type="email"
-          initial={user.email}
-          validate={emailError}
-          save={(value) => updateUserAuth(user.id, { action: 'set_email', email: value.trim() })}
-        />
+        {self ? (
+          // Your own password asks for the current one; skipping it here would defeat that.
+          <p className="text-sm text-muted">
+            Es tu cuenta: tu correo lo cambia otro administrador y tu contraseña se cambia en{' '}
+            <Link to="/mi-cuenta" viewTransition className="text-primary hover:underline">
+              Mi cuenta
+            </Link>
+            .
+          </p>
+        ) : (
+          <FieldForm
+            label="Correo"
+            type="email"
+            initial={user.email}
+            validate={emailError}
+            save={(value) => updateUserAuth(user.id, { action: 'set_email', email: value.trim() })}
+          />
+        )}
       </Card>
-      <Card className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold">Contraseña</h2>
-        <PasswordSection user={user} />
-      </Card>
+      {!self && (
+        <Card className="flex flex-col gap-4">
+          <h2 className="text-xl font-bold">Contraseña</h2>
+          <PasswordSection user={user} />
+        </Card>
+      )}
       <Card className="flex flex-col gap-4">
         <h2 className="text-xl font-bold">Fincas</h2>
         {user.memberships.length === 0 ? (

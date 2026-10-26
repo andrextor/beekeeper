@@ -62,7 +62,7 @@ function isNullableString(value: unknown): value is string | null {
   return value === null || typeof value === 'string'
 }
 
-function isRole(value: unknown): value is Role {
+export function isRole(value: unknown): value is Role {
   return value === 'owner' || value === 'reviewer'
 }
 

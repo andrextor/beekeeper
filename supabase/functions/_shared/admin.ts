@@ -84,11 +84,12 @@ export function serveAdmin(name: string, handle: (request: AdminRequest) => Prom
       const actorId = caller.data.user.id
       const profile = await admin
         .from('profiles')
-        .select('is_platform_admin')
+        .select('is_platform_admin, deactivated_at')
         .eq('id', actorId)
         .maybeSingle()
       if (profile.error) throw profile.error
-      if (profile.data?.is_platform_admin !== true) {
+      // A deactivated admin may still hold a token for up to an hour: no admin power with it.
+      if (profile.data?.is_platform_admin !== true || profile.data.deactivated_at !== null) {
         return respond(403, { error: 'not_platform_admin' })
       }
 

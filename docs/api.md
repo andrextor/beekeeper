@@ -351,7 +351,7 @@ const { data: rows } = await supabase.rpc('admin_list_organizations', { p_search
 
 ### Manage accounts (A7)
 
-`profiles.deactivated_at` is set while an account is deactivated (sign-in refused with `user_banned`; history kept). Admin RPCs, platform admin only (`not_platform_admin` otherwise); membership ones lock the organization first:
+`profiles.deactivated_at` is set while an account is deactivated (sign-in refused with `user_banned`; history kept). A deactivated admin has no admin power, and a deactivated owner does not count as a farm's owner (`last_owner` rules count active owners only). Admin RPCs, platform admin only (`not_platform_admin` otherwise); membership ones lock the organization first:
 
 | RPC | Does | Errors (`P0001` detail) |
 |-----|------|------------------------|
@@ -367,12 +367,12 @@ Edge Function `admin-update-user`, `POST { action, user_id, … }`, platform adm
 
 | `action` | Body | Errors |
 |----------|------|--------|
-| `set_email` | `email` (confirmed at once) | `invalid_email`, `email_taken`, `user_not_found` |
-| `set_password` | `password` (8 characters to 72 bytes) | `invalid_password`, `user_not_found` |
-| `deactivate` | — | `own_account`, `last_admin` (409), `user_not_found` |
+| `set_email` | `email` (confirmed at once) | `invalid_email`, `email_taken`, `user_not_found`, `use_my_account` (409, own account) |
+| `set_password` | `password` (8 characters to 72 bytes) | `invalid_password`, `user_not_found`, `use_my_account` (409, own account: change it with the current password) |
+| `deactivate` | — | `own_account`, `last_owner` (the only active owner of a live farm), `last_admin` (409), `user_not_found` |
 | `reactivate` | — | `user_not_found` |
 
-Answers `200 { ok: true }`; `400 invalid_body`, `invalid_user`, `invalid_action`. A password change does not end the person's open sessions; a deactivated account keeps its current access token until it expires (≤ 1 h). There is no hard delete: deactivating is deleting, because history keeps who did it. `deactivate` and the SQL half (`admin_set_deactivated`, `service_role` only) roll back together.
+Answers `200 { ok: true }`; `400 invalid_body`, `invalid_user`, `invalid_action`. A password change does not end the person's open sessions; a deactivated account keeps its current access token until it expires (≤ 1 h). There is no hard delete: deactivating is deleting, because history keeps who did it. `profiles.deactivated_at` is the source of truth: the function writes it first (`admin_set_deactivated`, `service_role` only, with the rules under locks) and then sets Auth's ban to match it; if the ban fails, it puts SQL back only when this request changed it.
 
 ### Create accounts (Edge Function `admin-create-user`)
 

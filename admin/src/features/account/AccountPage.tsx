@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Eye, EyeOff } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Button } from '../../components/ui/Button'
@@ -12,22 +12,18 @@ import {
   changeOwnPassword,
   manageErrorMessage,
   updateOwnName,
+  useRefreshAccounts,
   userDetailQuery,
 } from '../../lib/manage-user'
 import { useSession } from '../../lib/session'
 
 function NameForm({ userId, initial }: { userId: string; initial: string }) {
-  const queryClient = useQueryClient()
+  const refresh = useRefreshAccounts()
   const [name, setName] = useState(initial)
   const [invalid, setInvalid] = useState<string>()
   const save = useMutation({
     mutationFn: (value: string) => updateOwnName(userId, value),
-    onSuccess: () =>
-      Promise.all(
-        ['admin-user', 'admin-users', 'admin-org'].map((key) =>
-          queryClient.invalidateQueries({ queryKey: [key] }),
-        ),
-      ),
+    onSuccess: refresh,
   })
   const submit = (event: FormEvent) => {
     event.preventDefault()

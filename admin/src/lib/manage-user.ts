@@ -1,7 +1,25 @@
-import { type Role, uuidPattern } from './admin-api'
+import { useQueryClient } from '@tanstack/react-query'
+import { isRole, type Role, uuidPattern } from './admin-api'
 import { AdminError, adminErrorMessage, invokeAdminFunction, rpcError } from './admin-errors'
 import { isRecord } from './guards'
 import { supabase } from './supabase'
+
+// Every list that shows an account, a membership or a count of them.
+const accountQueryKeys = [
+  'admin-user',
+  'admin-users',
+  'admin-org',
+  'admin-orgs',
+  'admin-orgs-recent',
+  'admin-stats',
+]
+
+/** After any change to accounts or memberships: refetch every list that shows them. */
+export function useRefreshAccounts() {
+  const queryClient = useQueryClient()
+  return () =>
+    Promise.all(accountQueryKeys.map((key) => queryClient.invalidateQueries({ queryKey: [key] })))
+}
 
 export function manageErrorMessage(error: unknown): string {
   return adminErrorMessage(error, 'No pudimos guardar el cambio. Inténtalo de nuevo.')
@@ -23,10 +41,6 @@ export type UserDetail = {
   deactivatedAt: string | null
   createdAt: string
   memberships: UserMembership[]
-}
-
-function isRole(value: unknown): value is Role {
-  return value === 'owner' || value === 'reviewer'
 }
 
 export async function fetchUserDetail(id: string): Promise<UserDetail | null> {

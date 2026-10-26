@@ -45,11 +45,13 @@ export function passwordError(password: string): string | undefined {
 
 /** The same rules as the admin-create-user function, so most mistakes never leave the browser. */
 export function validateCreateUser(form: CreateUserForm): Partial<Record<CreateUserField, string>> {
-  const errors: Partial<Record<CreateUserField, string>> = {
-    displayName: nameError(form.displayName),
-    email: emailError(form.email),
-    password: passwordError(form.password),
-  }
+  const errors: Partial<Record<CreateUserField, string>> = {}
+  const displayName = nameError(form.displayName)
+  if (displayName) errors.displayName = displayName
+  const email = emailError(form.email)
+  if (email) errors.email = email
+  const password = passwordError(form.password)
+  if (password) errors.password = password
   if (form.kind === 'beekeeper') {
     const farm = form.organizationName.trim()
     if (farm.length < 1 || farm.length > 120) {
@@ -57,9 +59,6 @@ export function validateCreateUser(form: CreateUserForm): Partial<Record<CreateU
     }
   }
   if (form.kind === 'reviewer' && !form.organizationId) errors.organizationId = 'Elige la finca.'
-  for (const field of Object.keys(errors) as CreateUserField[]) {
-    if (errors[field] === undefined) delete errors[field]
-  }
   return errors
 }
 

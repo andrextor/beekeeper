@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(29);
+select plan(32);
 
 select tests.create_user('admin@landak.test') as admin_id \gset
 select tests.make_platform_admin(:'admin_id');
@@ -109,38 +109,56 @@ select throws_ok(
   'P0001', 'No puedes quitarte tu propio permiso de administrador.', 'own flag stays'
 );
 
--- Deactivate (the Edge Function's half, as service_role).
+-- Deactivate (the Edge Function's half, as service_role). owner_id owns only a deleted farm now.
 select tests.clear_authentication();
 set local role service_role;
-select public.admin_set_deactivated(:'admin_id', :'reviewer_id', true);
-select ok((select deactivated_at is not null from public.profiles where id = :'reviewer_id'), 'deactivated');
-select public.admin_set_deactivated(:'admin_id', :'reviewer_id', false);
-select ok((select deactivated_at is null from public.profiles where id = :'reviewer_id'), 'reactivated');
+select public.admin_set_deactivated(:'admin_id', :'owner_id', true);
+select ok((select deactivated_at is not null from public.profiles where id = :'owner_id'), 'deactivated');
+select public.admin_set_deactivated(:'admin_id', :'owner_id', false);
+select ok((select deactivated_at is null from public.profiles where id = :'owner_id'), 'reactivated');
 select throws_ok(
   format('select public.admin_set_deactivated(%L, %L, true)', :'admin_id', :'admin_id'),
   'P0001', 'No puedes desactivar tu propia cuenta.', 'own account stays active'
 );
 select throws_ok(
-  format('select public.admin_set_deactivated(%L, %L, true)', :'owner_id', :'reviewer_id'),
+  format('select public.admin_set_deactivated(%L, %L, true)', :'owner_id', :'loose_id'),
   'P0001', 'Solo administradores de la plataforma.', 'the actor must be an admin'
 );
--- With a second admin, one can be deactivated; but not when it would leave no active admin.
+-- reviewer_id is now the only owner of Finca A.
+select throws_ok(
+  format('select public.admin_set_deactivated(%L, %L, true)', :'admin_id', :'reviewer_id'),
+  'P0001', 'Es el único propietario activo de una finca. Agrega otro propietario antes.',
+  'the last active owner of a farm stays active'
+);
+
+-- A deactivated admin keeps a token for up to an hour, but no admin power.
 reset role;
 select tests.make_platform_admin(:'loose_id');
 set local role service_role;
 select public.admin_set_deactivated(:'admin_id', :'loose_id', true);
 select ok((select deactivated_at is not null from public.profiles where id = :'loose_id'), 'another admin deactivated');
-select public.admin_set_deactivated(:'admin_id', :'loose_id', false);
-reset role;
--- admin_id is deactivated but still holds a session: deactivating loose would leave no active admin.
-update public.profiles set deactivated_at = now() where id = :'admin_id';
-set local role service_role;
 select throws_ok(
-  format('select public.admin_set_deactivated(%L, %L, true)', :'admin_id', :'loose_id'),
-  'P0001', 'Debe quedar al menos un administrador activo.', 'the last active admin stays'
+  format('select public.admin_set_deactivated(%L, %L, true)', :'loose_id', :'owner_id'),
+  'P0001', 'Solo administradores de la plataforma.', 'a deactivated admin cannot deactivate'
 );
 reset role;
-update public.profiles set deactivated_at = null where id = :'admin_id';
+select tests.authenticate_as(:'loose_id');
+select throws_ok(
+  format('select public.admin_set_display_name(%L, %L)', :'owner_id', 'X'),
+  'P0001', 'Solo administradores de la plataforma.', 'a deactivated admin cannot use admin RPCs'
+);
+select tests.clear_authentication();
+
+-- A deactivated owner does not count as the farm's owner.
+update public.organization_members set role = 'owner' where organization_id = :'org_a' and user_id = :'loose_id';
+select tests.authenticate_as(:'admin_id');
+select throws_ok(
+  format('select public.admin_remove_member(%L, %L)', :'org_a', :'reviewer_id'),
+  'P0001', 'La finca debe tener al menos un propietario.', 'a deactivated owner is not counted'
+);
+select tests.clear_authentication();
+update public.organization_members set role = 'reviewer' where organization_id = :'org_a' and user_id = :'loose_id';
+update public.profiles set deactivated_at = null where id = :'loose_id';
 update public.profiles set deactivated_at = now() where id = :'reviewer_id';
 
 -- Lists show it.
