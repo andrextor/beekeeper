@@ -21,7 +21,13 @@ export function authErrorMessage(error: unknown): string {
   return (code && messages[code]) || fallbackMessage
 }
 
-/** Only internal paths: "//evil.com" or "https://…" in ?next= would send the admin off-site after signing in. */
+const panelOrigin = 'http://panel.invalid'
+
+/**
+ * Only internal paths: "//evil.com" or "https://…" in ?next= would send the admin off-site after signing in.
+ * Parsing catches what browsers normalize to "//", such as "/\\evil.com" or a tab in "/\t/evil.com".
+ */
 export function safeNextPath(next: string | null): string {
-  return next?.startsWith('/') && !next.startsWith('//') && !next.startsWith('/\\') ? next : '/'
+  const url = next?.startsWith('/') ? URL.parse(next, panelOrigin) : null
+  return url?.origin === panelOrigin ? url.pathname + url.search + url.hash : '/'
 }
