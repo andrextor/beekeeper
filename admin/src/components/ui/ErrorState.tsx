@@ -10,7 +10,7 @@ export function ErrorState({
 }) {
   return (
     <div role="alert" className="flex flex-col items-center gap-3 px-4 py-12 text-center">
-      <TriangleAlert size={48} className="text-danger" aria-hidden />
+      <TriangleAlert size={48} className="animate-pop text-danger" aria-hidden />
       <p className="max-w-sm">{message}</p>
       {onRetry && (
         <Button variant="secondary" onClick={onRetry}>

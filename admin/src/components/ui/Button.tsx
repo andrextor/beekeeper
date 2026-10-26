@@ -5,10 +5,12 @@ import { cx } from '../../lib/cx'
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-primary text-on-primary shadow-sm hover:opacity-90',
+  primary:
+    'bg-primary text-on-primary shadow-sm hover:shadow-lg hover:shadow-primary/25 hover:brightness-110',
   secondary: 'glass text-text hover:bg-glass-field',
   ghost: 'text-text hover:bg-glass-field',
-  danger: 'bg-danger text-on-danger hover:opacity-90',
+  danger:
+    'bg-danger text-on-danger shadow-sm hover:shadow-lg hover:shadow-danger/25 hover:brightness-110',
 }
 
 const sizes = {
@@ -39,7 +41,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cx(
-        'inline-flex items-center justify-center gap-2 rounded-control font-medium transition disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center gap-2 rounded-control font-medium transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50',
         variants[variant],
         sizes[size],
         className,

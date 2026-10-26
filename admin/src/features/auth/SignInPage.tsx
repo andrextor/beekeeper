@@ -25,7 +25,7 @@ export function SignInPage() {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
       if (error) throw error
     },
-    onSuccess: () => navigate(next, { replace: true }),
+    onSuccess: () => navigate(next, { replace: true, viewTransition: true }),
   })
 
   if (loading) return <PageSpinner />
@@ -39,7 +39,7 @@ export function SignInPage() {
 
   return (
     <AuthLayout>
-      <form onSubmit={submit} className="flex flex-col gap-4">
+      <form onSubmit={submit} className="stagger flex flex-col gap-4">
         <Input
           label="Correo"
           type="email"
@@ -64,7 +64,11 @@ export function SignInPage() {
           }
         />
         {signIn.isError && (
-          <p role="alert" className="text-sm text-danger">
+          <p
+            role="alert"
+            key={signIn.failureCount + signIn.submittedAt}
+            className="animate-shake text-sm text-danger"
+          >
             {authErrorMessage(signIn.error)}
           </p>
         )}

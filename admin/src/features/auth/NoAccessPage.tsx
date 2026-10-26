@@ -11,7 +11,7 @@ export function NoAccessPage() {
   const navigate = useNavigate()
   const leave = useMutation({
     mutationFn: signOut,
-    onSettled: () => navigate('/ingresar', { replace: true }),
+    onSettled: () => navigate('/ingresar', { replace: true, viewTransition: true }),
   })
 
   if (loading) return <PageSpinner />
@@ -20,7 +20,7 @@ export function NoAccessPage() {
   return (
     <AuthLayout>
       <div className="flex flex-col items-center gap-3 text-center">
-        <ShieldX size={48} className="text-danger" aria-hidden />
+        <ShieldX size={48} className="animate-pop text-danger" aria-hidden />
         <p>Esta cuenta no tiene acceso al panel de administración.</p>
         <p className="text-sm text-muted">{session.user.email}</p>
       </div>
