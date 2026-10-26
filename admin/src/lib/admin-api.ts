@@ -266,6 +266,10 @@ export async function fetchApiary(id: string): Promise<Apiary | null> {
   return data
 }
 
+export function apiaryQuery(id: string) {
+  return queryOptions({ queryKey: ['admin-apiary', id], queryFn: () => fetchApiary(id) })
+}
+
 // ponytail: one apiary holds tens of hives, so no pagination; add it if apiaries grow past a few hundred.
 export async function fetchHives(apiaryId: string): Promise<Hive[]> {
   const { data, error } = await supabase
@@ -379,6 +383,8 @@ export async function fetchPhotos(hiveId: string, page: number): Promise<Page<Ph
 
 const photoBucket = 'hive-photos'
 export const signedUrlSeconds = 3600
+// Refreshing signed URLs at 50 min keeps every image loadable.
+export const signedUrlStaleTime = 50 * 60_000
 
 export function thumbnailPath(storagePath: string): string {
   return storagePath.replace(/\.jpg$/, '.thumb.jpg')
