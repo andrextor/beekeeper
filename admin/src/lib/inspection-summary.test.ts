@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import type { Inspection } from './admin-api'
 import { formatCalendarDate } from './format'
-import { type Inspection, inspectionFields, inspectionSummary } from './inspection-summary'
+import { inspectionFields, inspectionSummary } from './inspection-summary'
 
 const empty: Inspection = {
   id: '00000000-0000-4000-e000-000000000001',

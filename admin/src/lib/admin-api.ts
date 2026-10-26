@@ -277,3 +277,144 @@ export async function fetchHives(apiaryId: string): Promise<Hive[]> {
   if (error) throw error
   return data
 }
+
+export async function fetchHive(id: string): Promise<Hive | null> {
+  if (!uuidPattern.test(id)) return null
+  const { data, error } = await supabase
+    .from('hives')
+    .select('*')
+    .eq('id', id)
+    .is('deleted_at', null)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+export type Inspection = Tables<'inspections'>
+export type HiveEvent = Tables<'hive_events'>
+
+type TimelineBase = { id: string; at: string; author_name: string | null }
+export type TimelineItem =
+  | (TimelineBase & { kind: 'inspection'; inspection: Inspection })
+  | (TimelineBase & { kind: 'event'; event: HiveEvent })
+
+export type TimelineCursor = { at: string; id: string }
+export type TimelinePage = { items: TimelineItem[]; next: TimelineCursor | null }
+
+export const timelinePageSize = 30
+
+// data is the row's to_jsonb: the columns the screen relies on are checked, the rest share the table's types.
+function isInspection(value: unknown): value is Inspection {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.inspected_at === 'string' &&
+    typeof value.source === 'string'
+  )
+}
+
+function isHiveEvent(value: unknown): value is HiveEvent {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.occurred_at === 'string' &&
+    typeof value.type === 'string'
+  )
+}
+
+/** An unknown kind (a newer server) is skipped; a malformed row throws. */
+export function parseTimelineRow(row: {
+  kind: string
+  id: string
+  at: string
+  author_name: string | null
+  data: unknown
+}): TimelineItem | null {
+  const base = { id: row.id, at: row.at, author_name: row.author_name }
+  if (row.kind === 'inspection') {
+    if (!isInspection(row.data)) throw new Error('Unexpected hive_timeline inspection')
+    return { ...base, kind: 'inspection', inspection: row.data }
+  }
+  if (row.kind === 'event') {
+    if (!isHiveEvent(row.data)) throw new Error('Unexpected hive_timeline event')
+    return { ...base, kind: 'event', event: row.data }
+  }
+  return null
+}
+
+export async function fetchTimeline(
+  hiveId: string,
+  cursor: TimelineCursor | null,
+): Promise<TimelinePage> {
+  const { data, error } = await supabase.rpc('hive_timeline', {
+    p_hive_id: hiveId,
+    p_before: cursor?.at,
+    p_before_id: cursor?.id,
+    p_limit: timelinePageSize,
+  })
+  if (error) throw error
+  const last = data.at(-1)
+  return {
+    items: data.flatMap((row) => parseTimelineRow(row) ?? []),
+    next: last && data.length === timelinePageSize ? { at: last.at, id: last.id } : null,
+  }
+}
+
+export type Photo = Tables<'photos'> & { inspections: { inspected_at: string } | null }
+
+export const photoPageSize = 48
+
+export async function fetchPhotos(hiveId: string, page: number): Promise<Page<Photo>> {
+  const { data, error, count } = await supabase
+    .from('photos')
+    .select('*, inspections(inspected_at)', { count: 'exact' })
+    .eq('hive_id', hiveId)
+    .is('deleted_at', null)
+    .order('taken_at', { ascending: false })
+    .order('id', { ascending: false })
+    .range((page - 1) * photoPageSize, page * photoPageSize - 1)
+  if (error) throw error
+  return { rows: data, total: count ?? 0 }
+}
+
+const photoBucket = 'hive-photos'
+export const signedUrlSeconds = 3600
+
+export function thumbnailPath(storagePath: string): string {
+  return storagePath.replace(/\.jpg$/, '.thumb.jpg')
+}
+
+/** Thumbnail URLs by storage_path in one request; a missing thumbnail falls back to the main file. */
+export async function signThumbnails(storagePaths: string[]): Promise<Record<string, string>> {
+  if (storagePaths.length === 0) return {}
+  const bucket = supabase.storage.from(photoBucket)
+  const { data, error } = await bucket.createSignedUrls(
+    storagePaths.map(thumbnailPath),
+    signedUrlSeconds,
+  )
+  if (error) throw error
+  const urls: Record<string, string> = {}
+  const missing: string[] = []
+  storagePaths.forEach((path, index) => {
+    const signed = data[index]
+    if (signed && !signed.error && signed.signedUrl) urls[path] = signed.signedUrl
+    else missing.push(path)
+  })
+  if (missing.length > 0) {
+    const fallback = await bucket.createSignedUrls(missing, signedUrlSeconds)
+    if (fallback.error) throw fallback.error
+    missing.forEach((path, index) => {
+      const signed = fallback.data[index]
+      if (signed && !signed.error && signed.signedUrl) urls[path] = signed.signedUrl
+    })
+  }
+  return urls
+}
+
+export async function signPhoto(storagePath: string): Promise<string> {
+  const { data, error } = await supabase.storage
+    .from(photoBucket)
+    .createSignedUrl(storagePath, signedUrlSeconds)
+  if (error) throw error
+  return data.signedUrl
+}

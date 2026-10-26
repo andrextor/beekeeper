@@ -1,4 +1,4 @@
-import type { Tables } from './database.types'
+import type { Inspection } from './admin-api'
 import { formatCalendarDate, formatNumber, plural } from './format'
 import {
   attentionLevelLabels,
@@ -13,8 +13,6 @@ import {
   varroaMethodLabels,
   weatherLabels,
 } from './labels'
-
-export type Inspection = Tables<'inspections'>
 
 export type Field = { label: string; value: string }
 
