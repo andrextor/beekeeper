@@ -15,7 +15,8 @@ Each task is one commit. No new dependency: the function imports the same pinned
   5. Reviewer: the user becomes `reviewer` of the given organization; `display_name` set.
   6. Reviewer into a soft-deleted organization → `organization_not_found`.
   7. Reviewer into an unknown id → `organization_not_found`.
-  8. Unknown role → `invalid_role`.
+  8. Admin: `is_platform_admin` true, no membership, returns null.
+  9. Unknown role → `invalid_role`.
 - Check: `pnpm db:migrate && pnpm check:quick`.
 
 ## 2. Edge Function — `admin-create-user`
@@ -58,7 +59,8 @@ CHANGELOG `[0.14.0]` Added (accounts, print); `package.json` version.
    1. Nuevo usuario → Apicultor "Prueba Apicultor", farm "Finca Prueba", **Generar** → Crear usuario → the done card shows email and password. Apicultores lists "Finca Prueba" with that owner.
    2. In a private window, sign in to the panel with that account → "Esta cuenta no tiene acceso al panel de administración." (it is not an admin).
    3. Nuevo usuario → Revisor, farm Finca Landak → Apicultores → Finca Landak → Personas shows them as Revisor.
-   4. Same email again → "Ya existe una cuenta con ese correo."
-   5. Signed in as `owner@landak.test` (not admin), the panel never shows the page; calling the function with that session answers `not_platform_admin` (the curl is in `docs/deploy.md`).
+   4. Nuevo usuario → Admin → Usuarios shows the Admin badge; signing in with it in a private window opens the panel.
+  5. Same email again → "Ya existe una cuenta con ese correo."
+   6. Signed in as `owner@landak.test` (not admin), the panel never shows the page; calling the function with that session answers `not_platform_admin` (the curl is in `docs/deploy.md`).
 3. **Print** (local): on a Colmena with history, expand nothing, press **Imprimir** → the preview shows every inspection expanded, no sidebar or buttons, white page; "Guardar como PDF" downloads it. Same on Apiario and Apicultor, and once with the dark theme on (the PDF stays light).
-4. **Remote**, after merging: in your terminal `pnpm exec supabase db push --linked` and `pnpm exec supabase functions deploy admin-create-user`, then repeat 2.1–2.4 on https://beekeeper-one.vercel.app.
+4. **Remote**, after merging: in your terminal `pnpm exec supabase db push --linked` and `pnpm exec supabase functions deploy admin-create-user`, then repeat 2.1–2.5 on https://beekeeper-one.vercel.app.

@@ -8,12 +8,13 @@ Until the app ships (M1–M12) nobody can sign up, create a farm or accept an in
 
 - a **beekeeper**: account + their farm (organization), as its owner;
 - a **reviewer**: account + membership in an existing farm, as reviewer;
+- another **platform admin**: account with `is_platform_admin = true`, no farm (added 2026-10-25);
 
 with the password set right away, so the person can sign in without email (the project sends none).
 
 ## Decision
 
-**Only platform admins** (`profiles.is_platform_admin`) can create accounts. Beekeepers (owners) and reviewers can never create accounts: not from the app, not by calling the function or the SQL directly. The panel stays read-only for everything else; this is the one write it gets.
+**Only platform admins** (`profiles.is_platform_admin`) can create accounts, including other platform admins. Beekeepers (owners) and reviewers can never create accounts: not from the app, not by calling the function or the SQL directly. The panel stays read-only for everything else; this is the one write it gets.
 
 Owners keep inviting reviewers with invite codes (B2) once the app exists: a code never creates an account, it only gives an existing account access to one farm. Removing that is a separate decision, not part of A6.
 
@@ -43,7 +44,7 @@ Steps, in order; the first failure answers and stops:
 
    | Field | Rule | Error code |
    |-------|------|-----------|
-   | `kind` | `beekeeper` or `reviewer` | `invalid_kind` |
+   | `kind` | `beekeeper`, `reviewer` or `admin` | `invalid_kind` |
    | `email` | trimmed, lowercased, `x@y.z` shape, ≤ 254 | `invalid_email` |
    | `password` | 8–72 characters (Auth's minimum; bcrypt's limit) | `invalid_password` |
    | `display_name` | trimmed, 1–80 (the `profiles` check) | `invalid_name` |
@@ -54,7 +55,7 @@ Steps, in order; the first failure answers and stops:
 4. **Farm exists** (reviewer only). Select the organization by id with `deleted_at is null`; none → 404 `organization_not_found`. Checked before creating the account so a typo never creates and deletes one; step 6 checks again under the lock.
 5. **Account.** `auth.admin.createUser({ email, password, email_confirm: true })`. Email already registered (Auth `email_exists`) → 409 `email_taken`. The `on_auth_user_created` trigger makes the `profiles` row as for any sign-up.
 6. **Membership.** One RPC, `public.admin_provision_member` (below). On any error the function **deletes the Auth user it created in step 5** (no half-made accounts; the profile goes with it by `on delete cascade`) and answers with the RPC's code (`organization_not_found` → 404, anything else → 500 `server_error`).
-7. **Answer.** 200 `{ "user_id": "…", "organization_id": "…" }`. The password is never echoed, logged or stored outside Auth.
+7. **Answer.** 200 `{ "user_id": "…", "organization_id": "…" | null }`. The password is never echoed, logged or stored outside Auth.
 
 Errors always answer `{ "error": "<code>" }`, never Auth's or Postgres' English text. Unexpected exceptions → 500 `server_error`, with the detail only in the function logs (no password in them: the body is never logged).
 
@@ -65,10 +66,10 @@ admin_provision_member(
   p_actor_id uuid,          -- the admin from step 2
   p_user_id uuid,           -- the account from step 5
   p_display_name text,
-  p_role text,              -- 'owner' | 'reviewer'
+  p_role text,              -- 'owner' | 'reviewer' | 'admin'
   p_organization_id uuid,   -- reviewer
   p_organization_name text  -- owner
-) returns uuid              -- the organization id
+) returns uuid              -- the organization id; null for an admin
 ```
 
 - `security definer`, `set search_path = ''`, fully qualified names.
@@ -77,6 +78,7 @@ admin_provision_member(
 - Sets `profiles.display_name` for `p_user_id`.
 - `owner`: inserts `organizations (id = gen_random_uuid(), name, created_by = p_user_id)` and the `owner` membership. The organization is the beekeeper's own from the start, exactly as if they had created it in the app.
 - `reviewer`: `private.lock_organization(p_organization_id)` **first**, then reads it; missing or `deleted_at` set → `organization_not_found`. Inserts the `reviewer` membership.
+- `admin`: sets `profiles.is_platform_admin = true`; no organization, no membership; returns null.
 - Any other role → `invalid_role`.
 - Errors in the house style: `raise exception '<Spanish>' using errcode = 'P0001', detail = '<code>'`.
 
@@ -84,13 +86,14 @@ admin_provision_member(
 
 - **Usuarios** gets a **Nuevo usuario** button (Lucide `UserPlus`) next to the search → `/usuarios/nuevo`.
 - `/usuarios/nuevo`, breadcrumbs Usuarios › Nuevo usuario, one card:
-  - **Tipo**: Segmented, Apicultor (default) / Revisor. The kind lives in the link (`?tipo=revisor`), like the other views.
+  - **Tipo**: Segmented, Apicultor (default) / Revisor / Admin. The kind lives in the link (`?tipo=revisor`, `?tipo=admin`), like the other views.
+  - Admin shows a warning before the button: "Podrá ver todos los apicultores y crear usuarios, también otros administradores."
   - **Nombre** (required), **Correo** (required, `type="email"`, `autocomplete="off"`).
   - **Contraseña** (required, min 8): show/hide like sign-in, plus **Generar**, which fills a random 12-character password from `crypto.getRandomValues` over letters and digits without look-alikes (`0 O 1 l I`), and shows it.
   - Apicultor: **Nombre de la finca** (required).
   - Revisor: **Finca**: a search box over `admin_list_organizations` (10 results, deleted farms left out); picking one shows it as chosen with a "Cambiar" link.
   - **Crear usuario** button, disabled while sending; the form validates the same rules as the function before sending.
-- **Done**: the form is replaced by a card: "Usuario creado", the email and the password each with a copy button, the text "Compártela por un canal privado. No se vuelve a mostrar.", links **Ver apicultor** (the farm) and **Crear otro**. The users, beekeepers and dashboard queries are invalidated so the lists show the new account.
+- **Done**: the form is replaced by a card: "Usuario creado", the email and the password each with a copy button, the text "Compártela por un canal privado. No se vuelve a mostrar.", links **Ver apicultor** (the farm; not for an admin) and **Crear otro**. The users, beekeepers and dashboard queries are invalidated so the lists show the new account.
 - **Errors** under the button, in Spanish, by code:
 
   | Code | Message |
@@ -136,7 +139,7 @@ Print stylesheet (`admin/src/styles/theme.css`, `@media print`):
 - The secret key stays in the Supabase function runtime. The panel and Vercel keep only the URL and the publishable key.
 - Two admin checks: the function (before anything is created) and the SQL function (in the same transaction as the write). The SQL function is unreachable from `anon` and `authenticated`.
 - Passwords travel only in the HTTPS request body; never logged, echoed or stored outside Auth.
-- An admin account can now create accounts. The flag stays settable by SQL only (D1); `docs/deploy.md` says who has it.
+- An admin account can now create accounts, other admins included, so a stolen admin session can mint admins. Accepted for the pilot (Iván is the only admin and the panel is read-only otherwise); the flag is otherwise still set by SQL only, and `docs/deploy.md` says how to remove an admin (`update public.profiles set is_platform_admin = false …`) and to check the Usuarios list for the Admin badge. Removing admins from the panel is out of scope.
 - CLAUDE.md, AGENTS.md and `.claude/rules/tenancy.md` change from "the admin writes nothing" to "the admin writes nothing except creating accounts through `admin-create-user`".
 - `.claude/rules/tenancy.md` "Access comes from creating an organization or from an invite code" gains "or from a platform admin (A6)".
 
