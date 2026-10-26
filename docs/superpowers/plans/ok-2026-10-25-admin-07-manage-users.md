@@ -34,7 +34,7 @@ Spec: `docs/superpowers/specs/2026-10-25-admin-07-manage-users-design.md` · Bra
 2. Local, as `admin@landak.test`:
    1. Mi cuenta: change name (sidebar shows it); change password with a wrong current one → error; with the right one → sign out and in with the new one.
    2. Usuarios → `reviewer@landak.test`: rename; change email; new password → sign in with it in a private window.
-   3. Fincas: make them owner of Finca Landak, then try to demote `owner@landak.test` too → works while two owners exist; demote the last owner → "La finca debe tener al menos un dueño."; remove and add back.
+   3. Fincas: make them owner of Finca Landak, then try to demote `owner@landak.test` too → works while two owners exist; demote the last owner → "La finca debe tener al menos un propietario."; remove and add back.
    4. Acceso: make another account admin, remove it; try removing your own → refused.
    5. Desactivar the reviewer → badge everywhere; signing in with it → "Esta cuenta está desactivada."; Reactivar → signs in again.
 3. Remote after merge: `db push --linked`, `functions deploy admin-create-user` and `functions deploy admin-update-user`, repeat 2.2–2.5 on Vercel.

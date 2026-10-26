@@ -80,7 +80,7 @@ Answers `200 { ok: true }`. Plus the common `invalid_body`, `invalid_action`, `n
 
 | Code | Message |
 |------|---------|
-| `last_owner` | La finca debe tener al menos un dueño. |
+| `last_owner` | La finca debe tener al menos un propietario. |
 | `last_admin` | Debe quedar al menos un administrador activo. |
 | `own_admin` | No puedes quitarte tu propio permiso de administrador. |
 | `own_account` | No puedes desactivar tu propia cuenta. |

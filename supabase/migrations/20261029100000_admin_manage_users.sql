@@ -82,7 +82,7 @@ begin
     raise exception 'Esa persona no es miembro de la finca.' using errcode = 'P0001', detail = 'not_member';
   end if;
   if v_current_role = 'owner' and p_role <> 'owner' and private.owner_count(p_organization_id) = 1 then
-    raise exception 'La finca debe tener al menos un dueño.' using errcode = 'P0001', detail = 'last_owner';
+    raise exception 'La finca debe tener al menos un propietario.' using errcode = 'P0001', detail = 'last_owner';
   end if;
 
   update public.organization_members set role = p_role
@@ -129,7 +129,7 @@ begin
     raise exception 'Esa persona no es miembro de la finca.' using errcode = 'P0001', detail = 'not_member';
   end if;
   if v_current_role = 'owner' and private.owner_count(p_organization_id) = 1 then
-    raise exception 'La finca debe tener al menos un dueño.' using errcode = 'P0001', detail = 'last_owner';
+    raise exception 'La finca debe tener al menos un propietario.' using errcode = 'P0001', detail = 'last_owner';
   end if;
 
   delete from public.organization_members where organization_id = p_organization_id and user_id = p_user_id;

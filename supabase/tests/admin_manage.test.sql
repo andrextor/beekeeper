@@ -64,7 +64,7 @@ select is(
 );
 select throws_ok(
   format('select public.admin_set_member_role(%L, %L, %L)', :'org_a', :'reviewer_id', 'reviewer'),
-  'P0001', 'La finca debe tener al menos un dueño.', 'the last owner cannot be demoted'
+  'P0001', 'La finca debe tener al menos un propietario.', 'the last owner cannot be demoted'
 );
 select throws_ok(
   format('select public.admin_set_member_role(%L, %L, %L)', :'org_a', :'loose_id', 'owner'),
@@ -78,7 +78,7 @@ select throws_ok(
 -- Remove and add.
 select throws_ok(
   format('select public.admin_remove_member(%L, %L)', :'org_a', :'reviewer_id'),
-  'P0001', 'La finca debe tener al menos un dueño.', 'the last owner cannot be removed'
+  'P0001', 'La finca debe tener al menos un propietario.', 'the last owner cannot be removed'
 );
 select public.admin_remove_member(:'org_a', :'owner_id');
 select is(
