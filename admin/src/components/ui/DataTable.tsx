@@ -61,7 +61,7 @@ export function DataTable<T>({
             {rows.map((row) => (
               <tr
                 key={rowKey(row)}
-                className="border-b border-glass-border transition-colors last:border-0 hover:bg-glass-field"
+                className="relative border-b border-glass-border transition-colors last:border-0 hover:bg-glass-field"
               >
                 {columns.map((column) => (
                   <td key={column.header} className={cx('px-4 py-3', column.className)}>
