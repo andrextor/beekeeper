@@ -18,7 +18,7 @@ Status: greenfield. The September prototype (V0.3.1 ZIPs, Supabase project `kcqn
 
 ## Stack
 
-- **Backend = Supabase free plan, no server of our own**: PostgREST is the API, RLS the authorization, Auth by email + password with no emails sent (no domain yet; reviewers join with single-use invite codes), Storage for photos, region `sa-east-1`. Edge Functions only when SQL cannot do it.
+- **Backend = Supabase free plan, no server of our own**: PostgREST is the API, RLS the authorization, Auth by email + password with no emails sent (no domain yet; reviewers join with single-use invite codes), Storage for photos, region `us-east-1`. Edge Functions only when SQL cannot do it.
 - **Admin**: Vite + React 19 + TypeScript + Tailwind 4 + React Router 7 + TanStack Query + `lucide-react`, static build on Vercel Hobby.
 - Tooling: pnpm workspace, Biome, Supabase CLI local stack (Docker), pgTAP (`supabase test db`), Vitest in `admin/`.
 

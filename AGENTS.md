@@ -25,6 +25,7 @@ Trivial fixes may skip the spec, never the OK. Code reviews go to `docs/superpow
 | `supabase/functions/` | Edge Functions (Deno), only when SQL + RLS cannot do it |
 | `supabase/seed.sql` | Local demo data only, never run against the remote |
 | `docs/api.md` | The contract the mobile app relies on: tables, RPCs, storage paths, sync rules |
+| `docs/deploy.md` | Remote Supabase project: where each key lives, migrations, backups, restore (Spanish) |
 | `admin/` | Platform admin panel. `src/features/<screen>/` imports `components/` and `lib/`, never another feature |
 | `DESIGN.md` | Admin design system (palette, fonts, Lucide icons, Tailwind tokens, components). Read it before any UI work |
 | `docs/ROADMAP.md` | Every module in order, with its spec, plan and version |

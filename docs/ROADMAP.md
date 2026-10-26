@@ -34,7 +34,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 
 | # | Module | Spec | Plan | Version |
 |---|--------|------|------|---------|
-| D1 | Remote Supabase project, auth settings, first platform admin | `specs/2026-10-25-deploy-01-supabase-design.md` | `plans/2026-10-25-deploy-01-supabase.md` | 0.12.0 |
+| D1 | Remote Supabase project, auth settings, first platform admin | `specs/2026-10-25-deploy-01-supabase-design.md` | `plans/ok-2026-10-25-deploy-01-supabase.md` | 0.12.0 |
 | D2 | Admin panel on Vercel | `specs/2026-10-25-deploy-02-admin-vercel-design.md` | `plans/2026-10-25-deploy-02-admin-vercel.md` | 0.13.0 |
 
 ## Phase 4 — Mobile (`beekeeper-mobile`)

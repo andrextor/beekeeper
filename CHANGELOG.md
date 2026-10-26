@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-25
+
+### Added
+
+- Remote Supabase project `landak-apiario` (free plan, `us-east-1`): every migration, private photo bucket, sign-in by email and password with no email confirmation.
+- Weekly backup of the remote database (roles, schema and data), encrypted and kept 90 days as a GitHub artifact; it can also be run by hand.
+- `docs/deploy.md`: where each key lives, how to push a new migration, restore a backup or a paused project, and reset a password.
+
 ## [0.11.1] - 2026-10-28
 
 ### Fixed
