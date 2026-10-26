@@ -418,3 +418,6 @@ enabled = true
 # A6: the function checks the caller against Auth itself (new API keys; see its spec).
 [functions.admin-create-user]
 verify_jwt = false
+
+[functions.admin-update-user]
+verify_jwt = false
