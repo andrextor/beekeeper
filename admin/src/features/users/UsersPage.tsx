@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { ShieldCheck, UserRound } from 'lucide-react'
+import { ShieldCheck, UserPlus, UserRound } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { type Column, DataTable } from '../../components/ui/DataTable'
@@ -75,13 +75,23 @@ export function UsersPage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold">Usuarios</h1>
-      <SearchInput
-        label="Buscar"
-        placeholder="Correo o nombre"
-        value={q}
-        onSearch={setQuery}
-        className="md:max-w-md"
-      />
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <SearchInput
+          label="Buscar"
+          placeholder="Correo o nombre"
+          value={q}
+          onSearch={setQuery}
+          className="md:w-full md:max-w-md"
+        />
+        <Link
+          to="/usuarios/nuevo"
+          viewTransition
+          className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-control bg-primary px-4 font-medium text-on-primary shadow-sm transition duration-200 hover:-translate-y-0.5 hover:brightness-110 md:self-auto"
+        >
+          <UserPlus size={20} aria-hidden />
+          Nuevo usuario
+        </Link>
+      </div>
       {list.isError ? (
         <QueryError error={list.error} onRetry={() => list.refetch()} />
       ) : (
