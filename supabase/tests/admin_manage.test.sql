@@ -72,7 +72,7 @@ select throws_ok(
 );
 select throws_ok(
   format('select public.admin_set_member_role(%L, %L, %L)', :'org_a', :'owner_id', 'admin'),
-  'P0001', 'El rol debe ser propietario o revisor.', 'only owner or reviewer'
+  'P0001', 'El rol debe ser propietario, revisor u observador.', 'only owner, reviewer or viewer'
 );
 
 -- Remove and add.

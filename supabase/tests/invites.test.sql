@@ -26,7 +26,7 @@ select lives_ok(
 
 select throws_ok(
   format('select * from public.create_invite(%L, %L)', :'org', 'admin'),
-  'P0001', 'El rol debe ser propietario o revisor.', 'an unknown role is refused'
+  'P0001', 'El rol debe ser propietario, revisor u observador.', 'an unknown role is refused'
 );
 
 select code as revoked_code, invite_id as revoked_id from public.create_invite(:'org', 'reviewer') \gset
