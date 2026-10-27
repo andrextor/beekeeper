@@ -3,9 +3,9 @@ import type { ReactNode } from 'react'
 import { ThemeToggle } from '../../components/layout/ThemeToggle'
 
 const facts = [
-  { icon: QrCode, text: 'Cada colmena con su QR y su historial' },
-  { icon: CloudOff, text: 'La app trabaja sin señal y sincroniza sola' },
-  { icon: ShieldCheck, text: 'Cada finca ve solo sus datos' },
+  { icon: QrCode, text: 'Cada colmena con su QR y su historial', short: 'QR por colmena' },
+  { icon: CloudOff, text: 'La app trabaja sin señal y sincroniza sola', short: 'Sin señal' },
+  { icon: ShieldCheck, text: 'Cada finca ve solo sus datos', short: 'Datos privados' },
 ]
 
 function Logo() {
@@ -35,15 +35,29 @@ export function AuthLayout({
 }) {
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr] lg:grid-cols-2 lg:grid-rows-1">
-      <aside className="panal-band flex flex-col justify-between gap-10 px-6 pt-10 pb-16 lg:px-12 lg:py-12">
-        <Logo />
-        <div className="flex max-w-md flex-col gap-6">
+      <aside className="panal-band flex flex-col justify-between gap-8 px-6 pt-6 pb-14 lg:gap-10 lg:px-12 lg:py-12">
+        <div className="flex items-center justify-between gap-3">
+          <Logo />
+          <ThemeToggle className="text-white! hover:bg-white/10! lg:hidden" />
+        </div>
+        <div className="flex max-w-md flex-col gap-4 lg:gap-6">
           <p className="text-xs font-semibold tracking-[0.12em] text-mist uppercase">
             Panel de administración
           </p>
           <p className="font-display text-2xl leading-tight font-bold tracking-tight text-balance lg:text-4xl">
             Cada colmena, su historia. <span className="text-accent">Aunque no haya señal.</span>
           </p>
+          <ul className="flex flex-wrap gap-2 lg:hidden">
+            {facts.map(({ icon: Icon, short }) => (
+              <li
+                key={short}
+                className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-xs text-white/85"
+              >
+                <Icon size={14} className="text-accent" aria-hidden />
+                {short}
+              </li>
+            ))}
+          </ul>
           <ul className="hidden flex-col gap-3 lg:flex">
             {facts.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-3 text-sm text-white/80">
@@ -60,17 +74,20 @@ export function AuthLayout({
         </p>
       </aside>
 
-      <main className="relative -mt-8 flex flex-col rounded-t-[28px] bg-bg px-6 pt-8 pb-10 lg:mt-0 lg:rounded-none lg:px-12">
-        <div className="flex justify-end">
+      <main className="relative -mt-8 flex flex-col rounded-t-[28px] bg-bg px-6 pt-8 pb-8 shadow-[0_-8px_24px_rgb(0_0_0/0.12)] lg:mt-0 lg:rounded-none lg:px-12 lg:pb-10 lg:shadow-none">
+        <div className="hidden justify-end lg:flex">
           <ThemeToggle />
         </div>
-        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 py-6">
+        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-7 lg:justify-center lg:gap-8 lg:py-6">
           <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
             {description && <p className="text-sm text-muted">{description}</p>}
           </div>
           {children}
         </div>
+        <p className="pt-8 text-center text-xs text-muted lg:hidden">
+          Impulsado por Finca Landak · Agroecología Integral
+        </p>
       </main>
     </div>
   )
