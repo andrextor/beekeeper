@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.19.1] - 2026-10-26
+
+### Changed
+
+- Manual: the Observador role is no longer marked "Próximamente" (the app ships it, M14); the roles table stacks into cards on phones instead of scrolling sideways.
+
 ## [0.19.0] - 2026-10-26
 
 ### Changed

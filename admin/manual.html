@@ -198,15 +198,21 @@ h3 { font-size: 1.05rem; font-weight: 700; }
 
 /* Roles table */
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
-table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 0.92rem; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
 th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 thead th { background: var(--soft); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 tbody tr:last-child td { border-bottom: 0; }
 td.y { color: var(--accent); font-weight: 600; }
 td.n { color: var(--muted); }
-.badge-new {
-  display: inline-block; vertical-align: middle; margin-left: 6px; padding: 2px 8px; border-radius: 999px;
-  background: var(--honey-soft); color: var(--fg); font: 600 0.7rem/1.4 var(--body); letter-spacing: 0.02em;
+@media (max-width: 559px) {
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  tbody tr { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+  tbody tr:last-child { border-bottom: 0; }
+  tbody td { border-bottom: 0; padding: 4px 14px 12px; }
+  tbody td:first-child { grid-column: 1 / -1; padding-top: 12px; font-weight: 600; }
+  tbody td[data-label]::before {
+    content: attr(data-label); display: block; font-size: 0.72rem; font-weight: 500; color: var(--muted);
+  }
 }
 
 /* Inspection sections */
@@ -393,7 +399,7 @@ footer { border-top: 1px solid var(--line); }
         <p class="lead">Quien trabaja en el apiario: revisa, dicta, toma fotos y registra actividades.</p>
       </div>
       <div class="card">
-        <h3>Observador <span class="badge-new">Próximamente</span></h3>
+        <h3>Observador</h3>
         <p class="lead">Quien solo sigue cómo van las colmenas: ve revisiones, visitas, fotos e historial, sin cambiar nada. Ideal para un técnico, un asesor o un socio.</p>
       </div>
     </div>
@@ -401,17 +407,17 @@ footer { border-top: 1px solid var(--line); }
       <table>
         <thead><tr><th>Puede…</th><th>Propietario</th><th>Revisor</th><th>Observador</th></tr></thead>
         <tbody>
-          <tr><td>Ver apiarios, colmenas e historial</td><td class="y">Sí</td><td class="y">Sí</td><td class="y">Sí</td></tr>
-          <tr><td>Ver revisiones, visitas y fotos</td><td class="y">Sí</td><td class="y">Sí</td><td class="y">Sí</td></tr>
-          <tr><td>Hacer revisiones, notas, fotos y actividades</td><td class="y">Sí</td><td class="y">Sí</td><td class="n">No</td></tr>
-          <tr><td>Editar o borrar lo que registró</td><td class="y">Todo</td><td class="y">Solo lo suyo</td><td class="n">No</td></tr>
-          <tr><td>Crear y editar apiarios y colmenas</td><td class="y">Sí</td><td class="n">No</td><td class="n">No</td></tr>
-          <tr><td>Imprimir y cambiar etiquetas QR</td><td class="y">Sí</td><td class="n">No</td><td class="n">No</td></tr>
-          <tr><td>Invitar personas y cambiar roles</td><td class="y">Sí</td><td class="n">No</td><td class="n">No</td></tr>
+          <tr><td>Ver apiarios, colmenas e historial</td><td data-label="Propietario" class="y">Sí</td><td data-label="Revisor" class="y">Sí</td><td data-label="Observador" class="y">Sí</td></tr>
+          <tr><td>Ver revisiones, visitas y fotos</td><td data-label="Propietario" class="y">Sí</td><td data-label="Revisor" class="y">Sí</td><td data-label="Observador" class="y">Sí</td></tr>
+          <tr><td>Hacer revisiones, notas, fotos y actividades</td><td data-label="Propietario" class="y">Sí</td><td data-label="Revisor" class="y">Sí</td><td data-label="Observador" class="n">No</td></tr>
+          <tr><td>Editar o borrar lo que registró</td><td data-label="Propietario" class="y">Todo</td><td data-label="Revisor" class="y">Solo lo suyo</td><td data-label="Observador" class="n">No</td></tr>
+          <tr><td>Crear y editar apiarios y colmenas</td><td data-label="Propietario" class="y">Sí</td><td data-label="Revisor" class="n">No</td><td data-label="Observador" class="n">No</td></tr>
+          <tr><td>Imprimir y cambiar etiquetas QR</td><td data-label="Propietario" class="y">Sí</td><td data-label="Revisor" class="n">No</td><td data-label="Observador" class="n">No</td></tr>
+          <tr><td>Invitar personas y cambiar roles</td><td data-label="Propietario" class="y">Sí</td><td data-label="Revisor" class="n">No</td><td data-label="Observador" class="n">No</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="lead">Si un revisor registra una pérdida, la colmena no cambia de estado: la app le pide avisar al propietario. El rol Observador llega con la próxima versión de la app.</p>
+    <p class="lead">Si un revisor registra una pérdida, la colmena no cambia de estado: la app le pide avisar al propietario.</p>
   </section>
 
   <section id="pantallas">
