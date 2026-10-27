@@ -228,6 +228,7 @@ td.n { color: var(--muted); }
   background: var(--deep); color: #ffffff; position: relative;
 }
 .quote::before { content: "Dictado"; display: block; font: 600 0.72rem/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mist); margin-bottom: 8px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .proposals { display: flex; flex-wrap: wrap; gap: 6px; }
 .proposals .chip { background: var(--leaf-soft); border-color: transparent; }
 .proposals .chip b { font-weight: 600; margin-right: 4px; }
@@ -551,14 +552,14 @@ footer { border-top: 1px solid var(--line); }
       <p class="lead">En la revisión toca <span class="tap">Dictar</span> y habla normal. La app convierte lo que dices en campos y te los muestra para que confirmes. Nada se guarda sin que lo aceptes.</p>
     </div>
     <p class="quote">"La reina no se vio, hay buena postura, tres cuadros de cría, reservas bajas. Alimentar y revisar en ocho días."</p>
-    <div class="proposals" role="group" aria-label="Lo que propone la app">
+    <p class="proposals"><span class="sr-only">Lo que propone la app:</span>
       <span class="chip"><b>Reina vista</b>No</span>
       <span class="chip"><b>Postura</b>Buena</span>
       <span class="chip"><b>Cuadros de cría</b>3</span>
       <span class="chip"><b>Reservas</b>Bajas</span>
       <span class="chip"><b>Acción</b>Alimentar</span>
       <span class="chip"><b>Próxima revisión</b>en 8 días</span>
-    </div>
+    </p>
     <ol class="steps">
       <li>Quita las propuestas que no van y corrige las que estén mal.</li>
       <li>Toca <span class="tap">Aceptar todo</span>. El texto que dictaste queda guardado junto a la revisión.</li>
