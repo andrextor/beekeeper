@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-10-26
+
+### Fixed
+
+- `viewer_role` pgTAP test inserts `hive_events` with their client id (the column has no default), so it runs and the viewer's event insert is refused by RLS, not by the missing id.
+
 ## [0.18.0] - 2026-10-26
 
 ### Changed
