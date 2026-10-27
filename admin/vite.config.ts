@@ -14,6 +14,8 @@ export default defineConfig({
   },
   build: {
     rolldownOptions: {
+      // The user manual is a second, public page: no login, no React.
+      input: { main: 'index.html', manual: 'manual.html' },
       output: {
         // Libraries change less often than the panel: separate chunks stay cached across deploys.
         codeSplitting: {

@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <title>Manual de Landak Apiario</title>
+    <script type="module" src="/src/manual.ts"></script>
+<style>
+/* Layout: a deep "Panal" hero like the app, then one reading column on warm stone with a sticky chip index. */
+:root {
+  --deep: #04303b;
+  --leaf: #0c6511;
+  --sprout: #82c75c;
+  --honey: #ffb545;
+  --mist: #a9c7cc;
+  --bg: #f6f5f0;
+  --surface: #ffffff;
+  --fg: #1f1d19;
+  --muted: #5f5b51;
+  --line: #e4e2da;
+  --soft: #f2f1ec;
+  --accent: #0c6511;
+  --on-accent: #ffffff;
+  --honey-soft: #fff1d6;
+  --leaf-soft: #e7f4e4;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --comb: rgba(201, 150, 60, 0.32);
+  --display: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --radius: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121511; --surface: #1a1e18; --fg: #eaeee7; --muted: #a3ab9e; --line: #2a3127;
+    --soft: #21261f; --accent: #82c75c; --on-accent: #121511; --honey-soft: #3a2f17;
+    --leaf-soft: #1c3317; --danger: #f97066; --danger-soft: #3a1c19; --comb: rgba(255, 181, 69, 0.1);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121511; --surface: #1a1e18; --fg: #eaeee7; --muted: #a3ab9e; --line: #2a3127;
+  --soft: #21261f; --accent: #82c75c; --on-accent: #121511; --honey-soft: #3a2f17;
+  --leaf-soft: #1c3317; --danger: #f97066; --danger-soft: #3a1c19; --comb: rgba(255, 181, 69, 0.1);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 1rem/1.65 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bg);
+}
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.2; margin: 0; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--honey); outline-offset: 2px; border-radius: 6px; }
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--deep);
+  color: #ffffff;
+  border-radius: 0 0 32px 32px;
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0; opacity: 0.13; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='72.75'%3E%3Cpath d='M21 0 42 12.12v24.25L21 48.5 0 36.37V12.12zM21 48.5v24.25' fill='none' stroke='%23ffb545' stroke-width='2'/%3E%3C/svg%3E");
+  -webkit-mask-image: linear-gradient(160deg, #000 20%, transparent 85%);
+  mask-image: linear-gradient(160deg, #000 20%, transparent 85%);
+}
+.hero .wrap { position: relative; padding-block: 48px 44px; display: grid; gap: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 0.95rem/1 var(--display); letter-spacing: 0.01em; }
+.brand .mark {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--honey); color: var(--deep); border-radius: 10px;
+}
+.eyebrow { color: var(--mist); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.hero h1 { font-size: clamp(2rem, 7vw, 3rem); font-weight: 800; letter-spacing: -0.02em; }
+.hero h1 em { font-style: normal; color: var(--honey); }
+.hero .lede { color: #d8e6e8; max-width: 34rem; font-size: 1.05rem; }
+.flow {
+  display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 6px 0 0; padding: 0;
+  counter-reset: flow;
+}
+.flow li {
+  counter-increment: flow;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px; padding: 6px 12px 6px 6px; font-size: 0.88rem; font-weight: 500;
+}
+.flow li::before {
+  content: counter(flow);
+  width: 22px; height: 22px; display: grid; place-items: center; border-radius: 999px;
+  background: var(--honey); color: var(--deep); font: 700 0.75rem/1 var(--display);
+}
+
+/* Sticky index */
+.index {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.index .wrap { overflow-x: auto; scrollbar-width: none; }
+.index .wrap::-webkit-scrollbar { display: none; }
+.index ul { display: flex; gap: 6px; list-style: none; margin: 0; padding: 10px 0; width: max-content; }
+.index a {
+  display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px;
+  border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
+  color: var(--fg); font-size: 0.86rem; font-weight: 500; text-decoration: none; white-space: nowrap;
+}
+.index a:hover { border-color: var(--accent); color: var(--accent); }
+
+main { display: grid; gap: 56px; padding-block: 36px 64px; }
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 6px; }
+.sec-head .eyebrow { color: var(--accent); }
+h2 { font-size: clamp(1.45rem, 4.6vw, 1.8rem); font-weight: 800; letter-spacing: -0.015em; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+.lead { color: var(--muted); }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px; display: grid; gap: 10px; min-width: 0;
+}
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+/* Numbered steps (real sequences only) */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: step; }
+.steps li {
+  counter-increment: step; position: relative; padding: 14px 16px 14px 60px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+}
+.steps li::before {
+  content: counter(step); position: absolute; left: 14px; top: 12px;
+  width: 32px; height: 36px; display: grid; place-items: center;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: var(--honey); color: var(--deep); font: 800 0.9rem/1 var(--display);
+}
+.steps strong, .card strong { font-weight: 600; }
+
+.tap {
+  display: inline-block; padding: 0 7px; border-radius: 6px; background: var(--soft);
+  border: 1px solid var(--line); font-weight: 600; font-size: 0.92em; white-space: nowrap;
+}
+
+.note {
+  display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+  padding: 14px 16px; border-radius: 14px; background: var(--honey-soft); font-size: 0.95rem;
+}
+.note.ok { background: var(--leaf-soft); }
+.note.bad { background: var(--danger-soft); }
+.note .ico { font: 800 1rem/1.5 var(--display); }
+
+/* Phone tab bar illustration */
+.phone {
+  border-radius: 26px; background: var(--deep); padding: 10px; max-width: 420px; width: 100%;
+  margin: 4px auto 0; box-shadow: 0 18px 40px rgba(4, 48, 59, 0.18);
+}
+.tabbar {
+  display: grid; grid-template-columns: repeat(5, 1fr); align-items: end;
+  background: var(--surface); border-radius: 18px; padding: 10px 6px 8px;
+}
+.tab { display: grid; justify-items: center; gap: 4px; font-size: 0.68rem; font-weight: 600; color: var(--muted); }
+.tab svg { width: 22px; height: 22px; }
+.tab.on { color: var(--accent); }
+.tab.on .pill { background: var(--leaf-soft); border-radius: 999px; padding: 2px 14px; }
+.tab.scan .fab {
+  width: 54px; height: 54px; margin-top: -26px; border-radius: 18px; display: grid; place-items: center;
+  background: var(--honey); color: var(--deep); box-shadow: 0 6px 16px rgba(201, 150, 60, 0.4);
+}
+.tabs-explain { display: grid; gap: 10px; }
+.tabs-explain .card { grid-template-columns: 44px 1fr; align-items: start; }
+.hexicon {
+  width: 40px; height: 44px; display: grid; place-items: center; color: var(--deep);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: var(--honey);
+}
+.hexicon svg { width: 20px; height: 20px; }
+
+/* Roles table */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 0.92rem; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--soft); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 0; }
+td.y { color: var(--accent); font-weight: 600; }
+td.n { color: var(--muted); }
+.badge-new {
+  display: inline-block; vertical-align: middle; margin-left: 6px; padding: 2px 8px; border-radius: 999px;
+  background: var(--honey-soft); color: var(--fg); font: 600 0.7rem/1.4 var(--body); letter-spacing: 0.02em;
+}
+
+/* Inspection sections */
+.fields { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; min-height: 30px; padding: 0 11px; border-radius: 999px;
+  background: var(--soft); border: 1px solid var(--line); font-size: 0.84rem;
+}
+
+/* Voice example */
+.quote {
+  font: 600 1.05rem/1.5 var(--display); padding: 16px 18px; border-radius: 14px;
+  background: var(--deep); color: #ffffff; position: relative;
+}
+.quote::before { content: "Dictado"; display: block; font: 600 0.72rem/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mist); margin-bottom: 8px; }
+.proposals { display: flex; flex-wrap: wrap; gap: 6px; }
+.proposals .chip { background: var(--leaf-soft); border-color: transparent; }
+.proposals .chip b { font-weight: 600; margin-right: 4px; }
+
+/* Sync states */
+.states { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.state { border-radius: 14px; padding: 14px; display: grid; gap: 4px; border: 1px solid var(--line); background: var(--surface); }
+.state .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; margin-right: 6px; }
+.state h3 { font-size: 0.95rem; display: flex; align-items: center; }
+.state p { font-size: 0.88rem; color: var(--muted); }
+
+/* Events */
+.events { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.event { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 2px; }
+.event b { font: 700 0.95rem/1.3 var(--display); }
+.event span { font-size: 0.84rem; color: var(--muted); }
+
+/* Queen colors */
+.queens { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.queen { display: grid; justify-items: center; gap: 4px; font-size: 0.78rem; text-align: center; }
+.queen i { width: 26px; height: 26px; border-radius: 999px; border: 1px solid var(--line); display: block; }
+.queen small { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Install link */
+.linkbox { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
+.linkbox code {
+  flex: 1 1 260px; min-width: 0; overflow-wrap: anywhere; padding: 10px 12px; border-radius: 12px;
+  background: var(--soft); border: 1px solid var(--line); font: 500 0.82rem/1.5 ui-monospace, Menlo, monospace;
+}
+button.copy {
+  min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--on-accent); font: 600 0.92rem/1 var(--body);
+}
+
+/* FAQ */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+details + details { margin-top: 8px; }
+summary {
+  cursor: pointer; list-style: none; padding: 14px 44px 14px 16px; font-weight: 600; position: relative; min-height: 44px;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  font: 700 1.2rem/1 var(--display); color: var(--accent);
+}
+details[open] summary::after { content: "–"; }
+details > div { padding: 0 16px 16px; color: var(--muted); display: grid; gap: 8px; }
+
+.admin { background: var(--deep); color: #ffffff; border-radius: 24px; padding: 24px 20px; display: grid; gap: 14px; position: relative; overflow: hidden; }
+.admin .eyebrow { color: var(--mist); }
+.admin p, .admin li { color: #d8e6e8; }
+.admin ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 6px; }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 24px 40px; color: var(--muted); font-size: 0.88rem; display: grid; gap: 6px; }
+
+@media (min-width: 720px) {
+  .hero .wrap { padding-block: 72px 64px; }
+  .card { padding: 22px; }
+}
+</style>
+  </head>
+  <body>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 2 20.5 7v10L12 22 3.5 17V7z"/></svg>
+      </span>
+      Landak Apiario
+    </div>
+    <p class="eyebrow">Manual de uso · App Android</p>
+    <h1>Tus colmenas, <em>con o sin señal</em>.</h1>
+    <p class="lede">Escanea la colmena, mira su historia, cuenta lo que ves y sigue con la siguiente. La app guarda todo en el teléfono y lo sube sola cuando vuelve la señal.</p>
+    <ol class="flow" aria-label="Cómo se usa en el apiario">
+      <li>Escanea el QR</li>
+      <li>Mira la ficha</li>
+      <li>Revisa o dicta</li>
+      <li>Guarda</li>
+      <li>Se sincroniza</li>
+    </ol>
+  </div>
+</header>
+
+<nav class="index" aria-label="Contenido">
+  <div class="wrap">
+    <ul>
+      <li><a href="#instalar">Instalar</a></li>
+      <li><a href="#ingresar">Ingresar</a></li>
+      <li><a href="#roles">Roles</a></li>
+      <li><a href="#pantallas">La app</a></li>
+      <li><a href="#apiarios">Apiarios y colmenas</a></li>
+      <li><a href="#qr">Etiquetas QR</a></li>
+      <li><a href="#revision">Revisión</a></li>
+      <li><a href="#voz">Voz</a></li>
+      <li><a href="#fotos">Fotos</a></li>
+      <li><a href="#actividades">Actividades</a></li>
+      <li><a href="#personas">Personas</a></li>
+      <li><a href="#sincronizacion">Sin señal</a></li>
+      <li><a href="#actualizar">Actualizar</a></li>
+      <li><a href="#problemas">Problemas</a></li>
+      <li><a href="#panel">Panel web</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section id="instalar">
+    <div class="sec-head">
+      <p class="eyebrow">Paso 1</p>
+      <h2>Instalar la app</h2>
+      <p class="lead">Toma unos 5 minutos. Necesitas internet solo para descargarla e ingresar la primera vez. Por ahora la app no está en Play Store: se instala desde un enlace.</p>
+    </div>
+    <ol class="steps">
+      <li>Abre en el teléfono el enlace que te mandaron por WhatsApp, o este mismo:
+        <div class="linkbox" style="margin-top:10px">
+          <code id="apk">https://github.com/andrextor/beekeeper-releases/releases/latest/download/landak-apiario.apk</code>
+          <button class="copy" type="button" data-copy="apk">Copiar enlace</button>
+        </div>
+      </li>
+      <li>Cuando termine la descarga, toca <span class="tap">Abrir</span> en el aviso. Si se te pasó, búscalo en <span class="tap">Archivos</span> → <span class="tap">Descargas</span>.</li>
+      <li>Si Android dice que no puede instalar apps de esa fuente, toca <span class="tap">Configuración</span>, activa <span class="tap">Permitir de esta fuente</span> y vuelve atrás.</li>
+      <li>Toca <span class="tap">Instalar</span>. Si aparece Play Protect, toca <span class="tap">Instalar de todas formas</span>.</li>
+      <li>Abre <strong>Landak Apiario</strong>.</li>
+    </ol>
+    <div class="note">
+      <span class="ico" aria-hidden="true">!</span>
+      <p>La app pide permisos la primera vez que los necesita: <strong>cámara</strong> para leer el QR y tomar fotos, <strong>micrófono</strong> para dictar y <strong>ubicación</strong> solo al guardar dónde está un apiario. Si dijiste que no, puedes darlos después en Ajustes → Apps → Landak Apiario → Permisos.</p>
+    </div>
+  </section>
+
+  <section id="ingresar">
+    <div class="sec-head">
+      <p class="eyebrow">Paso 2</p>
+      <h2>Ingresar</h2>
+      <p class="lead">Elige tu caso.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Soy el dueño y empiezo</h3>
+        <p>Toca <span class="tap">Crear cuenta</span>, escribe tu correo y una contraseña de 8 caracteres o más, y luego <span class="tap">Crear mi finca</span>. Quedas como propietario.</p>
+      </div>
+      <div class="card">
+        <h3>Me invitaron</h3>
+        <p>Toca <span class="tap">Crear cuenta</span> y después <span class="tap">Tengo un código</span>. Escribe el código que te mandaron, por ejemplo <strong>K7M2-9QXA</strong>. Sirve una sola vez y vence en 7 días.</p>
+      </div>
+      <div class="card">
+        <h3>Ya tengo cuenta</h3>
+        <p>Toca <span class="tap">Iniciar sesión</span> con tu correo y contraseña. Si el administrador te creó la cuenta, usa la contraseña que te dio.</p>
+      </div>
+    </div>
+    <p class="lead">¿Trabajas en más de una finca? En <span class="tap">Perfil</span> → <span class="tap">Cambiar de finca</span> pasas de una a otra. Cada finca ve solo sus datos.</p>
+  </section>
+
+  <section id="roles">
+    <div class="sec-head">
+      <p class="eyebrow">Quién hace qué</p>
+      <h2>Propietario, revisor y observador</h2>
+      <p class="lead">Cada persona tiene un rol en cada finca. El rol lo decide el servidor, no el teléfono: lo que no te corresponde no aparece.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Propietario</h3>
+        <p class="lead">El dueño de la finca. Crea apiarios y colmenas, invita gente y lo puede todo.</p>
+      </div>
+      <div class="card">
+        <h3>Revisor</h3>
+        <p class="lead">Quien trabaja en el apiario: revisa, dicta, toma fotos y registra actividades.</p>
+      </div>
+      <div class="card">
+        <h3>Observador <span class="badge-new">Próximamente</span></h3>
+        <p class="lead">Quien solo sigue cómo van las colmenas: ve revisiones, visitas, fotos e historial, sin cambiar nada. Ideal para un técnico, un asesor o un socio.</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Puede…</th><th>Propietario</th><th>Revisor</th><th>Observador</th></tr></thead>
+        <tbody>
+          <tr><td>Ver apiarios, colmenas e historial</td><td class="y">Sí</td><td class="y">Sí</td><td class="y">Sí</td></tr>
+          <tr><td>Ver revisiones, visitas y fotos</td><td class="y">Sí</td><td class="y">Sí</td><td class="y">Sí</td></tr>
+          <tr><td>Hacer revisiones, notas, fotos y actividades</td><td class="y">Sí</td><td class="y">Sí</td><td class="n">No</td></tr>
+          <tr><td>Editar o borrar lo que registró</td><td class="y">Todo</td><td class="y">Solo lo suyo</td><td class="n">No</td></tr>
+          <tr><td>Crear y editar apiarios y colmenas</td><td class="y">Sí</td><td class="n">No</td><td class="n">No</td></tr>
+          <tr><td>Imprimir y cambiar etiquetas QR</td><td class="y">Sí</td><td class="n">No</td><td class="n">No</td></tr>
+          <tr><td>Invitar personas y cambiar roles</td><td class="y">Sí</td><td class="n">No</td><td class="n">No</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead">Si un revisor registra una pérdida, la colmena no cambia de estado: la app le pide avisar al propietario. El rol Observador llega con la próxima versión de la app.</p>
+  </section>
+
+  <section id="pantallas">
+    <div class="sec-head">
+      <p class="eyebrow">Un vistazo</p>
+      <h2>Las cinco pestañas</h2>
+      <p class="lead">Abajo siempre tienes la barra. El botón del medio, en miel, abre el escáner.</p>
+    </div>
+    <div class="phone" aria-hidden="true">
+      <div class="tabbar">
+        <div class="tab on"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span>Inicio</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Apiarios</div>
+        <div class="tab scan"><span class="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></span>Escanear</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 7a4.5 4.5 0 0 1 .5 8.97"/><path d="M12 12v8M9 15l3-3 3 3"/></svg>Pendientes</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</div>
+      </div>
+    </div>
+    <div class="tabs-explain">
+      <div class="card">
+        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span>
+        <div><h3>Inicio</h3><p class="lead">Lo que pide atención: colmenas <strong>Para revisar</strong>, <strong>Tareas</strong> pendientes (como alimentar) y la <strong>Última actividad</strong> de la finca.</p></div>
+      </div>
+      <div class="card">
+        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+        <div><h3>Apiarios</h3><p class="lead">Tus apiarios y, dentro de cada uno, sus colmenas. Desde aquí el propietario crea y edita.</p></div>
+      </div>
+      <div class="card">
+        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></span>
+        <div><h3>Escanear</h3><p class="lead">Apunta a la etiqueta de la colmena y se abre su ficha. Funciona sin señal y tiene linterna.</p></div>
+      </div>
+      <div class="card">
+        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 7a4.5 4.5 0 0 1 .5 8.97"/><path d="M12 12v8M9 15l3-3 3 3"/></svg></span>
+        <div><h3>Pendientes</h3><p class="lead">Qué falta por subir al servidor y si algo necesita tu ayuda. Si dice <strong>Sincronizado</strong>, todo está a salvo.</p></div>
+      </div>
+      <div class="card">
+        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+        <div><h3>Perfil</h3><p class="lead">Tu cuenta, cambiar de finca, personas de la finca, cómo subir fotos y cerrar sesión.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="apiarios">
+    <div class="sec-head">
+      <p class="eyebrow">Solo propietario</p>
+      <h2>Apiarios y colmenas</h2>
+      <p class="lead">Un apiario es un lugar, por ejemplo "Vallecito 1". Dentro van sus colmenas, cada una con su nombre (C-01, C-02…) y su etiqueta QR.</p>
+    </div>
+    <ol class="steps">
+      <li><span class="tap">Apiarios</span> → <span class="tap">Nuevo apiario</span>. Ponle nombre y, si quieres, finca, lugar, altitud, flora y fuente de agua.</li>
+      <li>Toca <span class="tap">Usar mi ubicación</span> para guardar dónde está. Si la ubicación del teléfono está apagada, Android te pide activarla.</li>
+      <li>Entra al apiario → <span class="tap">Nueva colmena</span>. Elige tipo (Langstroth, Kenyana…), cámaras y alzas con los botones − / +, origen y raza.</li>
+      <li>Pon el año de la reina: la app te sugiere el color con que se marca.</li>
+    </ol>
+    <div class="card">
+      <h3>Color de la reina por año</h3>
+      <p class="lead">El código internacional de marcado. Una reina de 2026 se marca en blanco.</p>
+      <div class="queens">
+        <div class="queen"><i style="background:#ffffff"></i>Blanco<small>1 · 6</small></div>
+        <div class="queen"><i style="background:#facc15"></i>Amarillo<small>2 · 7</small></div>
+        <div class="queen"><i style="background:#dc2626"></i>Rojo<small>3 · 8</small></div>
+        <div class="queen"><i style="background:#16a34a"></i>Verde<small>4 · 9</small></div>
+        <div class="queen"><i style="background:#2563eb"></i>Azul<small>5 · 0</small></div>
+      </div>
+      <p class="lead" style="font-size:.85rem">El número es el último dígito del año.</p>
+    </div>
+    <div class="note">
+      <span class="ico" aria-hidden="true">i</span>
+      <p>No se puede borrar un apiario que todavía tiene colmenas. Y dos colmenas del mismo apiario no pueden llamarse igual: si pasa estando sin señal, Pendientes te pide renombrar una.</p>
+    </div>
+  </section>
+
+  <section id="qr">
+    <div class="sec-head">
+      <p class="eyebrow">Identificar colmenas</p>
+      <h2>Etiquetas QR</h2>
+      <p class="lead">Cada colmena tiene un código único. El QR solo dice qué colmena es: para ver sus datos igual necesitas tu cuenta.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Imprimir</h3>
+        <p>En una colmena, <span class="tap">Etiqueta QR</span> crea un PDF para compartir. En un apiario, <span class="tap">Imprimir etiquetas</span> arma una hoja con todas.</p>
+      </div>
+      <div class="card">
+        <h3>Escanear</h3>
+        <p>Botón <span class="tap">Escanear</span> y apunta. También sirve la cámara normal del teléfono: te ofrece abrir la colmena en la app.</p>
+      </div>
+      <div class="card">
+        <h3>Sin cámara</h3>
+        <p><span class="tap">Escribir código</span> y teclea lo que dice bajo el QR. Si confundes la O con el cero, la encuentra igual.</p>
+      </div>
+      <div class="card">
+        <h3>Etiqueta dañada</h3>
+        <p>En la colmena, <span class="tap">Cambiar etiqueta</span> y escanea una nueva. La vieja deja de funcionar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="revision">
+    <div class="sec-head">
+      <p class="eyebrow">En el apiario</p>
+      <h2>Hacer una revisión</h2>
+      <p class="lead">Abre la colmena y toca <span class="tap">Nueva revisión</span>. Todo se llena con toques grandes, pensados para usar con guantes. Ningún campo es obligatorio: llena lo que viste.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Colonia</h3>
+        <div class="fields"><span class="chip">Fuerza</span><span class="chip">Temperamento</span><span class="chip">Reina vista</span><span class="chip">Huevos</span><span class="chip">Larvas</span><span class="chip">Celdas reales</span></div>
+      </div>
+      <div class="card">
+        <h3>Cría y reservas</h3>
+        <div class="fields"><span class="chip">Cuadros de cría</span><span class="chip">Patrón de cría</span><span class="chip">Cuadros de miel</span><span class="chip">Cuadros de polen</span><span class="chip">Reservas</span></div>
+      </div>
+      <div class="card">
+        <h3>Sanidad</h3>
+        <div class="fields"><span class="chip">Varroa</span><span class="chip">Plagas</span><span class="chip">Signos de enfermedad</span></div>
+      </div>
+      <div class="card">
+        <h3>Trabajo</h3>
+        <div class="fields"><span class="chip">Atención</span><span class="chip">Acciones planeadas</span><span class="chip">Próxima revisión</span><span class="chip">Clima</span><span class="chip">Notas</span></div>
+      </div>
+    </div>
+    <div class="note ok">
+      <span class="ico" aria-hidden="true">%</span>
+      <p><strong>Varroa sin calculadora.</strong> Pon el método, las abejas de la muestra y las varroas contadas. Con 300 abejas y 7 varroas la app muestra <strong>Carga: 2,3 %</strong>.</p>
+    </div>
+    <ol class="steps">
+      <li>Toca un chip para elegirlo; tócalo otra vez para quitarlo.</li>
+      <li>Si te interrumpen, no pasa nada: al volver a la app dice <strong>Continuando la revisión…</strong> con todo lo que llenaste.</li>
+      <li>Toca <span class="tap">Terminar</span>. Aparece <strong>Guardado</strong> con <span class="tap">Deshacer</span> por si te equivocaste.</li>
+    </ol>
+    <p class="lead">Después, la revisión aparece en el historial de la colmena, lo más nuevo arriba, con quién la hizo. Si la colmena necesita algo, su ficha muestra una tarjeta de atención.</p>
+  </section>
+
+  <section id="voz">
+    <div class="sec-head">
+      <p class="eyebrow">Manos ocupadas</p>
+      <h2>Dictar la revisión</h2>
+      <p class="lead">En la revisión toca <span class="tap">Dictar</span> y habla normal. La app convierte lo que dices en campos y te los muestra para que confirmes. Nada se guarda sin que lo aceptes.</p>
+    </div>
+    <p class="quote">"La reina no se vio, hay buena postura, tres cuadros de cría, reservas bajas. Alimentar y revisar en ocho días."</p>
+    <div class="proposals" aria-label="Lo que propone la app">
+      <span class="chip"><b>Reina vista</b>No</span>
+      <span class="chip"><b>Postura</b>Buena</span>
+      <span class="chip"><b>Cuadros de cría</b>3</span>
+      <span class="chip"><b>Reservas</b>Bajas</span>
+      <span class="chip"><b>Acción</b>Alimentar</span>
+      <span class="chip"><b>Próxima revisión</b>en 8 días</span>
+    </div>
+    <ol class="steps">
+      <li>Quita las propuestas que no van y corrige las que estén mal.</li>
+      <li>Toca <span class="tap">Aceptar todo</span>. El texto que dictaste queda guardado junto a la revisión.</li>
+      <li>También puedes dictar dentro de una nota.</li>
+    </ol>
+    <div class="note">
+      <span class="ico" aria-hidden="true">!</span>
+      <p><strong>Para dictar sin señal</strong>, descarga una vez el español: Ajustes del teléfono → Google → Voz → Reconocimiento sin conexión → Español. Si dices el nombre de otra colmena ("Colmena 12…"), la app te avisa que no es la que tienes abierta. Si no hay micrófono, todo sigue funcionando con toques.</p>
+    </div>
+  </section>
+
+  <section id="fotos">
+    <div class="sec-head">
+      <p class="eyebrow">Evidencias</p>
+      <h2>Fotos</h2>
+      <p class="lead">En la revisión toca <span class="tap">Foto</span>. Toma varias seguidas; si una salió mal, quítala de la tira de abajo (con <span class="tap">Deshacer</span> si te arrepientes) y toca <span class="tap">Listo</span>.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Sin señal</h3>
+        <p>Las fotos se guardan en el teléfono y suben después, aunque cierres la app a mitad de camino.</p>
+      </div>
+      <div class="card">
+        <h3>Cuidar tus datos</h3>
+        <p>En <span class="tap">Perfil</span> → <span class="tap">Subir fotos con datos móviles</span> elige <strong>Solo con Wi-Fi</strong>. Pendientes te dirá cuántas esperan Wi-Fi y podrás tocar <span class="tap">Subir ahora con datos</span> si lo necesitas.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="actividades">
+    <div class="sec-head">
+      <p class="eyebrow">Lo que le haces a la colmena</p>
+      <h2>Actividades</h2>
+      <p class="lead">En la colmena toca <span class="tap">Registrar actividad</span>, o <span class="tap">Actividad</span> dentro de una revisión. Cada una queda en el historial con su detalle.</p>
+    </div>
+    <div class="events">
+      <div class="event"><b>Alimentación</b><span>Jarabe 1:1, 2 litros…</span></div>
+      <div class="event"><b>Tratamiento</b><span>Producto y dosis</span></div>
+      <div class="event"><b>Cosecha</b><span>Lo que sacaste</span></div>
+      <div class="event"><b>Cambio de reina</b><span>Año y color sugerido</span></div>
+      <div class="event"><b>División</b><span>Crea la colmena nueva al tiro</span></div>
+      <div class="event"><b>Unión</b><span>Dos colmenas en una</span></div>
+      <div class="event"><b>Traslado</b><span>A otro apiario</span></div>
+      <div class="event"><b>Enjambre</b><span>Si se fue o llegó</span></div>
+      <div class="event"><b>Pérdida</b><span>La colmena murió o se perdió</span></div>
+      <div class="event"><b>Nota</b><span>Cualquier observación</span></div>
+    </div>
+    <p class="lead">Tocando una actividad la editas o la borras, y siempre hay <span class="tap">Deshacer</span>. Un traslado mueve la colmena de apiario y un cambio de reina actualiza la ficha.</p>
+  </section>
+
+  <section id="personas">
+    <div class="sec-head">
+      <p class="eyebrow">Trabajo en equipo</p>
+      <h2>Personas e invitaciones</h2>
+      <p class="lead">El propietario invita a sus ayudantes con un código. Necesita conexión.</p>
+    </div>
+    <ol class="steps">
+      <li><span class="tap">Perfil</span> → <span class="tap">Personas de la finca</span> → <span class="tap">Invitar persona</span>. Ponle un nombre de referencia ("Ayudante") y el rol: Revisor si va a trabajar en el apiario, Observador si solo va a seguir cómo van las colmenas.</li>
+      <li>Comparte el código por WhatsApp. Sirve una sola vez y vence en 7 días; si te equivocas, <span class="tap">Cancelar código</span>.</li>
+      <li>La otra persona crea su cuenta y toca <span class="tap">Tengo un código</span>. Entra directo a tu finca.</li>
+    </ol>
+    <p class="lead">Desde la misma pantalla puedes <strong>Hacer propietario</strong> a alguien o quitarlo. Cualquiera puede <strong>Salir de esta finca</strong>, salvo el único propietario: primero tiene que nombrar otro.</p>
+    <div class="note">
+      <span class="ico" aria-hidden="true">!</span>
+      <p>Si sales de una finca con registros sin subir, la app te avisa y te ofrece <span class="tap">Sincronizar primero</span>. Al salir, esa finca y sus fotos se borran de tu teléfono.</p>
+    </div>
+  </section>
+
+  <section id="sincronizacion">
+    <div class="sec-head">
+      <p class="eyebrow">Offline de verdad</p>
+      <h2>Trabajar sin señal</h2>
+      <p class="lead">Todo lo que haces se guarda primero en el teléfono. Cuando vuelve la señal, la app lo sube sola, una sola vez, sin duplicar. Estos son los estados que vas a ver:</p>
+    </div>
+    <div class="states">
+      <div class="state"><h3><span class="dot" style="background:var(--accent)"></span>Sincronizado</h3><p>Ya está en el servidor. Puedes cambiar de teléfono tranquilo.</p></div>
+      <div class="state"><h3><span class="dot" style="background:var(--honey)"></span>Guardado en este dispositivo</h3><p>Está a salvo en el teléfono, esperando señal.</p></div>
+      <div class="state"><h3><span class="dot" style="background:var(--honey)"></span>Pendiente</h3><p>Subiendo o por subir. No hace falta que hagas nada.</p></div>
+      <div class="state"><h3><span class="dot" style="background:var(--danger)"></span>Requiere atención</h3><p>Algo no pudo subir. Toca <strong>Revisar</strong> y sigue lo que dice.</p></div>
+    </div>
+    <p class="lead">En <span class="tap">Pendientes</span> también tienes <span class="tap">Sincronizar ahora</span> por si quieres forzarlo.</p>
+  </section>
+
+  <section id="actualizar">
+    <div class="sec-head">
+      <p class="eyebrow">Mantener la app al día</p>
+      <h2>Actualizar y cambiar de teléfono</h2>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>"Hay una actualización"</h3>
+        <p>Un arreglo pequeño. Toca <span class="tap">Reiniciar ahora</span>. Tus datos no se tocan.</p>
+      </div>
+      <div class="card">
+        <h3>"Hay una nueva versión de la app"</h3>
+        <p>Toca <span class="tap">Descargar</span> e instala encima, igual que la primera vez. <strong>No desinstales</strong>: instalar encima conserva todo.</p>
+      </div>
+    </div>
+    <div class="note bad">
+      <span class="ico" aria-hidden="true">!</span>
+      <p><strong>Antes de desinstalar, cerrar sesión o cambiar de teléfono</strong>, mira Pendientes: debe decir <strong>Sincronizado</strong>. Lo que no se haya subido vive solo en ese teléfono y se pierde.</p>
+    </div>
+  </section>
+
+  <section id="problemas">
+    <div class="sec-head">
+      <p class="eyebrow">Si algo sale mal</p>
+      <h2>Problemas frecuentes</h2>
+    </div>
+    <div>
+      <details>
+        <summary>Dice "App no instalada" al instalar una versión nueva</summary>
+        <div><p>No desinstales la anterior si tienes registros pendientes. Escríbele a Iván por WhatsApp antes de hacer nada.</p></div>
+      </details>
+      <details>
+        <summary>Al abrir dice "No pudimos actualizar los datos"</summary>
+        <div><p>Toca <strong>Enviar respaldo</strong>, mándaselo a Iván por WhatsApp y no desinstales la app.</p></div>
+      </details>
+      <details>
+        <summary>Mis revisiones no aparecen en la finca</summary>
+        <div><p>Abre <strong>Pendientes</strong>. Si algo dice <strong>Requiere atención</strong>, toca <strong>Revisar</strong> y sigue lo que dice. Si dice "Sin conexión", busca señal o Wi-Fi.</p></div>
+      </details>
+      <details>
+        <summary>El QR dice "no es de Landak Apiario" o "no está asignado"</summary>
+        <div><p>El primero es un QR de otra cosa (una página web, un producto). El segundo es una etiqueta vieja que se reemplazó: usa la nueva o pide al propietario <strong>Cambiar etiqueta</strong>.</p></div>
+      </details>
+      <details>
+        <summary>El código de invitación no funciona</summary>
+        <div><p>Cada código sirve una vez y vence en 7 días. Pide al propietario uno nuevo.</p></div>
+      </details>
+      <details>
+        <summary>"Esta cuenta está desactivada"</summary>
+        <div><p>El administrador pausó tu cuenta. Tu historial se conserva; pídele que la reactive.</p></div>
+      </details>
+      <details>
+        <summary>Negué un permiso y ahora no puedo escanear o dictar</summary>
+        <div><p>Ajustes del teléfono → Apps → Landak Apiario → Permisos, y activa cámara, micrófono o ubicación.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <section id="panel">
+    <div class="admin">
+      <p class="eyebrow">Para el administrador de la plataforma</p>
+      <h2>El panel web</h2>
+      <p>Además de la app, existe un panel web para quien administra Landak Apiario. Se usa en el computador, aunque también funciona en el teléfono.</p>
+      <ul>
+        <li><strong>Resumen:</strong> cuántos apicultores, colmenas, revisiones y fotos hay, y cuánto espacio queda para fotos.</li>
+        <li><strong>Apicultores:</strong> cada finca con sus apiarios, colmenas, personas, historial y fotos. Solo lectura.</li>
+        <li><strong>Usuarios:</strong> crear cuentas de apicultores, revisores, observadores y administradores; cambiar nombre, correo y contraseña; agregar o quitar de fincas; desactivar y reactivar.</li>
+        <li><strong>Imprimir:</strong> la ficha de una finca, un apiario o una colmena sale lista para papel o PDF.</li>
+      </ul>
+      <p>El panel nunca cambia el historial de las colmenas: eso solo se registra desde la app.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Landak Apiario</strong> · Gestión apícola gratuita, hecha para el campo.</p>
+    <p>Impulsado por Finca Landak · Agroecología Integral.</p>
+  </div>
+</footer>
+  </body>
+</html>
