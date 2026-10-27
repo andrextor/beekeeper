@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-10-26
+
+### Changed
+
+- The user manual lives in the admin panel at `/manual.html`: public, no login, same domain, versioned with the code. The sidebar's "Manual de uso" opens it instead of the claude.ai page.
+
 ## [0.17.0] - 2026-10-26
 
 ### Added
