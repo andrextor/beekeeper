@@ -22,7 +22,7 @@ export function NotFoundState({
           <Link
             to={backTo}
             viewTransition
-            className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary hover:underline"
+            className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
             <ChevronLeft size={16} aria-hidden /> {backLabel}
           </Link>
