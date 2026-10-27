@@ -14,7 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - User page: name and email are saved together with one "Guardar cambios"; changing the password and adding to a farm open a dialog. The farm search is a dropdown that skips farms the person already belongs to.
 - Mi cuenta: the same single save and password dialog.
 - Light theme uses the app's warm stone page instead of sage, with fainter background glows, so the panel and the app look alike.
-- A faint honeycomb in the page corners, the same cell as the app's "Panal" bands; with a mouse, the cells near the pointer light up softly.
+- A faint honeycomb in the page corners, the same cell as the app's "Panal" bands; with a mouse, the cells near the pointer light up softly. Printed reports carry a strip of it at the top and bottom of each page.
 - Sidebar footer: an account block (initial, "Mi cuenta", email) with the theme and sign-out icon buttons beside it.
 - Empty apiaries and hives say the beekeeper creates them from the app.
 - Deactivating, demoting or removing the only owner of a farm now says what to do: make someone else owner first.
