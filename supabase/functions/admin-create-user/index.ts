@@ -1,4 +1,4 @@
-// A6: only a platform admin creates accounts (beekeeper + farm, reviewer in a farm, or another admin).
+// A6: only a platform admin creates accounts (beekeeper + farm, reviewer or viewer in a farm, or another admin).
 // Runs inside Supabase, the only place the secret key may live. Spec: docs/superpowers/specs/2026-10-25-admin-06-create-users-design.md
 import {
   authInputError,
@@ -11,7 +11,7 @@ import {
   uuidPattern,
 } from '../_shared/admin.ts'
 
-type Kind = 'beekeeper' | 'reviewer' | 'admin'
+type Kind = 'beekeeper' | 'reviewer' | 'viewer' | 'admin'
 
 type Input = {
   kind: Kind
@@ -22,9 +22,10 @@ type Input = {
   organizationId: string | null
 }
 
-const roles: Record<Kind, 'owner' | 'reviewer' | 'admin'> = {
+const roles: Record<Kind, 'owner' | 'reviewer' | 'viewer' | 'admin'> = {
   beekeeper: 'owner',
   reviewer: 'reviewer',
+  viewer: 'viewer',
   admin: 'admin',
 }
 
@@ -35,7 +36,7 @@ const provisionStatus: Record<string, number> = {
 }
 
 function isKind(value: unknown): value is Kind {
-  return value === 'beekeeper' || value === 'reviewer' || value === 'admin'
+  return value === 'beekeeper' || value === 'reviewer' || value === 'viewer' || value === 'admin'
 }
 
 /** The validated input, or the error code to answer with. */
@@ -57,7 +58,7 @@ function parseInput(body: unknown): Input | string {
       return 'invalid_organization_name'
     }
   }
-  if (body.kind === 'reviewer') {
+  if (body.kind === 'reviewer' || body.kind === 'viewer') {
     organizationId = trimmed(body.organization_id) ?? ''
     if (!uuidPattern.test(organizationId)) return 'invalid_organization'
   }
