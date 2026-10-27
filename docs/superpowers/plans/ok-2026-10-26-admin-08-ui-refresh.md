@@ -16,6 +16,12 @@ No new dependencies. All paths under `admin/src/` unless noted.
 8. **Gallery + docs**: `features/design/DesignPage.tsx` shows every button variant and size, Select, fields (error/disabled), Segmented, Badge tones, a DataTable with pagination and its mobile rows; `DESIGN.md` (solid surfaces, glass only on shell, sizes, Select, table and mobile row rules, new tokens); `docs/ROADMAP.md` row A8. `docs(admin): A8 design system and gallery`
 9. **Release** CHANGELOG `### Changed` + `package.json` 0.16.0. `chore(release): 0.16.0`
 
+## Divergences while implementing
+
+- `MobileCard` lives in `components/ui/DataTable.tsx` and `SectionCard` in `Card.tsx` (one component each, no new files); `Dialog` was extracted in task 5 together with `ConfirmDialog`.
+- Columns keep `className: 'text-right'` instead of a new `align` prop.
+- `last_owner` message made actionable (Iván's screenshot while deactivating the only owner).
+
 ## Checks
 
 You run them: `pnpm lint && pnpm admin:check` after task 9 (`pnpm ci:check` before merging).
