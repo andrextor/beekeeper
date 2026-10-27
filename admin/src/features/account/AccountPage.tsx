@@ -95,7 +95,10 @@ function PasswordForm({ email }: { email: string }) {
   const [errors, setErrors] = useState<Partial<Record<keyof typeof emptyPasswords, string>>>({})
   const change = useMutation({
     mutationFn: () => changeOwnPassword(email, fields.current, fields.next),
-    onSuccess: () => setOpen(false),
+    onSuccess: () => {
+      setFields(emptyPasswords)
+      setOpen(false)
+    },
   })
 
   const submit = (event: FormEvent) => {
@@ -129,7 +132,10 @@ function PasswordForm({ email }: { email: string }) {
     change.reset()
     setOpen(true)
   }
-  const close = () => setOpen(false)
+  const close = () => {
+    setFields(emptyPasswords)
+    setOpen(false)
+  }
 
   return (
     <>

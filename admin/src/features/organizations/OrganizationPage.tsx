@@ -18,6 +18,7 @@ import {
   organizationSummaryQuery,
   type PendingInvite,
 } from '../../lib/admin-api'
+import { cx } from '../../lib/cx'
 import { formatDate, formatLastInspection, formatNumber } from '../../lib/format'
 import { roleLabels } from '../../lib/labels'
 
@@ -117,7 +118,10 @@ function ApiaryCard({ organizationId, apiary }: { organizationId: string; apiary
     <Link
       to={`/apicultores/${organizationId}/apiarios/${apiary.id}`}
       viewTransition
-      className={`${cardClass} flex h-full flex-col gap-1 p-5 transition-colors hover:border-primary/40 hover:bg-muted-surface/50`}
+      className={cx(
+        cardClass,
+        'flex h-full flex-col gap-1 p-5 transition-colors hover:border-primary/40 hover:bg-muted-surface/50',
+      )}
     >
       <span className="font-display text-lg font-semibold">{apiary.name}</span>
       <span className="text-sm">

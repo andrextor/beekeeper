@@ -117,14 +117,17 @@ export function FarmPicker({
                 if (event.key === 'ArrowDown') {
                   event.preventDefault()
                   setOpen(true)
-                  setActive((current) => Math.min(current + 1, rows.length - 1))
+                  setActive((current) => Math.min(current + 1, Math.max(rows.length - 1, 0)))
                 } else if (event.key === 'ArrowUp') {
                   event.preventDefault()
                   setActive((current) => Math.max(current - 1, 0))
                 } else if (event.key === 'Enter' && open && rows[active]) {
                   event.preventDefault()
                   pick(rows[active])
-                } else if (event.key === 'Escape') {
+                } else if (event.key === 'Escape' && open) {
+                  // Inside a dialog, Esc would also close the dialog and lose what was typed.
+                  event.preventDefault()
+                  event.stopPropagation()
                   setOpen(false)
                 }
               }}

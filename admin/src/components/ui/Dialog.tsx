@@ -30,7 +30,10 @@ export function Dialog({
   return (
     <dialog
       ref={dialog}
-      onClose={onClose}
+      // A close the parent asked for (open=false) already happened in its state; only Esc or X reach onClose.
+      onClose={() => {
+        if (open) onClose()
+      }}
       onCancel={(event) => {
         // Esc while the change runs would hide its result.
         if (busy) event.preventDefault()

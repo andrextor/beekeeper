@@ -22,7 +22,7 @@ export function Segmented<T extends string>({
           aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
           className={cx(
-            'min-h-11 rounded-control px-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:min-h-8',
+            'min-h-11 rounded-control px-3 text-sm font-medium transition-colors duration-150 md:min-h-8',
             option.value === value
               ? 'bg-surface text-text shadow-xs ring-1 ring-border'
               : 'text-muted hover:text-text',

@@ -54,7 +54,8 @@ function DetailsForm({ user, self }: { user: UserDetail; self: boolean }) {
   const [values, setValues] = useState(initial)
   const [errors, setErrors] = useState<DetailErrors>({})
   const nameChanged = values.name.trim() !== initial.name
-  const emailChanged = !self && values.email.trim() !== initial.email
+  // Auth stores emails lowercased; compare the same way so a saved email is not still "changed".
+  const emailChanged = !self && values.email.trim().toLowerCase() !== initial.email.toLowerCase()
 
   const save = useMutation({
     mutationFn: async () => {

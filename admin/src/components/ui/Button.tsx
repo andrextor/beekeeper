@@ -12,7 +12,7 @@ export const buttonVariants: Record<ButtonVariant, string> = {
   link: 'text-primary underline-offset-4 hover:underline',
 }
 
-const sizes = {
+export const buttonSizes = {
   // Touch targets stay at 44 px on phones; controls get denser from md up.
   sm: 'min-h-11 px-3 md:h-8 md:min-h-8',
   md: 'min-h-11 px-4 md:h-9 md:min-h-9',
@@ -20,11 +20,11 @@ const sizes = {
 }
 
 export const buttonBase =
-  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-control text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
+  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-control text-sm font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50'
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant
-  size?: keyof typeof sizes
+  size?: keyof typeof buttonSizes
   loading?: boolean
 }
 
@@ -43,7 +43,7 @@ export function Button({
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={cx(buttonBase, buttonVariants[variant], sizes[size], className)}
+      className={cx(buttonBase, buttonVariants[variant], buttonSizes[size], className)}
       {...props}
     >
       {loading && <LoaderCircle size={16} className="animate-spin" aria-hidden />}

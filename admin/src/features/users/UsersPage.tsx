@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { ShieldCheck, UserPlus, UserRound } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
-import { buttonBase, buttonVariants } from '../../components/ui/Button'
+import { buttonBase, buttonSizes, buttonVariants } from '../../components/ui/Button'
 import { type Column, DataTable, MobileCard } from '../../components/ui/DataTable'
 import { ListEmpty } from '../../components/ui/ListEmpty'
 import { Pagination } from '../../components/ui/Pagination'
@@ -109,7 +109,8 @@ export function UsersPage() {
           className={cx(
             buttonBase,
             buttonVariants.primary,
-            'min-h-11 self-start px-4 md:h-9 md:min-h-9 md:self-auto',
+            buttonSizes.md,
+            'self-start md:self-auto',
           )}
         >
           <UserPlus size={16} aria-hidden />
