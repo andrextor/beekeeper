@@ -111,8 +111,10 @@ After signing in: `rpc('my_memberships')`. No memberships → onboarding offers 
 |-------|---------|-------------|
 | `profiles` | `id`, `email`, `display_name`, `is_platform_admin`, `deactivated_at` (A7, set while the admin has the account deactivated), `created_at`, `updated_at` | Yourself, people who share an organization with you, platform admin |
 | `organizations` | `id`, `name`, `created_by`, `created_at`, `updated_at`, `deleted_at` | Members, platform admin |
-| `organization_members` | `organization_id`, `user_id`, `role` (`owner` \| `reviewer`), `created_at`, `updated_at` | Members, platform admin |
+| `organization_members` | `organization_id`, `user_id`, `role` (`owner` \| `reviewer` \| `viewer`), `created_at`, `updated_at` | Members, platform admin |
 | `organization_invites` | `id`, `organization_id`, `label`, `role`, `invited_by`, `created_at`, `expires_at`, `accepted_at`, `accepted_by`, `revoked_at` — **list these columns explicitly**: `select=*` is refused because `code_hash` is not readable | Owners, platform admin |
+
+**Roles** (B8): `owner` writes everything; `reviewer` records inspections, events, notes and photos and edits only their own; `viewer` ("Observador") reads the whole organization like any member and writes nothing (`42501`). Spanish labels: Propietario, Revisor, Observador. **BREAKING for installed apps:** `role`, `my_memberships()` and the members list can return `viewer`; an app that only knows two roles must be updated (M14) before anyone is given the role.
 
 Direct writes allowed: `profiles.display_name` (own row), `organizations.name` and `organizations.deleted_at` (owners). Everything else goes through the RPCs.
 
@@ -230,7 +232,7 @@ Table `inspections`. Common columns (`id`, `organization_id`, `created_by`, `cre
 
 Out-of-range values fail with `23514` on `inspections_<column>_check` (`inspections_varroa_check` for the varroa trio).
 
-**Who writes:** owners and reviewers insert; owners edit or soft-delete any inspection, reviewers only those they created (others' rows come back as `[]` on PATCH, `42501` on upsert). The platform admin reads only. Inspections by a member who has since left stay editable by the owner. `hive_id` cannot change. Soft-deleting an inspection soft-deletes its linked events and photos in the same write (they come back in the next pull with a new `updated_at`); restoring the inspection does not restore them.
+**Who writes:** owners and reviewers insert; owners edit or soft-delete any inspection, reviewers only those they created (others' rows come back as `[]` on PATCH, `42501` on upsert). Viewers (B8) read and write nothing: every insert or upsert is `42501`, every PATCH `[]`. The platform admin reads only. Inspections by a member who has since left stay editable by the owner. `hive_id` cannot change. Soft-deleting an inspection soft-deletes its linked events and photos in the same write (they come back in the next pull with a new `updated_at`); restoring the inspection does not restore them.
 
 ### Open tasks
 
@@ -325,7 +327,7 @@ Common columns plus:
 | `bytes` | integer | 1..5242880, size of the main file |
 | `caption` | text | ≤ 300 |
 
-Same write rules as inspections: members insert, the owner edits any, a reviewer only their own; soft delete keeps the files.
+Same write rules as inspections: owners and reviewers insert (viewers get `42501`, also on the Storage upload), the owner edits any, a reviewer only their own; soft delete keeps the files.
 
 ### Reading
 
@@ -361,7 +363,7 @@ const { data: rows } = await supabase.rpc('admin_list_organizations', { p_search
 | RPC | Does | Errors (`P0001` detail) |
 |-----|------|------------------------|
 | `admin_set_display_name(p_user_id, p_display_name)` | Renames (1–80) | `invalid_name`, `user_not_found` |
-| `admin_set_member_role(p_organization_id, p_user_id, p_role)` | owner ↔ reviewer | `invalid_role`, `organization_not_found`, `not_member`, `last_owner` |
+| `admin_set_member_role(p_organization_id, p_user_id, p_role)` | any of owner, reviewer, viewer | `invalid_role`, `organization_not_found`, `not_member`, `last_owner` |
 | `admin_add_member(p_organization_id, p_user_id, p_role)` | Adds to a live farm | `invalid_role`, `organization_not_found`, `user_not_found`, `already_member` |
 | `admin_remove_member(p_organization_id, p_user_id)` | Removes from a farm (history kept) | `organization_not_found`, `not_member`, `last_owner` |
 | `admin_set_platform_admin(p_user_id, p_value)` | Grants or removes the admin flag | `own_admin`, `last_admin`, `user_not_found` |
@@ -385,12 +387,12 @@ Only for platform admins; owners and reviewers are refused. `POST /functions/v1/
 
 | Field | Rule |
 |-------|------|
-| `kind` | `beekeeper` (account + new farm, as `owner`), `reviewer` (account + `reviewer` of an existing farm) or `admin` (account with `is_platform_admin`, no farm) |
+| `kind` | `beekeeper` (account + new farm, as `owner`), `reviewer` (account + `reviewer` of an existing farm), `viewer` (account + `viewer` of an existing farm, B8) or `admin` (account with `is_platform_admin`, no farm) |
 | `email` | valid, ≤ 254; stored lowercase |
 | `password` | at least 8 characters, at most 72 bytes (UTF-8) |
 | `display_name` | 1–80 |
 | `organization_name` | beekeeper only, 1–120 |
-| `organization_id` | reviewer only, a live organization |
+| `organization_id` | reviewer and viewer only, a live organization |
 
 Answers `200 { user_id, organization_id }` (`organization_id` null for an admin). Errors answer `{ error: code }`: `400` `invalid_body`, `invalid_kind`, `invalid_email`, `invalid_password`, `invalid_name`, `invalid_organization_name`, `invalid_organization`; `401` `not_signed_in`; `403` `not_platform_admin`; `404` `organization_not_found`; `409` `email_taken`; `500` `server_error`. The account is confirmed (no email is sent) and is deleted again if the farm step fails. The password is never echoed or logged.
 
