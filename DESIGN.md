@@ -45,9 +45,11 @@ Source: *Manual de Identidad Finca Landak 2025* (colors; its typeface, Arsenal, 
 | `--color-on-danger` | `#ffffff` | `#121511` (white on `#f97066` is 2.6:1) |
 | `--color-warning-bg` | `#fff4e0` | `#3a2f17` |
 | `--color-success-bg` | `#e7f4e4` | `#1c3317` |
-| `--color-glass` | `rgb(255 255 255 / .66)` | `rgb(29 34 27 / .6)` |
-| `--color-glass-field` | `rgb(255 255 255 / .55)` | `rgb(18 21 17 / .5)` |
-| `--color-glass-border` | `rgb(255 255 255 / .85)` | `rgb(255 255 255 / .07)` |
+| `--color-muted-surface` | `#f1f4ef` | `#21261f` (table header band, hovers, segmented track) |
+| `--color-input` | `#b7c2b4` | `#3d453a` (field borders) |
+| `--color-ring` | `primary` at 25 % | `primary` at 25 % (focus ring of fields and buttons) |
+| `--color-glass` | `rgb(255 255 255 / .66)` | `rgb(29 34 27 / .6)` (shell only) |
+| `--color-glass-border` | `rgb(255 255 255 / .85)` | `rgb(255 255 255 / .07)` (shell only) |
 
 Palette **"Bosque claro"** (chosen 2026-10-26 among five, after the deep-teal dark background was rejected as too heavy): green never fills a background, it marks actions and states; honey marks what is active or pending. `deep` stays a brand color but is no longer a surface.
 
@@ -82,15 +84,20 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 ## Layout
 
 - Mobile first (390 px), then 1024 and 1440. The admin is used mostly on a laptop but must work on a phone.
-- Shell: sidebar 248 px on ≥ `lg` (glass panel, `text` color, active item `accent` left bar on a 15 % `accent` tint); on smaller screens a glass top bar with a menu sheet. The deep-green sidebar was dropped on 2026-10-26: too heavy.
-- **Glass** (admin only; the app stays opaque for sun readability): the page background carries two soft glows (`sprout` top-left, `honey` bottom-right, 22/16 % light, 8/6 % dark); sidebar, top bar and cards use the `glass` utility (`--app-glass` translucent surface, 16 px blur, hairline `--app-glass-border`, soft shadow). With `prefers-reduced-transparency` it falls back to the solid `surface`. Every component follows it: secondary buttons are glass; ghost and icon buttons hover to `glass-field`; inputs and badges sit on `glass-field` (a lighter see-through fill, see `--color-glass-field`); badges keep a `glass-border` hairline, inputs a `--color-field-border` outline (`#7f8d83` / `#66705f`, ≥ 3:1 so the field is visible on glass); skeletons are `text` at 10 %. Primary and danger buttons stay solid: they are the actions.
+- Shell: sidebar 248 px on ≥ `lg` (glass panel; nav items `text-sm`, active item a `surface` pill with `shadow-xs` and a `primary` icon); on smaller screens a glass top bar with a menu sheet.
+- **Surfaces (A8, 2026-10-26):** cards, tables, dialogs and list items are **solid** `surface` + 1 px `border` + `shadow-xs`. **Glass** (16 px blur over the page's two soft glows) is kept only for the shell: sidebar and top bar. The look follows shadcn/ui, Linear and the Vercel dashboard; the earlier all-glass look read as washed out.
+- **Motion:** nothing moves on hover (no lift, scale or glow); hover changes color in 150 ms. Page enter animations and view transitions stay.
+- **Density:** from `md` up controls are 32 / 36 / 40 px (`sm` / `md` / `lg`), icon buttons 36 px, all `text-sm`; below `md` every control is 44 px.
 - Content max width 1200 px, gutter 16 px (mobile) / 32 px (desktop), 8-px spacing grid.
-- Radius: 8 px controls, 12 px cards. Shadow only on overlays and glass panels.
-- Tables become stacked cards below `md`.
+- Radius: 8 px controls, 12 px cards. Shadow `xs` on cards and controls, `lg` on dropdowns, `2xl` on dialogs.
+- **Tables** (from `md` up): bordered container, header band `muted-surface` in `text-xs` muted, 48 px rows split by 1 px dividers (no zebra), hover `muted-surface`, numbers right-aligned, a trailing chevron when the row opens a page. Pagination shows "1–25 de N" and Anterior / Siguiente.
+- **Tables below `md`** become `MobileCard`s: a solid card with the title line (name + badge), 2–3 muted lines, chevron when it links. Never horizontal scroll, never smaller text.
 
 ## Components (`admin/src/components/ui/`)
 
-`Button` (primary / secondary / ghost / danger, sizes sm/md, loading state), `IconButton`, `Input`, `SearchInput` (debounced 300 ms), `Badge` (tone = semantic token), `StatCard`, `Card`, `DataTable` (columns config, empty, loading skeleton, pagination), `Pagination`, `EmptyState` (icon + title + hint), `Skeleton`, `Timeline` (+ `TimelineItem`), `PhotoGrid` + `Lightbox`, `Toast`, `ErrorState` (Spanish message + retry).
+`Button` (primary / secondary / ghost / danger / link, sizes sm/md/lg, loading state), `IconButton` (ghost / secondary), `Input` (+ `Field`, `fieldClass`, `leading` / `trailing` slots), `Select` (native select + chevron), `SearchInput` (debounced 300 ms, search icon), `Segmented` (tabs: `muted-surface` track, pressed = `surface` pill), `Badge` (tone, optional `dot`, tinted fill + inset ring), `Card`, `SectionCard` (title, description, footer bar for actions: one save per form), `DataTable` + `MobileCard`, `Pagination`, `Dialog` (native dialog, header, footer bar) + `ConfirmDialog`, `EmptyState` (icon in a circle + title + hint), `Skeleton`, `ErrorState` (Spanish message + retry). Feature-level: the farm combobox (`FarmPicker`, search + dropdown, `exclude`). Gallery at `/_design`.
+
+**Forms:** one form, one `Guardar cambios` in the `SectionCard` footer, disabled until something changed, with `Descartar`. Rare or risky actions (a new password, adding to a farm) open a `Dialog` from a footer button instead of living open on the page.
 
 ## Standing rules
 
@@ -98,5 +105,5 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 2. Every list names its source column and shows an empty state, a loading skeleton and an error state.
 3. Dates in Spanish (`Intl.DateTimeFormat('es-CO')`), relative for < 7 days ("hace 3 días"), absolute otherwise; times in the browser's zone.
 4. Numbers with `Intl.NumberFormat('es-CO')`.
-5. Focus visible on every interactive element (2 px `--app-focus` ring + 2 px offset: `leaf` by day, `honey` by night, both ≥ 3:1 against the page); touch targets ≥ 44 px.
+5. Focus visible on every interactive element: fields and buttons show a 3 px `ring` (fields also turn their border `primary`); everything else the 2 px `--app-focus` outline + 2 px offset (`leaf` by day, `honey` by night, ≥ 3:1). Touch targets ≥ 44 px below `md`.
 6. Copy is Spanish, short, and never blames the user.
