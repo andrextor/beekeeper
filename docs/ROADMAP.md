@@ -21,6 +21,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 | B6 | Platform admin read API | `specs/2026-10-25-backend-06-admin-api-design.md` | `plans/ok-2026-10-25-backend-06-admin-api.md` | 0.6.0 |
 | B7 | Contract gaps found by the mobile specs (tombstones, deleted organizations, `deactivated_at`) | `specs/2026-10-25-backend-07-api-gaps-design.md` | `plans/ok-2026-10-25-backend-07-api-gaps.md` | 0.15.1 |
 | B8 | Read-only role "Observador" (`viewer`) for owners, admin and invites | `specs/2026-10-26-backend-08-viewer-role-design.md` | `plans/ok-2026-10-26-backend-08-viewer-role.md` | 0.17.0 |
+| — | Invite codes last 30 days | — | `plans/ok-2026-10-26-invite-30-days.md` | 0.19.0 |
 
 ## Phase 2 — Admin panel (`beekeeper/admin`)
 
@@ -55,5 +56,5 @@ See `beekeeper-mobile/docs/ROADMAP.md` (M1 scaffold … M12 APK distribution).
 1. A reviewer inspects existing hives; only the owner creates or edits apiaries and hives.
 2. ~~No pure read-only role in V1~~ → **`viewer` ("Observador") reads everything and writes nothing** (Iván, 2026-10-26, B8; the app learns it in M14).
 3. A reviewer sees every apiary of the organization (no per-apiary assignment in V1).
-4. ~~Sign-in by email one-time code~~ → **email + password, no emails sent; reviewers join with a single-use invite code** (Iván, 2026-10-25: there is no domain to send email from). Google sign-in later.
+4. ~~Sign-in by email one-time code~~ → **email + password, no emails sent; reviewers join with a single-use invite code** (Iván, 2026-10-25: there is no domain to send email from). Codes last 30 days (Iván, 2026-10-26; were 7). Google sign-in later.
 5. No `farms` table: an apiary carries an optional `farm_name`.

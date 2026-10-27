@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-10-26
+
+### Changed
+
+- Invite codes last 30 days instead of 7 (`create_invite`); codes already issued keep their date. The app already shows the server's `expires_at`, so it needs no change. The manual says 30 days.
+
 ## [0.18.1] - 2026-10-26
 
 ### Fixed

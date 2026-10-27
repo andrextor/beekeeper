@@ -1,6 +1,6 @@
 begin;
 \ir _helpers.psql
-select plan(19);
+select plan(20);
 
 select tests.create_user('owner@landak.test') as owner_id \gset
 select tests.create_user('reviewer@landak.test') as reviewer_id \gset
@@ -32,6 +32,11 @@ select throws_ok(
 select code as revoked_code, invite_id as revoked_id from public.create_invite(:'org', 'reviewer') \gset
 select public.revoke_invite(:'revoked_id');
 select code as expired_code, invite_id as expired_id from public.create_invite(:'org', 'reviewer') \gset
+select ok(
+  (select expires_at from public.organization_invites where id = :'expired_id')
+    between now() + interval '29 days' and now() + interval '31 days',
+  'a new code lasts 30 days'
+);
 select code as owner_code from public.create_invite(:'org', 'owner') \gset
 
 select tests.clear_authentication();
