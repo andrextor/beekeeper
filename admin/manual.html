@@ -71,6 +71,8 @@ a { color: var(--accent); text-underline-offset: 3px; }
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
+footer .wrap { padding-block: 24px 40px; color: var(--muted); font-size: 0.88rem; display: grid; gap: 6px; }
+
 /* Hero */
 .hero {
   position: relative;
@@ -214,6 +216,12 @@ td.n { color: var(--muted); }
   background: var(--soft); border: 1px solid var(--line); font-size: 0.84rem;
 }
 
+/* Events */
+.events { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.event { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 2px; }
+.event b { font: 700 0.95rem/1.3 var(--display); }
+.event span { font-size: 0.84rem; color: var(--muted); }
+
 /* Voice example */
 .quote {
   font: 600 1.05rem/1.5 var(--display); padding: 16px 18px; border-radius: 14px;
@@ -230,12 +238,6 @@ td.n { color: var(--muted); }
 .state .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; margin-right: 6px; }
 .state h3 { font-size: 0.95rem; display: flex; align-items: center; }
 .state p { font-size: 0.88rem; color: var(--muted); }
-
-/* Events */
-.events { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-.event { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 2px; }
-.event b { font: 700 0.95rem/1.3 var(--display); }
-.event span { font-size: 0.84rem; color: var(--muted); }
 
 /* Queen colors */
 .queens { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
@@ -274,7 +276,6 @@ details > div { padding: 0 16px 16px; color: var(--muted); display: grid; gap: 8
 .admin ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 6px; }
 
 footer { border-top: 1px solid var(--line); }
-footer .wrap { padding-block: 24px 40px; color: var(--muted); font-size: 0.88rem; display: grid; gap: 6px; }
 
 @media (min-width: 720px) {
   .hero .wrap { padding-block: 72px 64px; }
@@ -287,7 +288,7 @@ footer .wrap { padding-block: 24px 40px; color: var(--muted); font-size: 0.88rem
   <div class="wrap">
     <div class="brand">
       <span class="mark" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 2 20.5 7v10L12 22 3.5 17V7z"/></svg>
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 2 20.5 7v10L12 22 3.5 17V7z"/></svg>
       </span>
       Landak Apiario
     </div>
@@ -420,32 +421,32 @@ footer .wrap { padding-block: 24px 40px; color: var(--muted); font-size: 0.88rem
     </div>
     <div class="phone" aria-hidden="true">
       <div class="tabbar">
-        <div class="tab on"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span>Inicio</div>
-        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Apiarios</div>
-        <div class="tab scan"><span class="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></span>Escanear</div>
-        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 7a4.5 4.5 0 0 1 .5 8.97"/><path d="M12 12v8M9 15l3-3 3 3"/></svg>Pendientes</div>
-        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</div>
+        <div class="tab on"><span class="pill"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span>Inicio</div>
+        <div class="tab"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Apiarios</div>
+        <div class="tab scan"><span class="fab"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></span>Escanear</div>
+        <div class="tab"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 7a4.5 4.5 0 0 1 .5 8.97"/><path d="M12 12v8M9 15l3-3 3 3"/></svg>Pendientes</div>
+        <div class="tab"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</div>
       </div>
     </div>
     <div class="tabs-explain">
       <div class="card">
-        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span>
+        <span class="hexicon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span>
         <div><h3>Inicio</h3><p class="lead">Lo que pide atención: colmenas <strong>Para revisar</strong>, <strong>Tareas</strong> pendientes (como alimentar) y la <strong>Última actividad</strong> de la finca.</p></div>
       </div>
       <div class="card">
-        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+        <span class="hexicon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
         <div><h3>Apiarios</h3><p class="lead">Tus apiarios y, dentro de cada uno, sus colmenas. Desde aquí el propietario crea y edita.</p></div>
       </div>
       <div class="card">
-        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></span>
+        <span class="hexicon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></span>
         <div><h3>Escanear</h3><p class="lead">Apunta a la etiqueta de la colmena y se abre su ficha. Funciona sin señal y tiene linterna.</p></div>
       </div>
       <div class="card">
-        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 7a4.5 4.5 0 0 1 .5 8.97"/><path d="M12 12v8M9 15l3-3 3 3"/></svg></span>
+        <span class="hexicon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 7a4.5 4.5 0 0 1 .5 8.97"/><path d="M12 12v8M9 15l3-3 3 3"/></svg></span>
         <div><h3>Pendientes</h3><p class="lead">Qué falta por subir al servidor y si algo necesita tu ayuda. Si dice <strong>Sincronizado</strong>, todo está a salvo.</p></div>
       </div>
       <div class="card">
-        <span class="hexicon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+        <span class="hexicon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
         <div><h3>Perfil</h3><p class="lead">Tu cuenta, cambiar de finca, personas de la finca, cómo subir fotos y cerrar sesión.</p></div>
       </div>
     </div>
@@ -550,7 +551,7 @@ footer .wrap { padding-block: 24px 40px; color: var(--muted); font-size: 0.88rem
       <p class="lead">En la revisión toca <span class="tap">Dictar</span> y habla normal. La app convierte lo que dices en campos y te los muestra para que confirmes. Nada se guarda sin que lo aceptes.</p>
     </div>
     <p class="quote">"La reina no se vio, hay buena postura, tres cuadros de cría, reservas bajas. Alimentar y revisar en ocho días."</p>
-    <div class="proposals" aria-label="Lo que propone la app">
+    <div class="proposals" role="group" aria-label="Lo que propone la app">
       <span class="chip"><b>Reina vista</b>No</span>
       <span class="chip"><b>Postura</b>Buena</span>
       <span class="chip"><b>Cuadros de cría</b>3</span>
