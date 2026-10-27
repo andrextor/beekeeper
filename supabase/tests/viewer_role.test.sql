@@ -23,8 +23,8 @@ insert into public.apiaries (id, organization_id, name) values (:'apiary_a', :'o
 insert into public.hives (id, organization_id, apiary_id, name, qr_code) values (:'hive_a', :'org_a', :'apiary_a', 'C-01', 'AAAAAAAAAA');
 insert into public.inspections (id, organization_id, hive_id, inspected_at, source, population_strength)
 values (:'insp_owner', :'org_a', :'hive_a', now(), 'manual', 4);
-insert into public.hive_events (organization_id, hive_id, type, occurred_at, details)
-values (:'org_a', :'hive_a', 'note', now(), '{"text": "Piquera limpia", "source": "text"}');
+insert into public.hive_events (id, organization_id, hive_id, type, occurred_at, details)
+values (gen_random_uuid(), :'org_a', :'hive_a', 'note', now(), '{"text": "Piquera limpia", "source": "text"}');
 insert into public.photos (id, organization_id, hive_id, storage_path, taken_at)
 values (:'photo_owner', :'org_a', :'hive_a', format('%s/%s/%s.jpg', :'org_a', :'hive_a', :'photo_owner'), now());
 
@@ -53,7 +53,7 @@ select throws_ok(
   '42501', null, 'a viewer cannot record an inspection'
 );
 select throws_ok(
-  format('insert into public.hive_events (organization_id, hive_id, type, occurred_at, details) values (%L, %L, %L, now(), %L)', :'org_a', :'hive_a', 'note', '{"text": "Hola", "source": "text"}'),
+  format('insert into public.hive_events (id, organization_id, hive_id, type, occurred_at, details) values (%L, %L, %L, %L, now(), %L)', gen_random_uuid(), :'org_a', :'hive_a', 'note', '{"text": "Hola", "source": "text"}'),
   '42501', null, 'nor a note or event'
 );
 select throws_ok(
