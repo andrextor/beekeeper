@@ -22,7 +22,7 @@ const messages: Record<string, string> = {
   user_not_found: 'Esa cuenta ya no existe.',
   not_member: 'Esa persona ya no pertenece a la finca.',
   already_member: 'Ya pertenece a esa finca.',
-  last_owner: 'La finca debe tener al menos un propietario.',
+  last_owner: 'Es el único propietario de una finca. Primero haz propietario a otra persona.',
   last_admin: 'Debe quedar al menos un administrador activo.',
   own_admin: 'No puedes quitarte tu propio permiso de administrador.',
   own_account: 'No puedes desactivar tu propia cuenta.',

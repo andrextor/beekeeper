@@ -1,8 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Eye, EyeOff } from 'lucide-react'
+import { Check, Eye, EyeOff, KeyRound } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Button } from '../../components/ui/Button'
-import { Card } from '../../components/ui/Card'
+import { SectionCard } from '../../components/ui/Card'
+import { Dialog } from '../../components/ui/Dialog'
 import { IconButton } from '../../components/ui/IconButton'
 import { Input } from '../../components/ui/Input'
 import { QueryError } from '../../components/ui/QueryError'
@@ -17,7 +18,7 @@ import {
 } from '../../lib/manage-user'
 import { useSession } from '../../lib/session'
 
-function NameForm({ userId, initial }: { userId: string; initial: string }) {
+function NameForm({ userId, email, initial }: { userId: string; email: string; initial: string }) {
   const refresh = useRefreshAccounts()
   const [name, setName] = useState(initial)
   const [invalid, setInvalid] = useState<string>()
@@ -25,6 +26,7 @@ function NameForm({ userId, initial }: { userId: string; initial: string }) {
     mutationFn: (value: string) => updateOwnName(userId, value),
     onSuccess: refresh,
   })
+  const dirty = name.trim() !== initial
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const found = nameError(name)
@@ -32,21 +34,54 @@ function NameForm({ userId, initial }: { userId: string; initial: string }) {
     if (!found) save.mutate(name)
   }
   return (
-    <form onSubmit={submit} noValidate className="flex max-w-md flex-col gap-3">
-      <Input
-        label="Nombre"
-        autoComplete="name"
-        value={name}
-        onChange={(event) => {
-          setName(event.target.value)
-          save.reset()
-        }}
-        error={invalid ?? (save.isError ? manageErrorMessage(save.error) : undefined)}
-        hint={save.isSuccess ? 'Guardado.' : undefined}
-      />
-      <Button type="submit" variant="secondary" loading={save.isPending} className="self-start">
-        Guardar
-      </Button>
+    <form onSubmit={submit} noValidate>
+      <SectionCard
+        title="Datos"
+        footer={
+          <>
+            {save.isSuccess && !dirty && (
+              <span className="mr-auto flex items-center gap-1.5 text-sm text-muted">
+                <Check size={16} className="text-primary" aria-hidden />
+                Cambios guardados.
+              </span>
+            )}
+            <Button
+              variant="ghost"
+              disabled={!dirty || save.isPending}
+              onClick={() => {
+                setName(initial)
+                setInvalid(undefined)
+                save.reset()
+              }}
+            >
+              Descartar
+            </Button>
+            <Button type="submit" disabled={!dirty} loading={save.isPending}>
+              Guardar cambios
+            </Button>
+          </>
+        }
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <Input
+            label="Nombre"
+            autoComplete="name"
+            value={name}
+            onChange={(event) => {
+              setName(event.target.value)
+              save.reset()
+            }}
+            error={invalid ?? (save.isError ? manageErrorMessage(save.error) : undefined)}
+          />
+          <Input
+            label="Correo"
+            value={email}
+            disabled
+            readOnly
+            hint="Otro administrador puede cambiarlo."
+          />
+        </div>
+      </SectionCard>
     </form>
   )
 }
@@ -55,11 +90,12 @@ const emptyPasswords = { current: '', next: '', repeat: '' }
 
 function PasswordForm({ email }: { email: string }) {
   const [fields, setFields] = useState(emptyPasswords)
+  const [open, setOpen] = useState(false)
   const [shown, setShown] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<keyof typeof emptyPasswords, string>>>({})
   const change = useMutation({
     mutationFn: () => changeOwnPassword(email, fields.current, fields.next),
-    onSuccess: () => setFields(emptyPasswords),
+    onSuccess: () => setOpen(false),
   })
 
   const submit = (event: FormEvent) => {
@@ -87,29 +123,71 @@ function PasswordForm({ email }: { email: string }) {
     />
   )
 
+  const start = () => {
+    setFields(emptyPasswords)
+    setErrors({})
+    change.reset()
+    setOpen(true)
+  }
+  const close = () => setOpen(false)
+
   return (
-    <form onSubmit={submit} noValidate className="flex max-w-md flex-col gap-3">
-      {field('current', 'Contraseña actual', 'current-password')}
-      {field('next', 'Contraseña nueva', 'new-password')}
-      {field('repeat', 'Repite la contraseña nueva', 'new-password')}
-      <span className="flex items-center gap-2 text-sm text-muted">
-        <IconButton
-          icon={shown ? EyeOff : Eye}
-          label={shown ? 'Ocultar contraseñas' : 'Mostrar contraseñas'}
-          onClick={() => setShown((current) => !current)}
-        />
-        {shown ? 'Ocultar' : 'Mostrar'}
-      </span>
-      {change.isError && (
-        <p role="alert" className="text-sm text-danger">
-          {manageErrorMessage(change.error)}
-        </p>
-      )}
-      {change.isSuccess && <p className="text-sm">Contraseña cambiada.</p>}
-      <Button type="submit" loading={change.isPending} className="self-start">
-        Cambiar contraseña
-      </Button>
-    </form>
+    <>
+      <SectionCard
+        title="Contraseña"
+        description={
+          change.isSuccess ? (
+            <span className="flex items-center gap-1.5">
+              <Check size={16} className="text-primary" aria-hidden />
+              Contraseña cambiada.
+            </span>
+          ) : (
+            'Te pedimos la actual antes de cambiarla.'
+          )
+        }
+        footer={
+          <Button variant="secondary" onClick={start}>
+            <KeyRound size={16} aria-hidden />
+            Cambiar contraseña
+          </Button>
+        }
+      />
+      <Dialog
+        open={open}
+        title="Cambiar contraseña"
+        busy={change.isPending}
+        onClose={close}
+        footer={
+          <>
+            <Button variant="secondary" onClick={close} disabled={change.isPending}>
+              Cancelar
+            </Button>
+            <Button type="submit" form="own-password-form" loading={change.isPending}>
+              Cambiar contraseña
+            </Button>
+          </>
+        }
+      >
+        <form id="own-password-form" onSubmit={submit} noValidate className="flex flex-col gap-3">
+          {field('current', 'Contraseña actual', 'current-password')}
+          {field('next', 'Contraseña nueva', 'new-password')}
+          {field('repeat', 'Repite la contraseña nueva', 'new-password')}
+          <span className="flex items-center gap-2 text-sm text-muted">
+            <IconButton
+              icon={shown ? EyeOff : Eye}
+              label={shown ? 'Ocultar contraseñas' : 'Mostrar contraseñas'}
+              onClick={() => setShown((current) => !current)}
+            />
+            {shown ? 'Ocultar' : 'Mostrar'}
+          </span>
+          {change.isError && (
+            <p role="alert" className="text-sm text-danger">
+              {manageErrorMessage(change.error)}
+            </p>
+          )}
+        </form>
+      </Dialog>
+    </>
   )
 }
 
@@ -120,25 +198,19 @@ export function AccountPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold">Mi cuenta</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Mi cuenta</h1>
       {profile.isError ? (
         <QueryError error={profile.error} onRetry={() => profile.refetch()} />
       ) : !profile.data ? (
         <Skeleton className="h-40" />
       ) : (
         <>
-          <Card className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold">Datos</h2>
-            <p className="text-sm text-muted">
-              Correo <span className="text-text">{profile.data.email}</span>. Otro administrador
-              puede cambiarlo.
-            </p>
-            <NameForm userId={userId} initial={profile.data.displayName ?? ''} />
-          </Card>
-          <Card className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold">Contraseña</h2>
-            <PasswordForm email={profile.data.email} />
-          </Card>
+          <NameForm
+            userId={userId}
+            email={profile.data.email}
+            initial={profile.data.displayName ?? ''}
+          />
+          <PasswordForm email={profile.data.email} />
         </>
       )}
     </div>
