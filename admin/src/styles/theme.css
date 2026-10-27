@@ -121,8 +121,13 @@
   --app-glass-shadow: 0 8px 32px rgb(24 33 26 / 0.07);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 10%, transparent);
   --app-glow-honey: color-mix(in srgb, var(--color-honey) 8%, transparent);
-  --app-honeycomb: color-mix(in srgb, var(--color-honey) 45%, transparent);
-  --app-honeycomb-glow: color-mix(in srgb, var(--color-honey) 85%, transparent);
+  /* Plain honey vanishes on the cream page; a darker amber (honey + stone-700) keeps the cells visible. */
+  --app-honeycomb: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--color-honey) 65%, var(--color-stone-700)) 30%,
+    transparent
+  );
+  --app-honeycomb-glow: color-mix(in srgb, var(--color-honey) 70%, var(--color-stone-700));
 }
 
 /* src/lib/theme.ts resolves "system" to light or dark, so the dark tokens live in one block. */
