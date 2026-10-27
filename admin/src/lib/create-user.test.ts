@@ -59,10 +59,21 @@ describe('validateCreateUser', () => {
     ).toBeDefined()
   })
 
-  it('asks a reviewer for a farm', () => {
+  it('asks a reviewer or a viewer for a farm', () => {
     expect(validateCreateUser({ ...beekeeper, kind: 'reviewer' }).organizationId).toBe(
       'Elige la finca.',
     )
+    expect(validateCreateUser({ ...beekeeper, kind: 'viewer' }).organizationId).toBe(
+      'Elige la finca.',
+    )
+    expect(
+      validateCreateUser({
+        ...beekeeper,
+        kind: 'viewer',
+        organizationName: '',
+        organizationId: 'x',
+      }),
+    ).toEqual({})
   })
 })
 

@@ -30,7 +30,7 @@ export type OrganizationRow = Omit<GeneratedOrganization, 'deleted_at' | 'last_i
   last_inspection_at: string | null
 }
 
-export type Role = 'owner' | 'reviewer'
+export type Role = 'owner' | 'reviewer' | 'viewer'
 
 export type Membership = {
   id: string
@@ -63,7 +63,7 @@ function isNullableString(value: unknown): value is string | null {
 }
 
 export function isRole(value: unknown): value is Role {
-  return value === 'owner' || value === 'reviewer'
+  return value === 'owner' || value === 'reviewer' || value === 'viewer'
 }
 
 function isMembership(value: unknown): value is Membership {

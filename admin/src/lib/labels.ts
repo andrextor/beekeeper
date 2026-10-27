@@ -46,7 +46,11 @@ export const hiveStatusLabels = {
 export const roleLabels = {
   owner: 'Propietario',
   reviewer: 'Revisor',
+  viewer: 'Observador',
 } as const
+
+/** Badge tones per role (assignable to BadgeTone): owners stand out, viewers read as "only looking". */
+export const roleTones = { owner: 'primary', reviewer: 'neutral', viewer: 'warning' } as const
 
 export const inspectionSourceLabels = { manual: 'Manual', voice: 'Por voz' } as const
 

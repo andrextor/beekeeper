@@ -20,7 +20,7 @@ import {
 } from '../../lib/admin-api'
 import { cx } from '../../lib/cx'
 import { formatDate, formatLastInspection, formatNumber } from '../../lib/format'
-import { roleLabels } from '../../lib/labels'
+import { roleLabels, roleTones } from '../../lib/labels'
 
 type Tab = 'apiarios' | 'personas'
 
@@ -30,7 +30,7 @@ const tabs: ReadonlyArray<{ value: Tab; label: string }> = [
 ]
 
 function RoleBadge({ role }: { role: Member['role'] }) {
-  return <Badge tone={role === 'owner' ? 'primary' : 'neutral'}>{roleLabels[role]}</Badge>
+  return <Badge tone={roleTones[role]}>{roleLabels[role]}</Badge>
 }
 
 function MemberEmail({ row }: { row: Member }) {

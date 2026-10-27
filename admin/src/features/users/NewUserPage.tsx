@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { ShieldAlert } from 'lucide-react'
+import { Eye, ShieldAlert } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs'
@@ -14,6 +14,7 @@ import {
   type CreateUserForm,
   createUser,
   createUserErrorMessage,
+  joinsFarm,
   type UserKind,
   validateCreateUser,
 } from '../../lib/create-user'
@@ -23,12 +24,14 @@ import { CopyField, FarmPicker, PasswordField } from './fields'
 const kindParams: Readonly<Record<UserKind, string>> = {
   beekeeper: 'apicultor',
   reviewer: 'revisor',
+  viewer: 'observador',
   admin: 'admin',
 }
 
 const kinds: ReadonlyArray<{ value: UserKind; label: string }> = [
   { value: 'beekeeper', label: 'Apicultor' },
   { value: 'reviewer', label: 'Revisor' },
+  { value: 'viewer', label: 'Observador' },
   { value: 'admin', label: 'Admin' },
 ]
 
@@ -159,8 +162,14 @@ export function NewUserPage() {
                 error={errors.organizationName}
               />
             )}
-            {kind === 'reviewer' && (
+            {joinsFarm(kind) && (
               <FarmPicker value={farm} onChange={setFarm} error={errors.organizationId} />
+            )}
+            {kind === 'viewer' && (
+              <p className="flex gap-2 rounded-control bg-muted-surface p-3 text-sm">
+                <Eye size={20} className="shrink-0 text-muted" aria-hidden />
+                Verá las colmenas, revisiones, visitas y fotos de la finca, sin poder cambiar nada.
+              </p>
             )}
             {kind === 'admin' && (
               <p className="flex gap-2 rounded-control bg-warning-bg p-3 text-sm">

@@ -16,12 +16,15 @@ export function Field({
   label,
   hint,
   error,
+  hideLabel = false,
   className,
   children,
 }: {
   label: string
   hint?: string
   error?: string
+  /** Keep the label for screen readers only, where the row already says what the control is. */
+  hideLabel?: boolean
   className?: string
   children: (control: { id: string; describedBy: string | undefined }) => ReactNode
 }) {
@@ -29,7 +32,7 @@ export function Field({
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined
   return (
     <div className={cx('flex flex-col gap-1.5', className)}>
-      <label htmlFor={id} className="text-sm font-medium">
+      <label htmlFor={id} className={hideLabel ? 'sr-only' : 'text-sm font-medium'}>
         {label}
       </label>
       {children({ id, describedBy })}

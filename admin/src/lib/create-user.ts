@@ -1,6 +1,11 @@
 import { AdminError, adminErrorMessage, invokeAdminFunction } from './admin-errors'
 
-export type UserKind = 'beekeeper' | 'reviewer' | 'admin'
+export type UserKind = 'beekeeper' | 'reviewer' | 'viewer' | 'admin'
+
+/** Kinds that join an existing farm instead of creating one. */
+export function joinsFarm(kind: UserKind): boolean {
+  return kind === 'reviewer' || kind === 'viewer'
+}
 
 export type CreateUserForm = {
   kind: UserKind
@@ -58,7 +63,7 @@ export function validateCreateUser(form: CreateUserForm): Partial<Record<CreateU
       errors.organizationName = 'Escribe el nombre de la finca (hasta 120 caracteres).'
     }
   }
-  if (form.kind === 'reviewer' && !form.organizationId) errors.organizationId = 'Elige la finca.'
+  if (joinsFarm(form.kind) && !form.organizationId) errors.organizationId = 'Elige la finca.'
   return errors
 }
 
@@ -90,7 +95,7 @@ export async function createUser(form: CreateUserForm): Promise<CreatedUser> {
     email: form.email.trim(),
     password: form.password,
     organization_name: form.kind === 'beekeeper' ? form.organizationName.trim() : undefined,
-    organization_id: form.kind === 'reviewer' ? form.organizationId : undefined,
+    organization_id: joinsFarm(form.kind) ? form.organizationId : undefined,
   })
   if (typeof data.user_id !== 'string') throw new AdminError('server_error')
   return {
