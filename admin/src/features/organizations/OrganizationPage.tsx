@@ -120,7 +120,7 @@ function ApiaryCard({ organizationId, apiary }: { organizationId: string; apiary
       viewTransition
       className={cx(
         cardClass,
-        'flex h-full flex-col gap-1 p-5 transition-colors hover:border-primary/40 hover:bg-muted-surface/50',
+        'flex h-full flex-col gap-1 p-5 transition-colors hover:border-primary/40 hover:bg-muted-surface',
       )}
     >
       <span className="font-display text-lg font-semibold">{apiary.name}</span>
