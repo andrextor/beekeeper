@@ -32,11 +32,11 @@ Source: *Manual de Identidad Finca Landak 2025* (colors; its typeface, Arsenal, 
 
 | Token | Light | Dark |
 |-------|-------|------|
-| `--color-bg` | `#f4f7f2` (soft sage) | `#121511` (olive black) |
+| `--color-bg` | `stone-50` `#fafaf7` (warm stone, the app's `bg-soft`) | `#121511` (olive black) |
 | `--color-surface` | `#ffffff` | `#1a1e18` |
-| `--color-border` | `#dfe7dc` | `#242a22` |
-| `--color-text` | `#18211a` | `#eaeee7` |
-| `--color-text-muted` | `#617065` (5:1 on bg) | `#9aa595` |
+| `--color-border` | `stone-200` `#e4e2da` | `#242a22` |
+| `--color-text` | `stone-900` `#1f1d19` | `#eaeee7` |
+| `--color-text-muted` | `#6b675d` (5:1 on bg) | `#9aa595` |
 | `--color-primary` | `leaf` | `sprout` |
 | `--color-on-primary` | `#ffffff` | `#121511` |
 | `--color-accent` | `honey` | `honey` |
@@ -45,13 +45,13 @@ Source: *Manual de Identidad Finca Landak 2025* (colors; its typeface, Arsenal, 
 | `--color-on-danger` | `#ffffff` | `#121511` (white on `#f97066` is 2.6:1) |
 | `--color-warning-bg` | `#fff4e0` | `#3a2f17` |
 | `--color-success-bg` | `#e7f4e4` | `#1c3317` |
-| `--color-muted-surface` | `#f1f4ef` | `#21261f` (table header band, hovers, segmented track) |
-| `--color-input` | `#b7c2b4` | `#3d453a` (field borders) |
-| `--color-ring` | `primary` at 25 % | `primary` at 25 % (focus ring of fields and buttons) |
+| `--color-muted-surface` | `stone-100` `#f2f1ec` | `#21261f` (table header band, hovers, segmented track) |
+| `--color-input` | `#949085` | `#646d5f` (field borders, ≥ 3:1 on surface) |
+| `--color-ring` | `primary` at 25 % | `primary` at 25 % (soft halo around a focused field, on top of its `primary` border) |
 | `--color-glass` | `rgb(255 255 255 / .66)` | `rgb(29 34 27 / .6)` (shell only) |
 | `--color-glass-border` | `rgb(255 255 255 / .85)` | `rgb(255 255 255 / .07)` (shell only) |
 
-Palette **"Bosque claro"** (chosen 2026-10-26 among five, after the deep-teal dark background was rejected as too heavy): green never fills a background, it marks actions and states; honey marks what is active or pending. `deep` stays a brand color but is no longer a surface.
+Palette **"Bosque claro"** (chosen 2026-10-26 among five, after the deep-teal dark background was rejected as too heavy; on 2026-10-26 the light page moved from sage to the app's warm stone, with the page glows halved, so admin and app read as one product): green never fills a background, it marks actions and states; honey marks what is active or pending. `deep` stays a brand color but is no longer a surface.
 
 ### Record states (shared vocabulary with the app)
 
@@ -105,5 +105,5 @@ Tokens live in `admin/src/styles/theme.css` under `@theme` (brand + stone scales
 2. Every list names its source column and shows an empty state, a loading skeleton and an error state.
 3. Dates in Spanish (`Intl.DateTimeFormat('es-CO')`), relative for < 7 days ("hace 3 días"), absolute otherwise; times in the browser's zone.
 4. Numbers with `Intl.NumberFormat('es-CO')`.
-5. Focus visible on every interactive element: fields and buttons show a 3 px `ring` (fields also turn their border `primary`); everything else the 2 px `--app-focus` outline + 2 px offset (`leaf` by day, `honey` by night, ≥ 3:1). Touch targets ≥ 44 px below `md`.
+5. Focus visible on every interactive element: the 2 px `--app-focus` outline + 2 px offset (`leaf` by day, `honey` by night, ≥ 3:1); fields instead turn their border `primary` with a soft 3 px `ring`. Touch targets ≥ 44 px below `md`.
 6. Copy is Spanish, short, and never blames the user.

@@ -95,11 +95,12 @@
 :root {
   color-scheme: light;
   /* Palette "Bosque claro" (2026-10-26): soft sage by day, olive black by night; green only for actions. */
-  --app-bg: #f4f7f2;
+  /* Warm stone like the app (bg-soft = stone-50), so both products feel like one. */
+  --app-bg: var(--color-stone-50);
   --app-surface: #ffffff;
-  --app-border: #dfe7dc;
-  --app-text: #18211a;
-  --app-text-muted: #617065;
+  --app-border: var(--color-stone-200);
+  --app-text: var(--color-stone-900);
+  --app-text-muted: #6b675d;
   --app-primary: var(--color-leaf);
   --app-on-primary: #ffffff;
   --app-accent: var(--color-honey);
@@ -112,13 +113,14 @@
   --app-glass: rgb(255 255 255 / 0.66);
   --app-glass-border: rgb(255 255 255 / 0.85);
   /* Solid surfaces (A8): header bands and hovers, field borders, the soft focus ring. */
-  --app-muted-surface: #f1f4ef;
-  --app-input: #b7c2b4;
+  --app-muted-surface: var(--color-stone-100);
+  /* Field outlines keep 3:1 against white (WCAG 1.4.11). */
+  --app-input: #949085;
   --app-ring: color-mix(in srgb, var(--app-primary) 25%, transparent);
   --app-focus: var(--color-leaf);
   --app-glass-shadow: 0 8px 32px rgb(24 33 26 / 0.07);
-  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 22%, transparent);
-  --app-glow-honey: color-mix(in srgb, var(--color-honey) 16%, transparent);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 10%, transparent);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 8%, transparent);
 }
 
 /* src/lib/theme.ts resolves "system" to light or dark, so the dark tokens live in one block. */
@@ -139,11 +141,11 @@
   --app-glass: rgb(29 34 27 / 0.6);
   --app-glass-border: rgb(255 255 255 / 0.07);
   --app-muted-surface: #21261f;
-  --app-input: #3d453a;
+  --app-input: #646d5f;
   --app-focus: var(--color-honey);
   --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
-  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 8%, transparent);
-  --app-glow-honey: color-mix(in srgb, var(--color-honey) 6%, transparent);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 5%, transparent);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 4%, transparent);
 }
 
 /* Children enter one after another; put it on a list or a form. */
@@ -231,7 +233,7 @@
     --app-glass: #ffffff;
     --app-glass-border: #d0d5cf;
     --app-muted-surface: #f4f5f3;
-    --app-input: #b7c2b4;
+    --app-input: #949085;
     --app-glass-shadow: none;
   }
 
