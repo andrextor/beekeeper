@@ -89,6 +89,9 @@
   --color-glass-field: var(--app-glass-field);
   --color-glass-border: var(--app-glass-border);
   --color-field-border: var(--app-field-border);
+  --color-muted-surface: var(--app-muted-surface);
+  --color-input: var(--app-input);
+  --color-ring: var(--app-ring);
 }
 
 :root {
@@ -114,6 +117,10 @@
   --app-glass-field: rgb(255 255 255 / 0.55);
   /* Field outlines and the focus ring need 3:1 against the glass (WCAG 1.4.11); honey on sage is 1.7:1. */
   --app-field-border: #7f8d83;
+  /* Solid surfaces (A8): header bands and hovers, field borders, the soft focus ring. */
+  --app-muted-surface: #f1f4ef;
+  --app-input: #b7c2b4;
+  --app-ring: color-mix(in srgb, var(--app-primary) 25%, transparent);
   --app-focus: var(--color-leaf);
   --app-glass-shadow: 0 8px 32px rgb(24 33 26 / 0.07);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 22%, transparent);
@@ -139,6 +146,8 @@
   --app-glass-border: rgb(255 255 255 / 0.07);
   --app-glass-field: rgb(18 21 17 / 0.5);
   --app-field-border: #66705f;
+  --app-muted-surface: #21261f;
+  --app-input: #3d453a;
   --app-focus: var(--color-honey);
   --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
   --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 8%, transparent);
@@ -198,6 +207,12 @@
     @apply font-display;
   }
 
+  /* Tailwind 4 resets buttons to the default cursor. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
   :focus-visible {
     outline: 2px solid var(--app-focus);
     outline-offset: 2px;
@@ -225,6 +240,8 @@
     --app-glass-border: #d0d5cf;
     --app-glass-field: #ffffff;
     --app-field-border: #7f8d83;
+    --app-muted-surface: #f4f5f3;
+    --app-input: #b7c2b4;
     --app-glass-shadow: none;
   }
 
