@@ -1,7 +1,8 @@
 import { Hexagon, LogOut } from 'lucide-react'
-import { Link, NavLink } from 'react-router'
+import { NavLink } from 'react-router'
 import { cx } from '../../lib/cx'
 import { signOut, useSession } from '../../lib/session'
+import { IconButton } from '../ui/IconButton'
 import { navigation } from './navigation'
 import { ThemeToggle } from './ThemeToggle'
 
@@ -46,27 +47,31 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           ))}
         </ul>
       </nav>
-      <div className="flex flex-col gap-2 border-t border-border px-3 py-4">
-        <Link
+      <div className="flex items-center gap-1 border-t border-border p-3">
+        <NavLink
           to="/mi-cuenta"
           viewTransition
           onClick={onNavigate}
-          className="truncate px-3 text-sm text-muted hover:text-text hover:underline"
-          title={`${email ?? ''} · Mi cuenta`}
+          className={({ isActive }) =>
+            cx(
+              'flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-control px-2 py-1.5 transition-colors',
+              isActive ? 'bg-surface shadow-xs ring-1 ring-border' : 'hover:bg-muted-surface',
+            )
+          }
         >
-          {email}
-        </Link>
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => signOut()}
-            className="flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium text-muted transition-colors hover:bg-muted-surface hover:text-text lg:min-h-9"
+          <span
+            aria-hidden
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary uppercase"
           >
-            <LogOut size={18} aria-hidden />
-            Cerrar sesión
-          </button>
-          <ThemeToggle />
-        </div>
+            {email?.charAt(0) ?? '?'}
+          </span>
+          <span className="flex min-w-0 flex-col">
+            <span className="text-sm font-medium">Mi cuenta</span>
+            <span className="truncate text-xs text-muted">{email}</span>
+          </span>
+        </NavLink>
+        <ThemeToggle />
+        <IconButton icon={LogOut} label="Cerrar sesión" onClick={() => signOut()} />
       </div>
     </div>
   )
