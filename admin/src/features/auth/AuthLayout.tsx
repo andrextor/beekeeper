@@ -1,6 +1,7 @@
-import { CloudOff, Hexagon, QrCode, ShieldCheck } from 'lucide-react'
+import { CloudOff, QrCode, ShieldCheck } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { ThemeToggle } from '../../components/layout/ThemeToggle'
+import { BrandMark } from '../../components/ui/BrandMark'
 
 const facts = [
   { icon: QrCode, text: 'Cada colmena con su QR y su historial', short: 'QR por colmena' },
@@ -12,7 +13,7 @@ function Logo() {
   return (
     <span className="flex items-center gap-3">
       <span className="flex size-10 items-center justify-center rounded-card bg-accent text-on-accent shadow-sm">
-        <Hexagon size={22} strokeWidth={2.4} aria-hidden />
+        <BrandMark size={22} strokeWidth={2.4} />
       </span>
       <span className="font-display text-lg font-bold tracking-tight">Landak Apiario</span>
     </span>
