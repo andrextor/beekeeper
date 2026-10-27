@@ -32,6 +32,7 @@ Shared decisions that every module relies on: `DESIGN.md` (admin) / `beekeeper-m
 | A5 | Hive detail: timeline, inspections, events, photos | `specs/2026-10-25-admin-05-hive-timeline-design.md` | `plans/ok-2026-10-25-admin-05-hive-timeline.md` | 0.11.0 |
 | A6 | Platform admin creates beekeepers and reviewers; print reports | `specs/2026-10-25-admin-06-create-users-design.md` | `plans/ok-2026-10-25-admin-06-create-users.md` | 0.14.0 |
 | A7 | Admin manages accounts (name, email, password, farms, admin, deactivate); my account | `specs/2026-10-25-admin-07-manage-users-design.md` | `plans/ok-2026-10-25-admin-07-manage-users.md` | 0.15.0 |
+| A8 | UI refresh: solid surfaces, calm dense buttons, native select, structured tables, one save per form | `specs/2026-10-26-admin-08-ui-refresh-design.md` | `plans/ok-2026-10-26-admin-08-ui-refresh.md` | 0.16.0 |
 
 ## Phase 3 — Go live (external accounts, each step asks first)
 

@@ -9,7 +9,6 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import {
   fetchPhotos,
   type Photo,
-  pageCount,
   photoPageSize,
   signedUrlRefresh,
   signThumbnails,
@@ -67,7 +66,7 @@ export function PhotosTab({ hiveId }: { hiveId: string }) {
                 type="button"
                 onClick={() => setOpen(photo)}
                 aria-label={`Ver ${photoAlt(photo)}`}
-                className="glass block aspect-square w-full overflow-hidden rounded-control transition duration-200 hover:scale-[1.02]"
+                className="block aspect-square w-full overflow-hidden rounded-control border border-border bg-muted-surface transition-opacity hover:opacity-90"
               >
                 {url ? (
                   <img src={url} alt="" loading="lazy" className="size-full object-cover" />
@@ -81,7 +80,8 @@ export function PhotosTab({ hiveId }: { hiveId: string }) {
       </ul>
       <Pagination
         page={page}
-        pageCount={pageCount(photos.data.total, photoPageSize)}
+        total={photos.data.total}
+        pageSize={photoPageSize}
         onChange={setPage}
       />
       <Lightbox photo={open} onClose={() => setOpen(null)} />

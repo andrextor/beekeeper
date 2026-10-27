@@ -4,10 +4,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router'
 import { isNotPlatformAdmin } from './lib/admin-api'
+import { trackPointerGlow } from './lib/pointer-glow'
 import { initTheme } from './lib/theme'
 import { router } from './routes'
 
 initTheme()
+trackPointerGlow()
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -53,7 +53,7 @@ function Header({ hive }: { hive: Hive }) {
       <div className="flex flex-col gap-2">
         <ReportTitle>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold">{hive.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{hive.name}</h1>
             <HiveStatusBadge hive={hive} />
           </div>
         </ReportTitle>

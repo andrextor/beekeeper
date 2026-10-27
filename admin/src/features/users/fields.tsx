@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { Check, Copy, Eye, EyeOff, Sparkles } from 'lucide-react'
+import { Check, Copy, Eye, EyeOff, Search, Sparkles, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/Button'
+import { cardClass } from '../../components/ui/Card'
 import { IconButton } from '../../components/ui/IconButton'
-import { Input } from '../../components/ui/Input'
-import { SearchInput } from '../../components/ui/SearchInput'
+import { Field, fieldClass, Input } from '../../components/ui/Input'
 import { type FarmOption, searchLiveOrganizations } from '../../lib/admin-api'
 import { generatePassword } from '../../lib/create-user'
+import { cx } from '../../lib/cx'
 
 export function CopyField({ label, value }: { label: string; value: string }) {
   const [copied, setCopied] = useState<'yes' | 'failed' | null>(null)
@@ -24,10 +25,10 @@ export function CopyField({ label, value }: { label: string; value: string }) {
     }
   }
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-sm text-muted">{label}</span>
-      <span className="flex items-center gap-2">
-        <span className="break-all font-mono text-lg">{value}</span>
+    <div className="flex flex-col gap-1.5">
+      <span className="text-sm font-medium">{label}</span>
+      <span className="flex items-center gap-1 rounded-control border border-border bg-muted-surface pl-3">
+        <span className="min-w-0 flex-1 break-all py-2 font-mono text-sm">{value}</span>
         <IconButton
           icon={copied === 'yes' ? Check : Copy}
           label={copied === 'yes' ? 'Copiado' : `Copiar ${label.toLowerCase()}`}
@@ -43,72 +44,142 @@ export function CopyField({ label, value }: { label: string; value: string }) {
   )
 }
 
+/** A farm combobox: type to search live farms, pick one from the dropdown. `exclude` hides farms already chosen. */
 export function FarmPicker({
   value,
   onChange,
   error,
+  exclude = [],
 }: {
   value: FarmOption | null
   onChange: (farm: FarmOption | null) => void
   error?: string
+  exclude?: ReadonlyArray<string>
 }) {
+  const [text, setText] = useState('')
   const [search, setSearch] = useState('')
+  const [open, setOpen] = useState(false)
+  const [active, setActive] = useState(0)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(text.trim()), 300)
+    return () => clearTimeout(timer)
+  }, [text])
+
   const farms = useQuery({
     queryKey: ['admin-orgs', 'picker', search],
     queryFn: () => searchLiveOrganizations(search),
-    enabled: value === null,
+    enabled: open && value === null,
   })
+  const rows = (farms.data ?? []).filter((farm) => !exclude.includes(farm.id))
 
-  if (value) {
-    return (
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Finca</span>
-        <span className="flex flex-wrap items-center gap-3">
-          <span className="font-medium">{value.name}</span>
-          <button
-            type="button"
-            onClick={() => onChange(null)}
-            className="min-h-11 text-sm text-primary hover:underline"
-          >
-            Cambiar
-          </button>
-        </span>
-      </div>
-    )
+  const pick = (farm: FarmOption) => {
+    onChange(farm)
+    setOpen(false)
+    setText('')
   }
 
-  const rows = farms.data ?? []
   return (
-    <div className="flex flex-col gap-2">
-      <SearchInput
-        label="Finca"
-        placeholder="Nombre de la finca"
-        value={search}
-        onSearch={setSearch}
-      />
-      {error && <p className="text-sm text-danger">{error}</p>}
-      {farms.isError ? (
-        <p className="text-sm text-danger">No pudimos cargar las fincas. Inténtalo de nuevo.</p>
-      ) : farms.isPending ? (
-        <p className="text-sm text-muted">Cargando fincas…</p>
-      ) : rows.length === 0 ? (
-        <p className="text-sm text-muted">No hay fincas con ese nombre.</p>
-      ) : (
-        <ul className="flex flex-col gap-1">
-          {rows.map((farm) => (
-            <li key={farm.id}>
-              <button
-                type="button"
-                onClick={() => onChange(farm)}
-                className="flex min-h-11 w-full flex-col items-start rounded-control px-3 py-2 text-left transition hover:bg-glass-field"
+    <Field label="Finca" error={error}>
+      {({ id, describedBy }) =>
+        value ? (
+          <div className={cx(fieldClass(false), 'flex items-center justify-between gap-2 pr-1')}>
+            <span className="truncate font-medium">{value.name}</span>
+            <IconButton icon={X} label="Cambiar finca" onClick={() => onChange(null)} />
+          </div>
+        ) : (
+          <div className="relative">
+            <Search
+              size={16}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
+              aria-hidden
+            />
+            <input
+              id={id}
+              role="combobox"
+              aria-expanded={open}
+              aria-controls={`${id}-list`}
+              aria-autocomplete="list"
+              aria-activedescendant={open && rows[active] ? `${id}-${rows[active].id}` : undefined}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={describedBy}
+              autoComplete="off"
+              placeholder="Busca por nombre"
+              value={text}
+              onChange={(event) => {
+                setText(event.target.value)
+                setActive(0)
+                setOpen(true)
+              }}
+              onFocus={() => setOpen(true)}
+              onBlur={() => setOpen(false)}
+              onKeyDown={(event) => {
+                if (event.key === 'ArrowDown') {
+                  event.preventDefault()
+                  setOpen(true)
+                  setActive((current) => Math.min(current + 1, Math.max(rows.length - 1, 0)))
+                } else if (event.key === 'ArrowUp') {
+                  event.preventDefault()
+                  setActive((current) => Math.max(current - 1, 0))
+                } else if (event.key === 'Enter' && open && rows[active]) {
+                  event.preventDefault()
+                  pick(rows[active])
+                } else if (event.key === 'Escape' && open) {
+                  // Inside a dialog, Esc would also close the dialog and lose what was typed.
+                  event.preventDefault()
+                  event.stopPropagation()
+                  setOpen(false)
+                }
+              }}
+              className={cx(fieldClass(Boolean(error)), 'pl-9')}
+            />
+            {open && (
+              <div
+                className={cx(
+                  cardClass,
+                  'absolute top-full z-20 mt-1 max-h-64 w-full overflow-y-auto p-1 shadow-lg',
+                )}
               >
-                <span className="font-medium">{farm.name}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                {farms.isError ? (
+                  <p className="px-2 py-2 text-sm text-danger">
+                    No pudimos cargar las fincas. Inténtalo de nuevo.
+                  </p>
+                ) : farms.isPending ? (
+                  <p className="px-2 py-2 text-sm text-muted">Buscando…</p>
+                ) : rows.length === 0 ? (
+                  <p className="px-2 py-2 text-sm text-muted">No hay fincas con ese nombre.</p>
+                ) : (
+                  <div id={`${id}-list`} role="listbox" aria-label="Fincas">
+                    {rows.map((farm, index) => (
+                      <div
+                        key={farm.id}
+                        id={`${id}-${farm.id}`}
+                        role="option"
+                        // Focus stays in the input (aria-activedescendant); -1 only marks the option focusable.
+                        tabIndex={-1}
+                        aria-selected={index === active}
+                        // mousedown, not click: the input's blur would close the list first.
+                        onMouseDown={(event) => {
+                          event.preventDefault()
+                          pick(farm)
+                        }}
+                        onMouseEnter={() => setActive(index)}
+                        className={cx(
+                          'flex min-h-11 cursor-pointer items-center rounded-control px-2 text-sm md:min-h-9',
+                          index === active && 'bg-muted-surface',
+                        )}
+                      >
+                        {farm.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      }
+    </Field>
   )
 }
 

@@ -4,7 +4,7 @@ import { Link, useParams, useSearchParams } from 'react-router'
 import { HiveStatusBadge, QueenMark } from '../../components/HiveBadges'
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs'
 import { Card } from '../../components/ui/Card'
-import { type Column, DataTable } from '../../components/ui/DataTable'
+import { type Column, DataTable, MobileCard } from '../../components/ui/DataTable'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { FactList } from '../../components/ui/FactList'
 import { NotFoundState } from '../../components/ui/NotFoundState'
@@ -59,11 +59,7 @@ const hiveColumns: ReadonlyArray<Column<Hive>> = [
 
 function HiveCard({ hive }: { hive: Hive }) {
   return (
-    <Link
-      to={hivePath(hive)}
-      viewTransition
-      className="glass flex flex-col gap-2 rounded-card p-4 transition duration-200 hover:-translate-y-0.5"
-    >
+    <MobileCard to={hivePath(hive)}>
       <span className="flex flex-wrap items-center gap-2">
         <span className="font-medium">{hive.name}</span>
         <HiveStatusBadge hive={hive} />
@@ -74,7 +70,7 @@ function HiveCard({ hive }: { hive: Hive }) {
       <span className="flex items-center gap-2 text-sm text-muted">
         Reina <QueenMark hive={hive} />
       </span>
-    </Link>
+    </MobileCard>
   )
 }
 
@@ -101,7 +97,7 @@ function Facts({ apiary }: { apiary: Apiary }) {
           href={`https://www.google.com/maps?q=${apiary.latitude},${apiary.longitude}`}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex min-h-11 items-center gap-1 self-start text-sm font-medium text-primary hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 self-start text-sm font-medium text-primary underline-offset-4 hover:underline"
         >
           <MapPin size={16} aria-hidden /> Ver en el mapa
         </a>
@@ -123,7 +119,7 @@ function Hives({ apiaryId }: { apiaryId: string }) {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-2xl font-bold">Colmenas</h2>
+        <h2 className="text-lg font-semibold">Colmenas</h2>
         <Segmented
           label="Colmenas"
           options={filters}
@@ -147,6 +143,7 @@ function Hives({ apiaryId }: { apiaryId: string }) {
             <EmptyState
               icon={Hexagon}
               title={filter === 'todas' ? 'Aún no hay colmenas' : 'Sin colmenas activas'}
+              hint={filter === 'todas' ? 'El apicultor las crea desde la app.' : undefined}
             />
           }
         />
@@ -190,7 +187,7 @@ export function ApiaryPage() {
       ) : (
         <>
           <ReportTitle>
-            <h1 className="text-3xl font-bold">{found.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{found.name}</h1>
           </ReportTitle>
           <Facts apiary={found} />
           <Hives apiaryId={found.id} />

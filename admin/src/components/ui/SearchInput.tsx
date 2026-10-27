@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Input } from './Input'
 
@@ -42,6 +43,7 @@ export function SearchInput({
       placeholder={placeholder}
       value={text}
       onChange={(event) => setText(event.target.value)}
+      leading={<Search size={16} aria-hidden />}
       className={className}
     />
   )

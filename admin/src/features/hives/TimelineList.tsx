@@ -54,7 +54,7 @@ function Byline({ item }: { item: TimelineItem }) {
 
 function ItemIcon({ icon: Icon }: { icon: LucideIcon }) {
   return (
-    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-glass-field text-primary">
+    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
       <Icon size={20} aria-hidden />
     </span>
   )
@@ -104,7 +104,7 @@ function InspectionItem({ item, inspection }: { item: TimelineItem; inspection: 
             className="mt-2 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
           />
         </summary>
-        <div className="flex flex-col gap-4 border-t border-glass-border p-4 md:px-6">
+        <div className="flex flex-col gap-4 border-t border-border p-4 md:px-6">
           <FactList facts={fields.map((field) => ({ term: field.label, value: field.value }))} />
           {inspection.transcript && (
             <figure className="flex flex-col gap-1">

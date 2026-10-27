@@ -28,7 +28,7 @@ export function StorageCard({ bytes }: { bytes: number }) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(percent)}
-        className="h-3 overflow-hidden rounded-full bg-text/10"
+        className="h-2 overflow-hidden rounded-full bg-muted-surface ring-1 ring-border ring-inset"
       >
         <div
           className={cx('h-full rounded-full transition-[width] duration-500', barTones[tone])}

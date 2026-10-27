@@ -7,7 +7,7 @@ const fallback = 'No pudimos guardar el cambio. Inténtalo de nuevo.'
 describe('adminErrorMessage', () => {
   it('explains every rule in Spanish', () => {
     expect(adminErrorMessage(new AdminError('last_owner'), fallback)).toBe(
-      'La finca debe tener al menos un propietario.',
+      'Es el único propietario de una finca. Primero haz propietario a otra persona.',
     )
     expect(adminErrorMessage(new AdminError('last_admin'), fallback)).toBe(
       'Debe quedar al menos un administrador activo.',

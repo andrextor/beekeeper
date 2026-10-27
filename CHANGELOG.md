@@ -4,6 +4,31 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-26
+
+### Changed
+
+- Admin panel restyled (A8): solid cards with a fine border instead of glass, buttons that no longer jump on hover, denser 36 px controls on desktop (44 px on phones), a soft focus ring on fields and buttons.
+- Tables have a header band, row dividers, a chevron on rows that open a page and "1–25 de N" with Anterior / Siguiente; on phones each row is a solid card.
+- The Apiarios / Personas switch and similar filters are light tabs instead of a green block; badges are soft pills.
+- User page: name and email are saved together with one "Guardar cambios"; changing the password and adding to a farm open a dialog. The farm search is a dropdown that skips farms the person already belongs to.
+- Mi cuenta: the same single save and password dialog.
+- Light theme uses the app's warm stone page instead of sage, with fainter background glows, so the panel and the app look alike.
+- A faint honeycomb in the page corners, the same cell as the app's "Panal" bands; with a mouse, the cells near the pointer light up softly. Printed reports carry a strip of it at the top and bottom of each page.
+- Sidebar footer: an account block (initial, "Mi cuenta", email) with the theme and sign-out icon buttons beside it.
+- Empty apiaries and hives say the beekeeper creates them from the app.
+- Deactivating, demoting or removing the only owner of a farm now says what to do: make someone else owner first.
+
+### Fixed
+
+- Keyboard focus on buttons is a solid outline again, and field borders are visible enough on white (WCAG 1.4.11).
+- Esc in the farm search closes only the dropdown, not the dialog around it.
+- Printed reports (apiary, farm) showed an empty "Colmenas" list: the paper now gets the table, with no animations.
+
+### Added
+
+- Native `Select`, `Dialog`, `SectionCard` and `MobileCard` components, shown in the `/_design` gallery.
+
 ## [0.15.1] - 2026-10-25
 
 ### Fixed

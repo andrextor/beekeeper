@@ -47,7 +47,7 @@ function Done({
 }) {
   return (
     <Card className="flex flex-col gap-5">
-      <h2 className="text-xl font-bold">Usuario creado</h2>
+      <h2 className="text-lg font-semibold">Usuario creado</h2>
       <CopyField label="Correo" value={form.email.trim()} />
       <CopyField label="Contraseña" value={form.password} />
       <p className="rounded-control bg-warning-bg p-3 text-sm">
@@ -58,7 +58,7 @@ function Done({
           <Link
             to={`/apicultores/${created.organizationId}`}
             viewTransition
-            className="inline-flex min-h-11 items-center rounded-control px-4 font-medium text-primary hover:underline"
+            className="inline-flex min-h-11 items-center px-2 text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
             {form.kind === 'beekeeper' ? 'Ver apicultor' : 'Ver finca'}
           </Link>
@@ -113,7 +113,7 @@ export function NewUserPage() {
   return (
     <div className="flex flex-col gap-6">
       <Breadcrumbs items={[{ label: 'Usuarios', to: '/usuarios' }, { label: 'Nuevo usuario' }]} />
-      <h1 className="text-3xl font-bold">Nuevo usuario</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Nuevo usuario</h1>
       {create.isSuccess ? (
         <Done form={create.variables} created={create.data} onAnother={another} />
       ) : (

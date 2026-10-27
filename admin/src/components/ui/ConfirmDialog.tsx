@@ -1,7 +1,8 @@
-import { type ReactNode, useEffect, useRef } from 'react'
+import type { ReactNode } from 'react'
 import { Button } from './Button'
+import { Dialog } from './Dialog'
 
-/** Asks before a change of access. A native dialog gives the focus trap and Esc. */
+/** Asks before a change of access. */
 export function ConfirmDialog({
   open,
   title,
@@ -21,43 +22,29 @@ export function ConfirmDialog({
   onCancel: () => void
   children?: ReactNode
 }) {
-  const dialog = useRef<HTMLDialogElement>(null)
-
-  useEffect(() => {
-    const element = dialog.current
-    if (!element) return
-    if (open && !element.open) element.showModal()
-    if (!open && element.open) element.close()
-  }, [open])
-
   return (
-    <dialog
-      ref={dialog}
+    <Dialog
+      open={open}
+      title={title}
+      busy={pending}
       onClose={onCancel}
-      onCancel={(event) => {
-        // Esc while the change runs would hide its result.
-        if (pending) event.preventDefault()
-      }}
-      aria-label={title}
-      className="glass m-auto w-[min(100vw-2rem,28rem)] rounded-card p-6 text-text backdrop:bg-black/50 backdrop:backdrop-blur-sm"
-    >
-      <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold">{title}</h2>
-        {children}
-        {error && (
-          <p role="alert" className="text-sm text-danger">
-            {error}
-          </p>
-        )}
-        <div className="flex flex-wrap justify-end gap-3">
-          <Button variant="secondary" onClick={() => dialog.current?.close()} disabled={pending}>
+      footer={
+        <>
+          <Button variant="secondary" onClick={onCancel} disabled={pending}>
             Cancelar
           </Button>
           <Button variant="danger" onClick={onConfirm} loading={pending}>
             {confirmLabel}
           </Button>
-        </div>
-      </div>
-    </dialog>
+        </>
+      }
+    >
+      {children && <div className="text-sm text-muted">{children}</div>}
+      {error && (
+        <p role="alert" className="rounded-control bg-danger/10 px-3 py-2 text-sm text-danger">
+          {error}
+        </p>
+      )}
+    </Dialog>
   )
 }

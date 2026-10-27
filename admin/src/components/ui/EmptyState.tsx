@@ -14,10 +14,12 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
-      <Icon size={48} className="animate-pop text-muted" aria-hidden />
-      <p className="font-display text-xl">{title}</p>
+      <span className="mb-2 flex size-12 items-center justify-center rounded-full bg-muted-surface text-muted ring-1 ring-border">
+        <Icon size={22} aria-hidden />
+      </span>
+      <p className="font-display text-base font-semibold">{title}</p>
       {hint && <p className="max-w-sm text-sm text-muted">{hint}</p>}
-      {action}
+      {action && <div className="mt-2">{action}</div>}
     </div>
   )
 }

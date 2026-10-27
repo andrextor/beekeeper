@@ -86,19 +86,21 @@
   --color-warning-bg: var(--app-warning-bg);
   --color-success-bg: var(--app-success-bg);
   --color-glass: var(--app-glass);
-  --color-glass-field: var(--app-glass-field);
   --color-glass-border: var(--app-glass-border);
-  --color-field-border: var(--app-field-border);
+  --color-muted-surface: var(--app-muted-surface);
+  --color-input: var(--app-input);
+  --color-ring: var(--app-ring);
 }
 
 :root {
   color-scheme: light;
   /* Palette "Bosque claro" (2026-10-26): soft sage by day, olive black by night; green only for actions. */
-  --app-bg: #f4f7f2;
+  /* Warm stone like the app (bg-soft = stone-50), so both products feel like one. */
+  --app-bg: var(--color-stone-50);
   --app-surface: #ffffff;
-  --app-border: #dfe7dc;
-  --app-text: #18211a;
-  --app-text-muted: #617065;
+  --app-border: var(--color-stone-200);
+  --app-text: var(--color-stone-900);
+  --app-text-muted: #6b675d;
   --app-primary: var(--color-leaf);
   --app-on-primary: #ffffff;
   --app-accent: var(--color-honey);
@@ -110,14 +112,22 @@
   /* Glass: translucent panels over a softly lit page (sidebar, top bar, cards). */
   --app-glass: rgb(255 255 255 / 0.66);
   --app-glass-border: rgb(255 255 255 / 0.85);
-  /* Fields, chips and hovers inside glass panels: lighter than a panel, still see-through. */
-  --app-glass-field: rgb(255 255 255 / 0.55);
-  /* Field outlines and the focus ring need 3:1 against the glass (WCAG 1.4.11); honey on sage is 1.7:1. */
-  --app-field-border: #7f8d83;
+  /* Solid surfaces (A8): header bands and hovers, field borders, the soft focus ring. */
+  --app-muted-surface: var(--color-stone-100);
+  /* Field outlines keep 3:1 against white (WCAG 1.4.11). */
+  --app-input: #949085;
+  --app-ring: color-mix(in srgb, var(--app-primary) 25%, transparent);
   --app-focus: var(--color-leaf);
   --app-glass-shadow: 0 8px 32px rgb(24 33 26 / 0.07);
-  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 22%, transparent);
-  --app-glow-honey: color-mix(in srgb, var(--color-honey) 16%, transparent);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 10%, transparent);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 8%, transparent);
+  /* Plain honey vanishes on the cream page; a darker amber (honey + stone-700) keeps the cells visible. */
+  --app-honeycomb: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--color-honey) 65%, var(--color-stone-700)) 30%,
+    transparent
+  );
+  --app-honeycomb-glow: color-mix(in srgb, var(--color-honey) 70%, var(--color-stone-700));
 }
 
 /* src/lib/theme.ts resolves "system" to light or dark, so the dark tokens live in one block. */
@@ -137,12 +147,14 @@
   --app-success-bg: #1c3317;
   --app-glass: rgb(29 34 27 / 0.6);
   --app-glass-border: rgb(255 255 255 / 0.07);
-  --app-glass-field: rgb(18 21 17 / 0.5);
-  --app-field-border: #66705f;
+  --app-muted-surface: #21261f;
+  --app-input: #646d5f;
   --app-focus: var(--color-honey);
   --app-glass-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
-  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 8%, transparent);
-  --app-glow-honey: color-mix(in srgb, var(--color-honey) 6%, transparent);
+  --app-glow-sprout: color-mix(in srgb, var(--color-sprout) 5%, transparent);
+  --app-glow-honey: color-mix(in srgb, var(--color-honey) 4%, transparent);
+  --app-honeycomb: color-mix(in srgb, var(--color-honey) 12%, transparent);
+  --app-honeycomb-glow: color-mix(in srgb, var(--color-honey) 32%, transparent);
 }
 
 /* Children enter one after another; put it on a list or a form. */
@@ -192,10 +204,53 @@
     background-attachment: fixed;
   }
 
+  /* "Panal" like the app (M13): a faint honeycomb in the top-left and bottom-right corners, fading before the content. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--app-honeycomb);
+    mask-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='72.75'%3E%3Cpath d='M21 0 42 12.12v24.25L21 48.5 0 36.37V12.12zM21 48.5v24.25' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"),
+      radial-gradient(50rem 36rem at 0% 0%, black, transparent 80%),
+      radial-gradient(50rem 36rem at 100% 100%, black, transparent 80%);
+    mask-composite: intersect, add;
+    -webkit-mask-composite: source-in, source-over;
+  }
+
+  /* The cells under the pointer light up a little (src/lib/pointer-glow.ts); mouse and trackpad only. */
+  @media (hover: hover) and (pointer: fine) {
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-color: var(--app-honeycomb-glow);
+      mask-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='72.75'%3E%3Cpath d='M21 0 42 12.12v24.25L21 48.5 0 36.37V12.12zM21 48.5v24.25' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E"),
+        radial-gradient(
+          12rem circle at var(--pointer-x, -50rem) var(--pointer-y, -50rem),
+          black,
+          transparent
+        );
+      mask-composite: intersect;
+      -webkit-mask-composite: source-in;
+    }
+  }
+
   h1,
   h2,
   h3 {
     @apply font-display;
+  }
+
+  /* Tailwind 4 resets buttons to the default cursor. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 
   :focus-visible {
@@ -223,13 +278,51 @@
     --app-success-bg: #e7f4e4;
     --app-glass: #ffffff;
     --app-glass-border: #d0d5cf;
-    --app-glass-field: #ffffff;
-    --app-field-border: #7f8d83;
+    --app-muted-surface: #f4f5f3;
+    --app-input: #949085;
     --app-glass-shadow: none;
   }
 
   body {
     background: #ffffff;
+  }
+
+  body::after {
+    display: none;
+  }
+
+  /* A thin strip of honeycomb at the top and bottom of every sheet (fixed repeats per page).
+     Paper gets the cells drawn in the SVG itself and a white fade on top: masks render badly in print. */
+  body::before {
+    background-color: transparent;
+    mask-image: none;
+    background-image:
+      linear-gradient(
+        to bottom,
+        transparent,
+        #ffffff 1.2cm,
+        #ffffff calc(100% - 1.2cm),
+        transparent
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='72.75'%3E%3Cpath d='M21 0 42 12.12v24.25L21 48.5 0 36.37V12.12zM21 48.5v24.25' fill='none' stroke='%23d9b56b' stroke-opacity='0.6' stroke-width='1.2'/%3E%3C/svg%3E");
+    /* Browsers drop backgrounds on paper unless told otherwise. */
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Blocks that only appear on paper would start their enter animation at opacity 0 and print blank. */
+  /* biome-ignore-start lint/complexity/noImportantStyles: must beat every animation utility on paper */
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+  }
+  /* biome-ignore-end lint/complexity/noImportantStyles: must beat every animation utility on paper */
+
+  /* The chevron column and row hovers mean nothing on paper. */
+  td[aria-hidden],
+  th[aria-hidden] {
+    display: none;
   }
 
   .glass {

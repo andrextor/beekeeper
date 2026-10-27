@@ -35,7 +35,7 @@ export function QueenMark({ hive }: { hive: Hive }) {
         <span
           role="img"
           aria-label={`Marca ${label(queenColorLabels, hive.queen_color).toLowerCase()}`}
-          className={cx('size-3 rounded-full border border-glass-border', dot)}
+          className={cx('size-3 rounded-full border border-border', dot)}
         />
       )}
       {/* A colour this panel does not know (a newer server) shows as text. */}

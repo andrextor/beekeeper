@@ -3,8 +3,8 @@ import { MapPin, UserRound } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs'
-import { Card } from '../../components/ui/Card'
-import { type Column, DataTable } from '../../components/ui/DataTable'
+import { Card, cardClass } from '../../components/ui/Card'
+import { type Column, DataTable, MobileCard } from '../../components/ui/DataTable'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { NotFoundState } from '../../components/ui/NotFoundState'
 import { ReportTitle } from '../../components/ui/PrintButton'
@@ -18,6 +18,7 @@ import {
   organizationSummaryQuery,
   type PendingInvite,
 } from '../../lib/admin-api'
+import { cx } from '../../lib/cx'
 import { formatDate, formatLastInspection, formatNumber } from '../../lib/format'
 import { roleLabels } from '../../lib/labels'
 
@@ -59,28 +60,28 @@ const inviteColumns: ReadonlyArray<Column<PendingInvite>> = [
 
 function MemberCard({ row }: { row: Member }) {
   return (
-    <div className="glass flex flex-col gap-2 rounded-card p-4">
+    <MobileCard>
       <span className="flex flex-wrap items-center gap-2">
         <MemberEmail row={row} />
         <RoleBadge role={row.role} />
       </span>
       {row.display_name && <span className="text-sm text-muted">{row.display_name}</span>}
-      <span className="text-sm text-muted">Desde {formatDate(row.joined_at)}</span>
-    </div>
+      <span className="text-xs text-muted">Desde {formatDate(row.joined_at)}</span>
+    </MobileCard>
   )
 }
 
 function InviteCard({ row }: { row: PendingInvite }) {
   return (
-    <div className="glass flex flex-col gap-2 rounded-card p-4">
+    <MobileCard>
       <span className="flex flex-wrap items-center gap-2">
         <span className="font-medium">{row.label ?? 'Sin etiqueta'}</span>
         <RoleBadge role={row.role} />
       </span>
-      <span className="text-sm text-muted">
+      <span className="text-xs text-muted">
         Creada {formatDate(row.created_at)} · Vence {formatDate(row.expires_at)}
       </span>
-    </div>
+    </MobileCard>
   )
 }
 
@@ -97,7 +98,7 @@ function People({ summary }: { summary: OrganizationSummary }) {
       />
       {summary.pending_invites.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-2xl font-bold">Invitaciones pendientes</h2>
+          <h2 className="text-lg font-semibold">Invitaciones pendientes</h2>
           <DataTable
             caption="Invitaciones pendientes"
             columns={inviteColumns}
@@ -117,9 +118,12 @@ function ApiaryCard({ organizationId, apiary }: { organizationId: string; apiary
     <Link
       to={`/apicultores/${organizationId}/apiarios/${apiary.id}`}
       viewTransition
-      className="glass flex h-full flex-col gap-1 rounded-card p-4 transition duration-200 hover:-translate-y-0.5 md:p-6"
+      className={cx(
+        cardClass,
+        'flex h-full flex-col gap-1 p-5 transition-colors hover:border-primary/40 hover:bg-muted-surface',
+      )}
     >
-      <span className="font-display text-xl font-bold">{apiary.name}</span>
+      <span className="font-display text-lg font-semibold">{apiary.name}</span>
       <span className="text-sm">
         {formatNumber(apiary.hives_active)} de {formatNumber(apiary.hives_total)} activas
       </span>
@@ -132,7 +136,11 @@ function Apiaries({ summary }: { summary: OrganizationSummary }) {
   if (summary.apiaries.length === 0) {
     return (
       <Card>
-        <EmptyState icon={MapPin} title="Aún no hay apiarios" />
+        <EmptyState
+          icon={MapPin}
+          title="Aún no hay apiarios"
+          hint="El apicultor los crea desde la app."
+        />
       </Card>
     )
   }
@@ -161,7 +169,7 @@ function Header({ summary }: { summary: OrganizationSummary }) {
     <header className="flex flex-col gap-2">
       <ReportTitle>
         <span className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">{organization.name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{organization.name}</h1>
           {organization.deleted_at && <Badge tone="danger">Eliminado</Badge>}
         </span>
       </ReportTitle>
