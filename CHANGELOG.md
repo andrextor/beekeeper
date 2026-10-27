@@ -16,6 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Light theme uses the app's warm stone page instead of sage, with fainter background glows, so the panel and the app look alike.
 - A faint honeycomb in the page corners, the same cell as the app's "Panal" bands; with a mouse, the cells near the pointer light up softly. Printed reports carry a strip of it at the top and bottom of each page.
 - Sign-in and "Sin acceso" are a split screen: the app's deep "Panal" band with the product in one sentence on the left, the form on the right; on a phone the band is a hero on top and the form rises over it.
+- Sidebar: "Manual de uso" opens the user manual in a new tab.
 - Sidebar footer: an account block (initial, "Mi cuenta", email) with the theme and sign-out icon buttons beside it.
 - Empty apiaries and hives say the beekeeper creates them from the app.
 - Deactivating, demoting or removing the only owner of a farm now says what to do: make someone else owner first.
