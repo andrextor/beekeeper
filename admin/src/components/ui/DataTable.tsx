@@ -15,7 +15,10 @@ export function MobileCard({ to, children }: { to?: string; children: ReactNode 
     <Link
       to={to}
       viewTransition
-      className={cx(cardClass, 'flex items-center gap-3 p-4 transition-colors hover:bg-muted-surface')}
+      className={cx(
+        cardClass,
+        'flex items-center gap-3 p-4 transition-colors hover:bg-muted-surface',
+      )}
     >
       {body}
       <ChevronRight size={18} className="shrink-0 text-muted" aria-hidden />
@@ -108,10 +111,7 @@ export function DataTable<T>({
                 ))}
                 {rowHref && (
                   <td aria-hidden className="w-10 pr-3 text-muted">
-                    <ChevronRight
-                      size={16}
-                      className="transition-colors group-hover:text-text"
-                    />
+                    <ChevronRight size={16} className="transition-colors group-hover:text-text" />
                   </td>
                 )}
               </tr>

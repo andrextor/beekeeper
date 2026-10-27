@@ -35,7 +35,7 @@ export function Lightbox({ photo, onClose }: { photo: Photo | null; onClose: () 
       ref={dialog}
       onClose={onClose}
       aria-label={photo ? photoAlt(photo) : 'Foto'}
-      className="glass m-auto w-[min(100vw-2rem,64rem)] rounded-card p-0 text-text backdrop:bg-black/70 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(100vw-2rem,64rem)] rounded-card border border-border bg-surface p-0 text-text shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-[2px]"
     >
       {photo && (
         <div className="flex flex-col">

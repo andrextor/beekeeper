@@ -33,12 +33,14 @@ function StatCard({
   value: string
 }) {
   return (
-    <Card className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-muted">
-        <Icon size={20} aria-hidden />
-        <span className="text-sm">{label}</span>
+    <Card className="flex flex-col gap-3 md:p-5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-sm font-medium text-muted">{label}</span>
+        <span className="flex size-8 items-center justify-center rounded-control bg-primary/10 text-primary">
+          <Icon size={16} aria-hidden />
+        </span>
       </div>
-      <p className="font-display text-4xl font-bold tabular-nums">{value}</p>
+      <p className="font-display text-3xl font-semibold tracking-tight tabular-nums">{value}</p>
     </Card>
   )
 }
@@ -74,11 +76,11 @@ function RecentActivity() {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Actividad reciente</h2>
+        <h2 className="text-lg font-semibold">Actividad reciente</h2>
         <Link
           to="/apicultores"
           viewTransition
-          className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
         >
           Ver todos <ChevronRight size={16} aria-hidden />
         </Link>
@@ -95,13 +97,13 @@ function RecentActivity() {
         ) : recent.data.rows.length === 0 ? (
           <EmptyState icon={Users} title="Aún no hay apicultores" />
         ) : (
-          <ul className="stagger">
+          <ul className="stagger divide-y divide-border">
             {recent.data.rows.map((organization) => (
-              <li key={organization.id} className="border-b border-glass-border last:border-0">
+              <li key={organization.id}>
                 <Link
                   to={`/apicultores/${organization.id}`}
                   viewTransition
-                  className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-glass-field md:px-6"
+                  className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted-surface/60 md:px-6"
                 >
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{organization.name}</span>
@@ -125,7 +127,7 @@ export function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-3xl font-bold">Resumen</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Resumen</h1>
       {stats.isPending ? (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (

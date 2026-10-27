@@ -72,7 +72,11 @@ export function Input({ label, hint, error, leading, trailing, className, ...pro
             id={id}
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}
-            className={cx(fieldClass(Boolean(error)), leading != null && 'pl-9', trailing != null && 'pr-12')}
+            className={cx(
+              fieldClass(Boolean(error)),
+              leading != null && 'pl-9',
+              trailing != null && 'pr-12',
+            )}
             {...props}
           />
           {trailing != null && (

@@ -1,11 +1,13 @@
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { useSyncExternalStore } from 'react'
+import { cx } from '../../lib/cx'
 import {
   readThemePreference,
   setThemePreference,
   subscribeTheme,
   type ThemePreference,
 } from '../../lib/theme'
+import { buttonBase, buttonVariants } from '../ui/Button'
 
 const next: Record<ThemePreference, ThemePreference> = {
   system: 'light',
@@ -29,9 +31,9 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       onClick={() => setThemePreference(next[preference])}
       aria-label={`${labels[preference]}. Cambiar tema`}
       title={labels[preference]}
-      className={`inline-flex size-11 items-center justify-center rounded-control transition duration-200 ease-out hover:scale-110 active:scale-90 ${className}`}
+      className={cx(buttonBase, buttonVariants.ghost, 'size-11 md:size-9', className)}
     >
-      <Icon key={preference} size={20} className="animate-pop" aria-hidden />
+      <Icon size={18} aria-hidden />
     </button>
   )
 }

@@ -11,13 +11,11 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="glass flex h-full flex-col rounded-none border-y-0 border-l-0 text-text">
-      <div className="flex items-center gap-2 px-6 py-6">
-        <Hexagon
-          size={24}
-          className="text-primary transition-transform duration-500 ease-out hover:rotate-180"
-          aria-hidden
-        />
-        <span className="font-display text-xl font-bold">Landak Apiario</span>
+      <div className="flex items-center gap-2 px-5 py-5">
+        <span className="flex size-8 items-center justify-center rounded-control bg-primary text-on-primary">
+          <Hexagon size={18} aria-hidden />
+        </span>
+        <span className="font-display text-lg font-bold">Landak Apiario</span>
       </div>
       <nav aria-label="Principal" className="flex-1 px-3">
         <ul className="stagger flex flex-col gap-1">
@@ -30,25 +28,25 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={onNavigate}
                 className={({ isActive }) =>
                   cx(
-                    'group flex min-h-11 items-center gap-3 rounded-control border-l-4 px-3 transition-all duration-200 ease-out hover:translate-x-1 hover:bg-glass-field',
+                    'flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium transition-colors duration-150 lg:min-h-9',
                     isActive
-                      ? 'border-accent bg-accent/15 font-medium'
-                      : 'border-transparent text-muted',
+                      ? 'bg-surface text-text shadow-xs ring-1 ring-border'
+                      : 'text-muted hover:bg-muted-surface hover:text-text',
                   )
                 }
               >
-                <Icon
-                  size={20}
-                  className="transition-transform duration-200 group-hover:scale-110"
-                  aria-hidden
-                />
-                {label}
+                {({ isActive }) => (
+                  <>
+                    <Icon size={18} className={isActive ? 'text-primary' : undefined} aria-hidden />
+                    {label}
+                  </>
+                )}
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
-      <div className="flex flex-col gap-2 border-t border-glass-border px-3 py-4">
+      <div className="flex flex-col gap-2 border-t border-border px-3 py-4">
         <Link
           to="/mi-cuenta"
           viewTransition
@@ -62,16 +60,12 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <button
             type="button"
             onClick={() => signOut()}
-            className="group flex min-h-11 items-center gap-3 rounded-control px-3 transition-all duration-200 ease-out hover:translate-x-1 hover:bg-glass-field"
+            className="flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium text-muted transition-colors hover:bg-muted-surface hover:text-text lg:min-h-9"
           >
-            <LogOut
-              size={20}
-              className="transition-transform duration-200 group-hover:translate-x-0.5"
-              aria-hidden
-            />
+            <LogOut size={18} aria-hidden />
             Cerrar sesión
           </button>
-          <ThemeToggle className="hover:bg-glass-field" />
+          <ThemeToggle />
         </div>
       </div>
     </div>

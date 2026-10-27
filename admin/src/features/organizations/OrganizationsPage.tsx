@@ -2,12 +2,12 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Users } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
-import { type Column, DataTable } from '../../components/ui/DataTable'
+import { type Column, DataTable, MobileCard } from '../../components/ui/DataTable'
 import { ListEmpty } from '../../components/ui/ListEmpty'
 import { Pagination } from '../../components/ui/Pagination'
 import { QueryError } from '../../components/ui/QueryError'
 import { SearchInput } from '../../components/ui/SearchInput'
-import { fetchOrganizations, type OrganizationRow, pageCount } from '../../lib/admin-api'
+import { fetchOrganizations, type OrganizationRow } from '../../lib/admin-api'
 import { formatDate, formatLastInspection, formatNumber, formatRelative } from '../../lib/format'
 import { useListParams } from '../../lib/useListParams'
 
@@ -52,20 +52,16 @@ const columns: ReadonlyArray<Column<OrganizationRow>> = [
 function OrganizationCard({ row }: { row: OrganizationRow }) {
   const hives = `${formatNumber(row.hives_active)} ${row.hives_active === 1 ? 'colmena' : 'colmenas'}`
   return (
-    <Link
-      to={`/apicultores/${row.id}`}
-      viewTransition
-      className="glass flex flex-col gap-1 rounded-card p-4 transition duration-200 hover:-translate-y-0.5"
-    >
+    <MobileCard to={`/apicultores/${row.id}`}>
       <span className="flex flex-wrap items-center gap-2">
         <span className="font-medium">{row.name}</span>
         {row.deleted_at && <Badge tone="danger">Eliminado</Badge>}
       </span>
       <span className="truncate text-sm text-muted">{owners(row)}</span>
-      <span className="text-sm">
+      <span className="text-sm text-muted">
         {hives} · {formatLastInspection(row.last_inspection_at)}
       </span>
-    </Link>
+    </MobileCard>
   )
 }
 
@@ -80,7 +76,7 @@ export function OrganizationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold">Apicultores</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Apicultores</h1>
       <SearchInput
         label="Buscar"
         placeholder="Nombre o correo del propietario"
@@ -110,7 +106,7 @@ export function OrganizationsPage() {
               />
             }
           />
-          <Pagination page={page} pageCount={pageCount(list.data?.total ?? 0)} onChange={setPage} />
+          <Pagination page={page} total={list.data?.total ?? 0} onChange={setPage} />
         </>
       )}
     </div>
