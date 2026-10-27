@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { pageCount, pageSize as defaultPageSize } from '../../lib/admin-api'
+import { pageSize as defaultPageSize, pageCount } from '../../lib/admin-api'
 import { formatNumber } from '../../lib/format'
 import { Button } from './Button'
 

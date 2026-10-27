@@ -149,12 +149,14 @@ export function FarmPicker({
                 ) : rows.length === 0 ? (
                   <p className="px-2 py-2 text-sm text-muted">No hay fincas con ese nombre.</p>
                 ) : (
-                  <ul id={`${id}-list`} role="listbox" aria-label="Fincas">
+                  <div id={`${id}-list`} role="listbox" aria-label="Fincas">
                     {rows.map((farm, index) => (
-                      <li
+                      <div
                         key={farm.id}
                         id={`${id}-${farm.id}`}
                         role="option"
+                        // Focus stays in the input (aria-activedescendant); -1 only marks the option focusable.
+                        tabIndex={-1}
                         aria-selected={index === active}
                         // mousedown, not click: the input's blur would close the list first.
                         onMouseDown={(event) => {
@@ -168,9 +170,9 @@ export function FarmPicker({
                         )}
                       >
                         {farm.name}
-                      </li>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
             )}
