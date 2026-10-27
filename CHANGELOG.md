@@ -22,6 +22,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Keyboard focus on buttons is a solid outline again, and field borders are visible enough on white (WCAG 1.4.11).
 - Esc in the farm search closes only the dropdown, not the dialog around it.
+- Printed reports (apiary, farm) showed an empty "Colmenas" list: the paper now gets the table, with no animations.
 
 ### Added
 

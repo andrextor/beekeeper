@@ -241,6 +241,21 @@
     background: #ffffff;
   }
 
+  /* Blocks that only appear on paper would start their enter animation at opacity 0 and print blank. */
+  /* biome-ignore-start lint/complexity/noImportantStyles: must beat every animation utility on paper */
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+  }
+  /* biome-ignore-end lint/complexity/noImportantStyles: must beat every animation utility on paper */
+
+  /* The chevron column and row hovers mean nothing on paper. */
+  td[aria-hidden],
+  th[aria-hidden] {
+    display: none;
+  }
+
   .glass {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;

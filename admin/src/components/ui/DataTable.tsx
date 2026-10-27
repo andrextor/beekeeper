@@ -64,12 +64,13 @@ export function DataTable<T>({
 
   return (
     <div className={cx('transition-opacity', loading && 'opacity-60')} aria-busy={loading}>
-      <ul className="stagger flex flex-col gap-2 md:hidden">
+      {/* Paper is narrower than md: print the table, not the phone cards. */}
+      <ul className="stagger flex flex-col gap-2 md:hidden print:hidden">
         {rows.map((row) => (
           <li key={rowKey(row)}>{card(row)}</li>
         ))}
       </ul>
-      <div className={cx(cardClass, 'hidden overflow-x-auto md:block')}>
+      <div className={cx(cardClass, 'hidden overflow-x-auto md:block print:block')}>
         <table className="w-full text-left text-sm tabular-nums">
           <caption className="sr-only">{caption}</caption>
           <thead className="border-b border-border bg-muted-surface text-xs text-muted">
