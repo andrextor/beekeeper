@@ -130,7 +130,7 @@ A soft-deleted organization (`organizations.deleted_at`) grants nothing to its m
 |-----|--------|---------|-----|--------------------|
 | `create_organization` | `p_id` (client uuid), `p_name` | `uuid` | anyone signed in. Idempotent for its owner, also for parallel retries | `invalid_id`, `invalid_name`, `id_taken` |
 | `create_invite` | `p_organization_id`, `p_role`, `p_label?` | `[{ invite_id, code, expires_at }]` — `code` like `K7M2-9QXA`, shown **only here** | owner | `not_owner`, `organization_deleted`, `invalid_role`, `invalid_label` |
-| `accept_invite` | `p_code` (any case, spaces/dashes ok) | organization `uuid` | anyone signed in. Single use, 7 days; keeps `owner` if already owner | `invalid_code` |
+| `accept_invite` | `p_code` (any case, spaces/dashes ok) | organization `uuid` | anyone signed in. Single use, 30 days; keeps `owner` if already owner | `invalid_code` |
 | `revoke_invite` | `p_invite_id` | — | owner | `not_owner`, `organization_deleted`, `invite_not_pending` |
 | `set_member_role` | `p_organization_id`, `p_user_id`, `p_role` | — | owner | `not_owner`, `organization_deleted`, `invalid_role`, `not_member`, `last_owner` |
 | `remove_member` | `p_organization_id`, `p_user_id` | — | owner, or yourself (leave) | `not_allowed`, `not_member`, `last_owner` |
