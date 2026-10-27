@@ -38,7 +38,7 @@ export function SignInPage() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Ingresa al panel" description="Solo para administradores de Landak Apiario.">
       <form onSubmit={submit} className="stagger flex flex-col gap-4">
         <Input
           label="Correo"
@@ -72,7 +72,7 @@ export function SignInPage() {
             {authErrorMessage(signIn.error)}
           </p>
         )}
-        <Button type="submit" loading={signIn.isPending} className="w-full">
+        <Button type="submit" size="lg" loading={signIn.isPending} className="mt-2 w-full">
           Ingresar
         </Button>
       </form>
