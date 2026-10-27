@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.19.2] - 2026-10-26
+
+### Fixed
+
+- Admin and manual: the logo is the app icon's three-cell honeycomb instead of a single hexagon.
+
 ## [0.19.1] - 2026-10-26
 
 ### Changed

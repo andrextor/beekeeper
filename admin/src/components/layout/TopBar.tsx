@@ -1,5 +1,6 @@
-import { Hexagon, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useRef } from 'react'
+import { BrandMark } from '../ui/BrandMark'
 import { IconButton } from '../ui/IconButton'
 import { Sidebar } from './Sidebar'
 
@@ -11,7 +12,7 @@ export function TopBar() {
   return (
     <header className="glass sticky top-0 z-10 flex items-center gap-2 rounded-none border-x-0 border-t-0 px-2 lg:hidden print:hidden">
       <IconButton icon={Menu} label="Abrir menú" onClick={() => dialog.current?.showModal()} />
-      <Hexagon size={20} className="text-primary" aria-hidden />
+      <BrandMark size={20} className="text-primary" />
       <span className="font-display text-lg font-bold">Landak Apiario</span>
       <dialog
         ref={dialog}

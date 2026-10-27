@@ -1,7 +1,8 @@
-import { BookOpen, ExternalLink, Hexagon, LogOut } from 'lucide-react'
+import { BookOpen, ExternalLink, LogOut } from 'lucide-react'
 import { NavLink } from 'react-router'
 import { cx } from '../../lib/cx'
 import { signOut, useSession } from '../../lib/session'
+import { BrandMark } from '../ui/BrandMark'
 import { IconButton } from '../ui/IconButton'
 import { manualUrl, navigation } from './navigation'
 import { ThemeToggle } from './ThemeToggle'
@@ -14,7 +15,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     <div className="glass flex h-full flex-col rounded-none border-y-0 border-l-0 text-text">
       <div className="flex items-center gap-2 px-5 py-5">
         <span className="flex size-8 items-center justify-center rounded-control bg-primary text-on-primary">
-          <Hexagon size={18} aria-hidden />
+          <BrandMark size={18} />
         </span>
         <span className="font-display text-lg font-bold">Landak Apiario</span>
       </div>
