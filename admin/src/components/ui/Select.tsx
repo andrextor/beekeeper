@@ -8,6 +8,7 @@ export function Select<T extends string>({
   label,
   hint,
   error,
+  hideLabel,
   options,
   value,
   onChange,
@@ -17,12 +18,13 @@ export function Select<T extends string>({
   label: string
   hint?: string
   error?: string
+  hideLabel?: boolean
   options: ReadonlyArray<{ value: T; label: string }>
   value: T
   onChange: (value: T) => void
 }) {
   return (
-    <Field label={label} hint={hint} error={error} className={className}>
+    <Field label={label} hint={hint} error={error} hideLabel={hideLabel} className={className}>
       {({ id, describedBy }) => (
         <div className="relative">
           <select

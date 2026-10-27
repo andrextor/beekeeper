@@ -1,9 +1,9 @@
-import { Hexagon, LogOut } from 'lucide-react'
+import { BookOpen, ExternalLink, Hexagon, LogOut } from 'lucide-react'
 import { NavLink } from 'react-router'
 import { cx } from '../../lib/cx'
 import { signOut, useSession } from '../../lib/session'
 import { IconButton } from '../ui/IconButton'
-import { navigation } from './navigation'
+import { manualUrl, navigation } from './navigation'
 import { ThemeToggle } from './ThemeToggle'
 
 /** Glass panel over the page's glow (DESIGN.md → Layout). */
@@ -47,6 +47,19 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           ))}
         </ul>
       </nav>
+      <div className="px-3 pb-3">
+        <a
+          href={manualUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="group flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium text-muted transition-colors hover:bg-muted-surface hover:text-text lg:min-h-9"
+        >
+          <BookOpen size={18} aria-hidden />
+          Manual de uso
+          <ExternalLink size={14} className="ml-auto opacity-60" aria-hidden />
+          <span className="sr-only">(se abre en otra pestaña)</span>
+        </a>
+      </div>
       <div className="flex items-center gap-1 border-t border-border p-3">
         <NavLink
           to="/mi-cuenta"

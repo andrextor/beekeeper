@@ -16,7 +16,7 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import type { FarmOption, Role } from '../../lib/admin-api'
 import { emailError, nameError, passwordError } from '../../lib/create-user'
 import { formatDate } from '../../lib/format'
-import { roleLabels } from '../../lib/labels'
+import { roleLabels, roleTones } from '../../lib/labels'
 import {
   addMember,
   manageErrorMessage,
@@ -41,9 +41,16 @@ type Ask = (confirm: {
 }) => void
 
 const roles: ReadonlyArray<{ value: Role; label: string }> = [
-  { value: 'reviewer', label: roleLabels.reviewer },
   { value: 'owner', label: roleLabels.owner },
+  { value: 'reviewer', label: roleLabels.reviewer },
+  { value: 'viewer', label: roleLabels.viewer },
 ]
+
+const roleHints: Readonly<Record<Role, string>> = {
+  owner: 'Podrá cambiar todo en la finca, también las personas y sus roles.',
+  reviewer: 'Podrá hacer revisiones, notas, fotos y actividades.',
+  viewer: 'Verá colmenas, revisiones, visitas y fotos, sin poder cambiar nada.',
+}
 
 type DetailErrors = { name?: string; email?: string }
 
@@ -273,7 +280,6 @@ function MembershipRow({
   ask: Ask
 }) {
   const who = user.displayName ?? user.email
-  const next: Role = membership.role === 'owner' ? 'reviewer' : 'owner'
   return (
     <li className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0 md:flex-row md:items-center md:justify-between">
       <span className="flex min-w-0 flex-col gap-1">
@@ -285,28 +291,28 @@ function MembershipRow({
           >
             {membership.name}
           </Link>
-          <Badge tone={membership.role === 'owner' ? 'primary' : 'neutral'}>
-            {roleLabels[membership.role]}
-          </Badge>
+          <Badge tone={roleTones[membership.role]}>{roleLabels[membership.role]}</Badge>
           {membership.deletedAt && <Badge tone="danger">Eliminado</Badge>}
         </span>
         <span className="text-xs text-muted">Desde {formatDate(membership.since)}</span>
       </span>
       {!membership.deletedAt && (
-        <span className="flex flex-wrap gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() =>
+        <span className="flex flex-wrap items-center gap-2">
+          <Select
+            label={`Rol en ${membership.name}`}
+            hideLabel
+            options={roles}
+            value={membership.role}
+            onChange={(next) =>
               ask({
                 title: `¿Hacer a ${who} ${roleLabels[next].toLowerCase()} de ${membership.name}?`,
+                body: roleHints[next],
                 label: 'Cambiar rol',
                 run: () => setMemberRole(membership.organizationId, user.id, next),
               })
             }
-          >
-            Hacer {roleLabels[next].toLowerCase()}
-          </Button>
+            className="w-40"
+          />
           <Button
             variant="ghost"
             size="sm"
@@ -389,7 +395,7 @@ function AddMembershipDialog({
         error={missing ? 'Elige una finca.' : undefined}
         exclude={user.memberships.map((membership) => membership.organizationId)}
       />
-      <Select label="Rol" options={roles} value={role} onChange={setRole} />
+      <Select label="Rol" options={roles} value={role} onChange={setRole} hint={roleHints[role]} />
       {add.isError && (
         <p role="alert" className="text-sm text-danger">
           {manageErrorMessage(add.error)}

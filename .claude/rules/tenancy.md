@@ -9,9 +9,10 @@ paths:
 |-----|------|-------|
 | `owner` | whole organization | everything in it |
 | `reviewer` | whole organization | inspections, events, notes, photos; edits only rows they created |
+| `viewer` ("Observador", B8) | whole organization | nothing |
 | platform admin (`profiles.is_platform_admin`) | every organization | only accounts and memberships: `admin-create-user`, `admin-update-user` and the `admin_*` RPCs (A6, A7); never history |
 
-- Reads: `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())`. Writes: `private.is_member(organization_id)` or `private.has_role(organization_id, 'owner')`. A new predicate becomes a helper in `private`, never a copy inside a policy.
+- Reads: `organization_id in (select private.my_organization_ids()) or (select private.is_platform_admin())`. Writes: `private.can_record(organization_id)` (owner or reviewer: history) or `private.has_role(organization_id, 'owner')`; never `is_member`, which also lets a viewer through. A new predicate becomes a helper in `private`, never a copy inside a policy.
 - In policies, wrap `auth.uid()` and every argument-free or set-returning helper in `(select …)` so it runs once per query, not once per row.
 - Every domain row carries `organization_id`; children denormalize it and a trigger checks it against the parent, so policies never join.
 - `organization_members` and `organization_invites` have no insert/update/delete grants: changes go through RPCs. Every RPC that changes memberships (including `accept_invite`) takes `private.lock_organization` **first** and checks the caller's role **after** the lock, so a caller demoted while waiting is refused.

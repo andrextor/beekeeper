@@ -18,13 +18,18 @@ export function NoAccessPage() {
   if (!session) return <Navigate to="/ingresar" replace />
 
   return (
-    <AuthLayout>
-      <div className="flex flex-col items-center gap-3 text-center">
-        <span className="flex size-12 items-center justify-center rounded-full bg-danger/10 text-danger">
-          <ShieldX size={22} aria-hidden />
+    <AuthLayout
+      title="Sin acceso al panel"
+      description="Este panel es solo para administradores de Landak Apiario."
+    >
+      <div className="flex items-center gap-3 rounded-card border border-border bg-surface p-4 shadow-xs">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-danger/10 text-danger">
+          <ShieldX size={20} aria-hidden />
         </span>
-        <p>Esta cuenta no tiene acceso al panel de administración.</p>
-        <p className="text-sm text-muted">{session.user.email}</p>
+        <p className="min-w-0 text-sm">
+          <span className="block font-medium break-all">{session.user.email}</span>
+          <span className="text-muted">no tiene permiso de administrador.</span>
+        </p>
       </div>
       <Button
         variant="secondary"

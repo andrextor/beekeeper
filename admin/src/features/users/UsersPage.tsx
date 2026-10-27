@@ -11,14 +11,12 @@ import { SearchInput } from '../../components/ui/SearchInput'
 import { fetchUsers, type UserRow } from '../../lib/admin-api'
 import { cx } from '../../lib/cx'
 import { formatDate } from '../../lib/format'
-import { roleLabels } from '../../lib/labels'
+import { roleLabels, roleTones } from '../../lib/labels'
 import { useListParams } from '../../lib/useListParams'
 
 function MembershipBadge({ membership }: { membership: UserRow['organizations'][number] }) {
   return (
-    <Badge
-      tone={membership.deleted_at ? 'danger' : membership.role === 'owner' ? 'primary' : 'neutral'}
-    >
+    <Badge tone={membership.deleted_at ? 'danger' : roleTones[membership.role]}>
       {roleLabels[membership.role]} · {membership.name}
       {membership.deleted_at && ' · Eliminado'}
     </Badge>

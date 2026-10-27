@@ -40,6 +40,7 @@ describe('parseMemberships', () => {
     const rows = [
       { id: 'a', name: 'Finca Landak', role: 'owner', deleted_at: null },
       { id: 'b', name: 'Cerrada', role: 'reviewer', deleted_at: '2026-10-28T00:00:00Z' },
+      { id: 'c', name: 'Vecina', role: 'viewer', deleted_at: null },
     ]
     expect(parseMemberships(rows)).toEqual(rows)
   })
