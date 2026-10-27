@@ -13,7 +13,7 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void
 }) {
   return (
-    <fieldset className="glass inline-flex gap-1 self-start rounded-control p-1 print:hidden">
+    <fieldset className="inline-flex gap-1 self-start rounded-card bg-muted-surface p-1 print:hidden">
       <legend className="sr-only">{label}</legend>
       {options.map((option) => (
         <button
@@ -22,10 +22,10 @@ export function Segmented<T extends string>({
           aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
           className={cx(
-            'min-h-11 rounded-control px-4 text-sm font-medium transition duration-200 md:min-h-9',
+            'min-h-11 rounded-control px-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:min-h-8',
             option.value === value
-              ? 'bg-primary text-on-primary shadow-sm'
-              : 'text-muted hover:bg-glass-field hover:text-text',
+              ? 'bg-surface text-text shadow-xs ring-1 ring-border'
+              : 'text-muted hover:text-text',
           )}
         >
           {option.label}
